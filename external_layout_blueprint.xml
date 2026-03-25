@@ -1,0 +1,150 @@
+<!--
+    ODOO LAYOUT EXTERNE — "BLUEPRINT"
+    Consultance IT B2B · Blanc + #1e7fc8
+    Remplace web.external_layout_wave
+    Variables Odoo 100% conservées.
+-->
+
+<t t-name="web.external_layout_wave">
+    <t t-set="header_shape_height" t-value="'230'"/>
+
+    <!-- ═══════ HEADER ═══════ -->
+    <div t-attf-class="o_company_#{company.id}_layout header {{report_type != 'pdf' and 'h-0'}}">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             t-attf-class="{{report_type == 'pdf' and 'position-fixed' or 'position-absolute'}} start-0 top-0 w-100 z-n1"
+             preserveAspectRatio="none"
+             t-att-height="header_shape_height"
+             viewBox="0 0 1000 240"
+             fill="none">
+
+            <!-- Bande pleine header -->
+            <rect x="0" y="0" width="1000" height="72"
+                  t-att-fill="company.primary_color" fill-opacity="1"/>
+
+            <!-- Diagonales décoratives dans la bande -->
+            <polygon points="680,0 780,0 730,72 630,72"
+                     fill="#ffffff" fill-opacity=".03"/>
+            <polygon points="760,0 840,0 790,72 710,72"
+                     fill="#ffffff" fill-opacity=".025"/>
+
+            <!-- Dot grid coin droit dans la bande -->
+            <g fill="#ffffff">
+                <circle cx="920" cy="14" r="1.2" fill-opacity=".14"/>
+                <circle cx="930" cy="14" r="1.2" fill-opacity=".12"/>
+                <circle cx="940" cy="14" r="1.2" fill-opacity=".10"/>
+                <circle cx="950" cy="14" r="1.2" fill-opacity=".08"/>
+                <circle cx="960" cy="14" r="1.2" fill-opacity=".06"/>
+                <circle cx="970" cy="14" r="1.2" fill-opacity=".04"/>
+
+                <circle cx="920" cy="24" r="1.2" fill-opacity=".12"/>
+                <circle cx="930" cy="24" r="1.2" fill-opacity=".10"/>
+                <circle cx="940" cy="24" r="1.2" fill-opacity=".08"/>
+                <circle cx="950" cy="24" r="1.2" fill-opacity=".06"/>
+                <circle cx="960" cy="24" r="1.2" fill-opacity=".04"/>
+                <circle cx="970" cy="24" r="1.2" fill-opacity=".03"/>
+
+                <circle cx="920" cy="34" r="1.2" fill-opacity=".10"/>
+                <circle cx="930" cy="34" r="1.2" fill-opacity=".08"/>
+                <circle cx="940" cy="34" r="1.2" fill-opacity=".06"/>
+                <circle cx="950" cy="34" r="1.2" fill-opacity=".04"/>
+                <circle cx="960" cy="34" r="1.2" fill-opacity=".03"/>
+                <circle cx="970" cy="34" r="1.2" fill-opacity=".02"/>
+
+                <circle cx="920" cy="44" r="1.2" fill-opacity=".08"/>
+                <circle cx="930" cy="44" r="1.2" fill-opacity=".06"/>
+                <circle cx="940" cy="44" r="1.2" fill-opacity=".04"/>
+                <circle cx="950" cy="44" r="1.2" fill-opacity=".03"/>
+                <circle cx="960" cy="44" r="1.2" fill-opacity=".02"/>
+                <circle cx="970" cy="44" r="1.2" fill-opacity=".02"/>
+            </g>
+
+            <!-- Barre accent sous bande -->
+            <rect x="0" y="72" width="300" height="2.5"
+                  t-att-fill="company.primary_color" fill-opacity=".25"/>
+            <rect x="300" y="72" width="700" height="1"
+                  t-att-fill="company.primary_color" fill-opacity=".06"/>
+
+            <!-- Ligne fine sous zone info -->
+            <line x1="0" y1="146" x2="1000" y2="146"
+                  t-att-stroke="company.primary_color" stroke-opacity=".08" stroke-width=".5"/>
+        </svg>
+
+        <!-- Logo + adresse dans la bande bleue -->
+        <div class="d-flex justify-content-between align-items-center"
+             style="padding: 16px 36px; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="gap: 14px;">
+                <img t-if="company.logo" class="o_company_logo"
+                     t-att-src="image_data_uri(company.logo)" alt="Logo"
+                     style="max-height: 42px; object-fit: contain; border-radius: 6px;"/>
+                <div t-if="company.report_header" t-field="company.report_header"
+                     class="o_company_tagline"
+                     style="font-size: 7.5pt; color: rgba(255,255,255,0.6); letter-spacing: 0.3px;">
+                    Company tagline</div>
+            </div>
+            <div name="company_address" class="text-end"
+                 style="font-size: 7.5pt; line-height: 1.55; color: rgba(255,255,255,0.75);">
+                <t t-call="web.company_address_list"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ BODY ═══════ -->
+    <t t-call="web.external_layout_body" custom_layout_address="True">
+        <t t-out="0"/>
+    </t>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <div t-attf-class="footer o_company_#{company.id}_layout {{report_type != 'pdf' and 'position-relative mt-auto mx-n5'}}">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             t-attf-class="{{report_type == 'pdf' and 'position-fixed start-0'}} w-100"
+             preserveAspectRatio="none"
+             t-att-height="report_type == 'pdf' and '180'"
+             viewBox="0 0 1000 180"
+             fill="none">
+
+            <!-- Barre accent haut footer (inversée header) -->
+            <rect x="700" y="48" width="300" height="2.5"
+                  t-att-fill="company.secondary_color" fill-opacity=".25"/>
+            <rect x="0" y="49" width="700" height="1"
+                  t-att-fill="company.secondary_color" fill-opacity=".06"/>
+
+            <!-- Zone de fond footer -->
+            <rect x="0" y="50" width="1000" height="130"
+                  fill="#f5f7fa" fill-opacity=".5"/>
+
+            <!-- Dot grid coin bas-gauche -->
+            <g t-att-fill="company.secondary_color">
+                <circle cx="20" cy="140" r="1.2" fill-opacity=".10"/>
+                <circle cx="30" cy="140" r="1.2" fill-opacity=".08"/>
+                <circle cx="40" cy="140" r="1.2" fill-opacity=".06"/>
+                <circle cx="50" cy="140" r="1.2" fill-opacity=".05"/>
+                <circle cx="60" cy="140" r="1.2" fill-opacity=".04"/>
+                <circle cx="70" cy="140" r="1.2" fill-opacity=".03"/>
+
+                <circle cx="20" cy="150" r="1.2" fill-opacity=".08"/>
+                <circle cx="30" cy="150" r="1.2" fill-opacity=".06"/>
+                <circle cx="40" cy="150" r="1.2" fill-opacity=".05"/>
+                <circle cx="50" cy="150" r="1.2" fill-opacity=".04"/>
+                <circle cx="60" cy="150" r="1.2" fill-opacity=".03"/>
+                <circle cx="70" cy="150" r="1.2" fill-opacity=".03"/>
+
+                <circle cx="20" cy="160" r="1.2" fill-opacity=".06"/>
+                <circle cx="30" cy="160" r="1.2" fill-opacity=".05"/>
+                <circle cx="40" cy="160" r="1.2" fill-opacity=".04"/>
+                <circle cx="50" cy="160" r="1.2" fill-opacity=".03"/>
+                <circle cx="60" cy="160" r="1.2" fill-opacity=".03"/>
+                <circle cx="70" cy="160" r="1.2" fill-opacity=".02"/>
+            </g>
+
+            <!-- Filet bas -->
+            <rect x="0" y="177" width="1000" height="3"
+                  t-att-fill="company.secondary_color" fill-opacity=".4"/>
+        </svg>
+
+        <t t-call="web.external_layout_footer_content"
+           is_centered_footer="True"
+           footer_content_classes="(report_type != 'pdf' and 'position-absolute end-0 start-0 bottom-0 mx-5 ' or '') + 'pt-5 text-center'"/>
+    </div>
+</t>

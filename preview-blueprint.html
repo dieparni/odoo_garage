@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview — Odoo Layout "Blueprint" — Consultance IT B2B</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --blue: #1e7fc8;
+    --blue-dark: #165d94;
+    --blue-light: #e8f2fb;
+    --blue-10: rgba(30,127,200,0.10);
+    --blue-06: rgba(30,127,200,0.06);
+    --blue-03: rgba(30,127,200,0.03);
+    --ink: #0f172a;
+    --ink-70: #3b4963;
+    --ink-45: #6b7a94;
+    --ink-20: #c0c8d6;
+    --ink-10: #e2e6ed;
+    --ink-05: #f1f3f6;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #e8ecf1;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+
+  /* ═══════════════════ A4 ═══════════════════ */
+  .a4 {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ═══════════════════ HEADER ═══════════════════ */
+  .hdr {
+    position: relative;
+    background: var(--white);
+    z-index: 1;
+  }
+
+  .hdr-top {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+    padding: 26px 44px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Motif géométrique dans la bande bleue */
+  .hdr-top::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 320px; height: 100%;
+    background:
+      linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.03) 50%, transparent 50%),
+      linear-gradient(135deg, transparent 55%, rgba(255,255,255,0.025) 55%, rgba(255,255,255,0.025) 70%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Dot grid dans le header bleu */
+  .hdr-top::after {
+    content: '';
+    position: absolute;
+    top: 10px; right: 16px;
+    width: 80px; height: 50px;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size: 10px 10px;
+    pointer-events: none;
+  }
+
+  .hdr-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+
+  .logo-box {
+    width: 46px; height: 46px;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 18px;
+    backdrop-filter: blur(4px);
+  }
+
+  .logo-text { color: white; }
+  .logo-text .name { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .logo-text .tagline {
+    font-size: 7.5pt;
+    font-weight: 400;
+    opacity: 0.65;
+    letter-spacing: 0.3px;
+    margin-top: 1px;
+  }
+
+  .co-addr {
+    text-align: right;
+    font-size: 7.5pt;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+  }
+  .co-addr strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+
+  /* Barre accent sous le header bleu */
+  .hdr-accent {
+    height: 3px;
+    background: linear-gradient(90deg,
+      var(--blue) 0%,
+      var(--blue) 30%,
+      var(--blue-light) 30%,
+      var(--blue-light) 100%
+    );
+  }
+
+  /* Zone info sous header */
+  .hdr-info {
+    padding: 18px 44px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--ink-10);
+  }
+
+  .client-block { font-size: 8.5pt; line-height: 1.6; }
+  .client-block .lbl {
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .client-block .cname { font-size: 10pt; font-weight: 700; color: var(--ink); }
+  .client-block .csub { color: var(--ink-45); }
+
+  .meta-pills {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pill {
+    background: var(--ink-05);
+    border-radius: 6px;
+    padding: 8px 14px;
+    text-align: center;
+  }
+  .pill .pk {
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--ink-45);
+    margin-bottom: 2px;
+  }
+  .pill .pv {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ═══════════════════ BODY ═══════════════════ */
+  .body { flex: 1; padding: 0 44px 24px; }
+
+  .doc-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 0 12px;
+  }
+  .doc-title h2 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .doc-title .ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: var(--ink-45);
+    background: var(--blue-06);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+
+  thead tr {
+    background: var(--blue);
+  }
+  thead th {
+    font-size: 6.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: white;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child { border-radius: 0 6px 0 0; text-align: right; }
+  thead th.r { text-align: right; }
+
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: var(--blue-03); }
+
+  tbody td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--ink-10);
+    vertical-align: top;
+  }
+  tbody td.r {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+  }
+
+  tbody tr:last-child td { border-bottom: 2px solid var(--blue-10); }
+
+  .ln-name { font-weight: 600; font-size: 8.5pt; color: var(--ink); }
+  .ln-desc { font-size: 7pt; color: var(--ink-45); margin-top: 2px; line-height: 1.4; }
+  .ln-tag {
+    display: inline-block;
+    font-size: 6pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--blue-10);
+    color: var(--blue);
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+
+  /* Totals */
+  .totals-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .totals-box {
+    width: 240px;
+    background: var(--ink-05);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+
+  .t-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 8.5pt;
+  }
+  .t-row .k { color: var(--ink-45); font-weight: 500; }
+  .t-row .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    font-weight: 500;
+    color: var(--ink-70);
+  }
+
+  .t-row.total {
+    border-top: 2px solid var(--blue);
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+  .t-row.total .k {
+    font-weight: 800;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-size: 7.5pt;
+    letter-spacing: 0.05em;
+  }
+  .t-row.total .v {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  /* Notes */
+  .notes {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: var(--blue-06);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 6px 6px 0;
+    font-size: 7.5pt;
+    color: var(--ink-70);
+    line-height: 1.6;
+  }
+  .notes strong { color: var(--ink); font-weight: 600; }
+
+  /* ═══════════════════ FOOTER ═══════════════════ */
+  .ftr {
+    position: relative;
+    margin-top: auto;
+    overflow: hidden;
+  }
+
+  .ftr-bar {
+    height: 3px;
+    background: linear-gradient(90deg,
+      var(--blue-light) 0%,
+      var(--blue-light) 70%,
+      var(--blue) 70%,
+      var(--blue) 100%
+    );
+  }
+
+  .ftr-content {
+    background: var(--ink-05);
+    padding: 14px 44px 12px;
+    position: relative;
+  }
+
+  /* Dot grid footer */
+  .ftr-content::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 16px;
+    width: 60px; height: 40px;
+    background-image:
+      radial-gradient(circle, var(--blue) 0.8px, transparent 0.8px);
+    background-size: 8px 8px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .ftr-grid {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 7pt;
+    color: var(--ink-45);
+    flex-wrap: wrap;
+  }
+
+  .ftr-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ftr-item .fi-icon {
+    width: 14px; height: 14px;
+    background: var(--blue-10);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7px; color: var(--blue);
+  }
+
+  .ftr-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ink-10);
+    font-size: 6.5pt;
+    color: var(--ink-20);
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .badge { display: none; }
+    .a4 { box-shadow: none; border-radius: 0; }
+    tbody tr:hover { background: none; }
+  }
+
+  @media (max-width: 800px) {
+    .a4 { width: 100%; min-height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="badge">▸ Preview — Layout "Blueprint" — IT B2B</div>
+
+<div class="a4">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-row">
+        <div class="logo-area">
+          <div class="logo-box">N</div>
+          <div class="logo-text">
+            <div class="name">Nexus Digital Consulting</div>
+            <div class="tagline">Cloud · Data · Software Engineering</div>
+          </div>
+        </div>
+        <div class="co-addr">
+          <strong>Rue du Stand 14, 1204 Genève</strong><br>
+          +41 22 518 90 00 · info@nexus-digital.ch<br>
+          CHE-456.789.012 TVA
+        </div>
+      </div>
+    </div>
+    <div class="hdr-accent"></div>
+
+    <div class="hdr-info">
+      <div class="client-block">
+        <div class="lbl">Facturé à</div>
+        <div class="cname">Mercier Capital Management Sàrl</div>
+        <div class="csub">
+          Laurent Mercier<br>
+          Avenue de la Gare 18<br>
+          1003 Lausanne, Suisse
+        </div>
+      </div>
+      <div class="meta-pills">
+        <div class="pill">
+          <div class="pk">Date</div>
+          <div class="pv">12.02.2026</div>
+        </div>
+        <div class="pill">
+          <div class="pk">Échéance</div>
+          <div class="pv">14.03.2026</div>
+        </div>
+        <div class="pill">
+          <div class="pk">Ref. client</div>
+          <div class="pv">PO-2026-089</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BODY ═══ -->
+  <div class="body">
+    <div class="doc-title">
+      <h2>Facture</h2>
+      <span class="ref">INV/2026/0042</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44%">Prestation</th>
+          <th style="width:8%">Jours</th>
+          <th class="r" style="width:14%">TJM</th>
+          <th class="r" style="width:10%">TVA</th>
+          <th class="r" style="width:24%">Montant CHF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="ln-name">Architecture cloud Azure</div>
+            <div class="ln-desc">Design infrastructure, sizing, migration plan — Sprint 1-3</div>
+            <span class="ln-tag">Infrastructure</span>
+          </td>
+          <td>3.0</td>
+          <td class="r">1 760.00</td>
+          <td class="r">8.1%</td>
+          <td class="r">5 280.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ln-name">Développement API Gateway</div>
+            <div class="ln-desc">REST API .NET 8, auth OAuth2, rate limiting, structured logging</div>
+            <span class="ln-tag">Développement</span>
+          </td>
+          <td>4.0</td>
+          <td class="r">1 560.00</td>
+          <td class="r">8.1%</td>
+          <td class="r">6 240.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ln-name">Migration SQL Server → Azure SQL</div>
+            <div class="ln-desc">Audit schéma, optimisation index, migration données 2.4 TB</div>
+            <span class="ln-tag">Data</span>
+          </td>
+          <td>2.0</td>
+          <td class="r">1 920.00</td>
+          <td class="r">8.1%</td>
+          <td class="r">3 840.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="ln-name">Support &amp; maintenance mensuel</div>
+            <div class="ln-desc">SLA 4h, monitoring 24/7, patch management — Février 2026</div>
+            <span class="ln-tag">SLA</span>
+          </td>
+          <td>—</td>
+          <td class="r">1 800.00</td>
+          <td class="r">8.1%</td>
+          <td class="r">1 800.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals-wrap">
+      <div class="totals-box">
+        <div class="t-row">
+          <span class="k">Sous-total HT</span>
+          <span class="v">17 160.00</span>
+        </div>
+        <div class="t-row">
+          <span class="k">TVA 8.1%</span>
+          <span class="v">1 389.96</span>
+        </div>
+        <div class="t-row total">
+          <span class="k">Total TTC</span>
+          <span class="v">CHF 18 549.96</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <strong>Conditions :</strong> Paiement net 30 jours. Passé ce délai, un intérêt moratoire de 5% l'an sera appliqué conformément à l'art. 104 CO. Merci de mentionner la référence <strong>INV/2026/0042</strong> lors du virement.
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <div class="ftr">
+    <div class="ftr-bar"></div>
+    <div class="ftr-content">
+      <div class="ftr-grid">
+        <div class="ftr-item">
+          <div class="fi-icon">✉</div>
+          <span>info@nexus-digital.ch</span>
+        </div>
+        <div class="ftr-item">
+          <div class="fi-icon">☎</div>
+          <span>+41 22 518 90 00</span>
+        </div>
+        <div class="ftr-item">
+          <div class="fi-icon">⌂</div>
+          <span>www.nexus-digital.ch</span>
+        </div>
+        <div class="ftr-item">
+          <div class="fi-icon">₣</div>
+          <span>IBAN CH48 0024 3243 5678 9012 A</span>
+        </div>
+      </div>
+      <div class="ftr-bottom">
+        <span>Nexus Digital Consulting SA · RC Genève · CHE-456.789.012</span>
+        <span>Page 1 / 1</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
