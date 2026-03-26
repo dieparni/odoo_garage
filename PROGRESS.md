@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 3 — 2026-03-26
-## Statut global : Phase 1 terminée (Agents 1-3)
+## Dernier agent : 4 — 2026-03-26
+## Statut global : Phase 2 en cours (Agent 4 terminé)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -27,12 +27,27 @@
   - Menus: Réception > Devis, Atelier > OR
   - `tests/test_quotation.py` — 18 tests (workflow, compute, conversion, supplément)
   - Installation OK, 0 erreurs, 52 tests passent
+- Agent 4 : Métiers — Carrosserie, Peinture, Mécanique (2026-03-26)
+  - `models/constants.py` — DAMAGE_ZONES, DAMAGE_LEVELS partagés
+  - `models/bodywork_operation.py` — garage.bodywork.operation (workflow 4 états, auto-création peinture)
+  - `models/paint_operation.py` — garage.paint.operation (workflow 7 états : waiting→prep→booth→drying→polish→done, rework)
+  - `models/paint_formula.py` — garage.paint.formula (code constructeur, spectro, variantes)
+  - `models/paint_consumption.py` — garage.paint.consumption (produits, coûts compute)
+  - `models/mechanic_operation.py` — garage.mechanic.operation (workflow 4 états, OBD, pneus, entretien)
+  - `models/maintenance_plan.py` — garage.maintenance.plan + item (intervalles km/mois, compute next/overdue)
+  - One2many + counts sur repair_order (bodywork/paint/mechanic_operation_ids)
+  - `views/trade_views.xml` — form+tree+search pour chaque métier + onglets inline dans OR form
+  - Menus Atelier : Carrosserie, Peinture, Mécanique, Plans d'entretien
+  - Menu Config : Formules peinture
+  - Sécurité : 20 règles ACL (technician/chief/manager) pour 7 nouveaux modèles
+  - `hr` ajouté aux depends (technician_id sur les 3 opérations)
+  - `tests/test_trades.py` — 23 tests (workflows, auto-paint, consumption, maintenance)
+  - Installation OK, 0 erreurs, 75 tests passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 4 : Métiers (Carrosserie, Peinture, Mécanique) — spec `05_06_07_trades.md`
 - Agent 5 : Planning & Ressources — spec `08_09_10_11_planning_stock_sub_courtesy.md`
 - Agent 6 : Pièces & Stock — idem
 - Agent 7 : Sous-traitance & Courtoisie — idem
@@ -45,11 +60,12 @@
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - TVA fixée à 21% en dur — à rendre configurable via ir.config_parameter
 - portal.mixin non inclus sur quotation/OR (nécessite module portal, à ajouter avec Agent 9)
+- Création `product.product` en tests échoue si `purchase` installé (contrainte NOT NULL sur `purchase_line_warn`) — contourné en utilisant un produit existant
 
 ### 📝 Champs différés (dépendent de modèles futurs)
-- `vehicle.paint_formula_ids` → garage.paint.formula (Agent 4)
+- `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
 - `vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)
-- `repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5, nécessite `hr` dans depends)
+- `repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)
 - `repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)
 - `repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)
 - `repair_order.courtesy_loan_id`, `has_courtesy_vehicle` → garage.courtesy.loan (Agent 7)
@@ -59,12 +75,14 @@
 - `ro_line.stock_move_ids`, `parts_received` → stock.move (Agent 6)
 - `claim.document_ids` → garage.documentation (Agent 9)
 - `customer.total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date` → Agents 3+8
+- `paint_consumption` → stock.move pour décrémentation stock (Agent 6)
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 52 tests passent (0 fail, 0 error)
-- Phase 1 complète : véhicules + clients + assurances + devis + OR
-- Agent 4 doit lire `05_06_07_trades.md` pour les opérations métier
-- Penser à ajouter `hr` aux depends quand les techniciens seront implémentés
+- 75 tests passent (0 fail, 0 error)
+- Phase 1 complète + Agent 4 (métiers) terminé
+- `hr` est maintenant dans les depends (pour technician_id sur les opérations)
+- Agent 5 doit lire la spec `08_09_10_11_planning_stock_sub_courtesy.md` pour le planning
 - Les actions QC (action_request_qc, action_validate_qc) sont simplifiées — à enrichir avec Agent 9
 - La facturation (action_create_invoice) est différée à Agent 8
+- Les consommations peinture ne décrémentent pas encore le stock (Agent 6)
