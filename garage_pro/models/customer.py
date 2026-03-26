@@ -45,6 +45,7 @@ class ResPartner(models.Model):
         'fleet.vehicle',
         'driver_id',
         string="Véhicules (conducteur)",
+        domain=[('active', '=', True)],
     )
     owned_vehicle_ids = fields.One2many(
         'fleet.vehicle',

@@ -8,9 +8,10 @@ class GaragePaintSystem(models.Model):
 
     _name = 'garage.paint.system'
     _description = 'Système de peinture (fabricant)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
-    name = fields.Char(string="Nom", required=True)
+    name = fields.Char(string="Nom", required=True, tracking=True)
     code = fields.Char(string="Code")
     supplier_id = fields.Many2one('res.partner', string="Fournisseur")
     active = fields.Boolean(default=True)

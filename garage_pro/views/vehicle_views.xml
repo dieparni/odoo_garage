@@ -9,8 +9,8 @@
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
-            <!-- Référence garage après le name -->
-            <xpath expr="//field[@name='license_plate']" position="after">
+            <!-- Référence garage dans le groupe Vehicle -->
+            <xpath expr="//field[@name='vin_sn']" position="before">
                 <field name="garage_ref" readonly="1"/>
             </xpath>
 
@@ -97,10 +97,9 @@
     <record id="garage_vehicle_tree" model="ir.ui.view">
         <field name="name">fleet.vehicle.tree.garage</field>
         <field name="model">fleet.vehicle</field>
-        <field name="inherit_id" ref="fleet.fleet_vehicle_view_list"/>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='license_plate']" position="after">
-                <field name="vin_sn" string="VIN" optional="show"/>
+            <xpath expr="//field[@name='vin_sn']" position="after">
                 <field name="body_type" optional="hide"/>
                 <field name="paint_code" optional="hide"/>
                 <field name="garage_ref" optional="hide"/>
@@ -116,10 +115,11 @@
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <field name="vin_sn" string="VIN"/>
+            <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="paint_code"/>
                 <field name="engine_code"/>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="after">
                 <separator/>
                 <filter string="Sous garantie" name="filter_warranty"
                         domain="[('is_under_warranty', '=', True)]"/>

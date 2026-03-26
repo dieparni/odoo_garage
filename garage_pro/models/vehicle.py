@@ -78,7 +78,7 @@ class GarageVehicle(models.Model):
         ('rwd', 'Propulsion (RWD)'),
         ('awd', 'Intégrale (AWD)'),
         ('4wd', '4x4 (4WD)'),
-    ], string="Transmission")
+    ], string="Type de transmission")
 
     # === ÉLECTRIQUE / HYBRIDE ===
     is_electric = fields.Boolean(
@@ -200,6 +200,9 @@ class GarageVehicle(models.Model):
                         "Le VIN contient des caractères invalides "
                         "(I, O, Q interdits)."
                     )
+                # Normaliser en majuscules
+                if rec.vin_sn != vin:
+                    rec.vin_sn = vin
 
     # ------------------------------------------------------------------
     # CRUD
