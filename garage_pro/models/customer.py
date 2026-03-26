@@ -147,6 +147,7 @@ class ResPartner(models.Model):
     last_visit_date = fields.Date(
         string="Dernière visite",
         compute='_compute_last_visit_date',
+        store=True,
     )
     garage_invoice_count = fields.Integer(
         string="Nombre factures garage",

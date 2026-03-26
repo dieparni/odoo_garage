@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ class GarageRepairOrder(models.Model):
 
     _name = 'garage.repair.order'
     _description = 'Ordre de réparation'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(
@@ -233,6 +234,19 @@ class GarageRepairOrder(models.Model):
     )
     quality_checklist_count = fields.Integer(
         compute='_compute_quality_checklist_count',
+    )
+    qc_validated = fields.Boolean(
+        string="QC validé",
+        readonly=True,
+    )
+    qc_validated_by = fields.Many2one(
+        'res.users',
+        string="QC validé par",
+        readonly=True,
+    )
+    qc_validated_date = fields.Datetime(
+        string="Date validation QC",
+        readonly=True,
     )
 
     # === DOCUMENTATION ===
@@ -543,12 +557,27 @@ class GarageRepairOrder(models.Model):
         })
 
     def action_request_qc(self):
-        """Remontage → Contrôle qualité."""
+        """Remontage → Contrôle qualité. Auto-crée une checklist si aucune."""
         self.write({'state': 'qc_pending'})
+        for rec in self:
+            if not rec.quality_checklist_ids:
+                self.env['garage.quality.checklist'].create_from_repair_order(rec)
 
     def action_validate_qc(self):
-        """QC → QC validé."""
-        self.write({'state': 'qc_done'})
+        """QC → QC validé. Vérifie que la checklist est complète."""
+        for rec in self:
+            checklists = rec.quality_checklist_ids
+            if checklists and not all(cl.is_fully_checked for cl in checklists):
+                raise UserError(
+                    "Tous les points de contrôle doivent être remplis "
+                    "avant de valider le QC."
+                )
+        self.write({
+            'state': 'qc_done',
+            'qc_validated': True,
+            'qc_validated_by': self.env.uid,
+            'qc_validated_date': fields.Datetime.now(),
+        })
 
     def action_ready(self):
         """QC validé → Prêt à livrer. Notifie le client."""
@@ -561,20 +590,31 @@ class GarageRepairOrder(models.Model):
                 template.send_mail(rec.id, force_send=False)
 
     def action_deliver(self):
-        """Prêt → Livré. Restitution du véhicule."""
+        """Prêt → Livré. Restitution du véhicule + courtoisie + notification."""
         self.write({
             'state': 'delivered',
             'actual_end_date': fields.Datetime.now(),
             'vehicle_location': 'delivered',
         })
-        # Mettre à jour l'odomètre si saisi
         for rec in self:
+            # Mettre à jour l'odomètre si saisi
             if rec.odometer_at_exit and rec.vehicle_id:
                 self.env['fleet.vehicle.odometer'].create({
                     'vehicle_id': rec.vehicle_id.id,
                     'value': rec.odometer_at_exit,
                     'date': fields.Date.today(),
                 })
+            # Restituer automatiquement le véhicule de courtoisie
+            if (rec.courtesy_loan_id
+                    and rec.courtesy_loan_id.state == 'active'):
+                rec.courtesy_loan_id.action_return()
+        # Notification client — véhicule prêt / livré
+        template = self.env.ref(
+            'garage_pro.email_template_or_ready', raise_if_not_found=False
+        )
+        if template:
+            for rec in self:
+                template.send_mail(rec.id, force_send=False)
 
     def action_cancel(self):
         """Annuler l'OR."""

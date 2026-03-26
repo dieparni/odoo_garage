@@ -18,6 +18,8 @@ DAMAGE_ZONES = [
     ('sill_r', 'Bas de caisse droit'),
     ('windshield', 'Pare-brise'),
     ('rear_window', 'Lunette arrière'),
+    ('side_window_l', 'Vitre latérale gauche'),
+    ('side_window_r', 'Vitre latérale droite'),
     ('mirror_l', 'Rétroviseur gauche'),
     ('mirror_r', 'Rétroviseur droit'),
     ('underbody', 'Soubassement'),

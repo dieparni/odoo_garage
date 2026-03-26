@@ -2,6 +2,8 @@
 
 from odoo import api, fields, models
 
+from .constants import DAMAGE_ZONES
+
 
 class GarageRepairOrderLine(models.Model):
     """Ligne d'OR — identique à la ligne de devis avec suivi d'exécution."""
@@ -67,6 +69,13 @@ class GarageRepairOrderLine(models.Model):
         currency_field='currency_id',
     )
 
+    # === TECHNICIEN ===
+    technician_id = fields.Many2one(
+        'hr.employee',
+        string="Technicien",
+        domain="[('is_garage_technician', '=', True)]",
+    )
+
     # === EXÉCUTION ===
     actual_time = fields.Float(
         string="Temps réel passé (heures)",
@@ -76,26 +85,10 @@ class GarageRepairOrderLine(models.Model):
     done_date = fields.Datetime(string="Date fin")
 
     # === ZONE CARROSSERIE ===
-    damage_zone = fields.Selection([
-        ('front_bumper', 'Pare-chocs avant'),
-        ('rear_bumper', 'Pare-chocs arrière'),
-        ('hood', 'Capot'),
-        ('trunk', 'Coffre'),
-        ('roof', 'Toit'),
-        ('fender_fl', 'Aile avant gauche'),
-        ('fender_fr', 'Aile avant droite'),
-        ('fender_rl', 'Aile arrière gauche'),
-        ('fender_rr', 'Aile arrière droite'),
-        ('door_fl', 'Porte avant gauche'),
-        ('door_fr', 'Porte avant droite'),
-        ('door_rl', 'Porte arrière gauche'),
-        ('door_rr', 'Porte arrière droite'),
-        ('sill_l', 'Bas de caisse gauche'),
-        ('sill_r', 'Bas de caisse droit'),
-        ('windshield', 'Pare-brise'),
-        ('rear_window', 'Lunette arrière'),
-        ('other', 'Autre'),
-    ], string="Zone endommagée")
+    damage_zone = fields.Selection(
+        DAMAGE_ZONES,
+        string="Zone endommagée",
+    )
 
     damage_level = fields.Selection([
         ('light', 'Léger (retouche/débosselage)'),

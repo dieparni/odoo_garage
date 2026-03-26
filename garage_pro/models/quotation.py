@@ -11,7 +11,7 @@ class GarageQuotation(models.Model):
 
     _name = 'garage.quotation'
     _description = 'Devis garage'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _order = 'create_date desc'
 
     name = fields.Char(

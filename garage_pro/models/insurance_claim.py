@@ -165,6 +165,20 @@ class GarageInsuranceClaim(models.Model):
         store=True,
     )
 
+    # === SUIVI FACTURATION ===
+    invoiced_amount = fields.Monetary(
+        string="Montant facturé",
+        compute='_compute_invoiced_paid',
+        store=True,
+        currency_field='currency_id',
+    )
+    paid_amount = fields.Monetary(
+        string="Montant encaissé",
+        compute='_compute_invoiced_paid',
+        store=True,
+        currency_field='currency_id',
+    )
+
     # === VEI ===
     is_vei = fields.Boolean(string="Véhicule Économiquement Irréparable")
     vei_vehicle_value = fields.Monetary(
@@ -241,6 +255,21 @@ class GarageInsuranceClaim(models.Model):
     def _compute_supplement_count(self):
         for rec in self:
             rec.supplement_count = len(rec.supplement_ids)
+
+    @api.depends('repair_order_id.invoice_ids.amount_total_signed',
+                 'repair_order_id.invoice_ids.payment_state',
+                 'repair_order_id.invoice_ids.state')
+    def _compute_invoiced_paid(self):
+        for rec in self:
+            invoices = rec.repair_order_id.invoice_ids.filtered(
+                lambda m: m.state == 'posted' and m.move_type == 'out_invoice'
+            ) if rec.repair_order_id else self.env['account.move']
+            rec.invoiced_amount = sum(invoices.mapped('amount_total_signed'))
+            rec.paid_amount = sum(
+                inv.amount_total_signed
+                for inv in invoices
+                if inv.payment_state in ('paid', 'in_payment')
+            )
 
     @api.depends('document_ids')
     def _compute_document_count(self):
