@@ -56,6 +56,7 @@
                             <field name="customer_id"/>
                             <field name="invoice_partner_id"/>
                             <field name="claim_id"/>
+                            <field name="is_insurance_claim" invisible="1"/>
                             <field name="user_id"/>
                         </group>
                     </group>

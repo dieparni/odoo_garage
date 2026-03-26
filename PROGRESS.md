@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 15 (bugfix auto-PO) — 2026-03-26
-## Statut global : Tous agents terminés (1-14) ✅ — bugfix appliqué
+## Dernier agent : 16 (gap spec closure) — 2026-03-26
+## Statut global : Tous agents terminés (1-14) ✅ — bugfix 15 + gaps 16 comblés
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -155,6 +155,20 @@
   - `tests/test_portal_vat_po.py` — 16 tests (TVA 21%/17%/0%, TVA sur OR, settings, stock disponible, rupture stock, activité, PO/message, MO sans PO, fournisseur manquant, templates portail, visibilité document)
   - Installation OK, 0 erreurs, 262 tests garage_pro passent
 
+- Agent 16 : Comblement des gaps spec (2026-03-26)
+  - `vehicle.total_spent` — champ monétaire calculé (somme des OR non-brouillon)
+  - `quotation.insurance_amount` / `franchise_amount_computed` — répartition assurance/franchise sur devis
+  - `insurance_claim.action_request_supplement()` — ouvre wizard supplément
+  - `insurance_claim.action_start_work()` — Approuvé → Travaux en cours (vérifie OR)
+  - `wizard/supplement_wizard.py` — garage.insurance.supplement.wizard (crée supplément + état sinistre)
+  - Boutons "Démarrer travaux" et "Demander supplément" dans claim form
+  - Vue wizard supplément dans claim_views.xml
+  - Champs split assurance/franchise dans quotation form footer
+  - Champ total_spent dans vehicle form
+  - Sécurité : 2 règles ACL pour le wizard supplément
+  - `tests/test_gaps.py` — 11 tests (total_spent, insurance split, start_work, supplement wizard)
+  - Installation OK, 0 erreurs, 273 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
@@ -188,8 +202,8 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **262 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-14) sont terminés** + bugfix agent 15
+- **273 tests garage_pro passent** (0 fail, 0 error)
+- **Tous les agents (1-14) sont terminés** + bugfix agent 15 + gaps agent 16
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos

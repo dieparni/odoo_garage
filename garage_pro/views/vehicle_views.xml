@@ -26,6 +26,8 @@
             <!-- Référence garage dans le groupe Vehicle -->
             <xpath expr="//field[@name='vin_sn']" position="before">
                 <field name="garage_ref" readonly="1"/>
+                <field name="total_spent" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
             </xpath>
 
             <!-- Notebook pages garage -->

@@ -172,10 +172,6 @@ class GarageVehicle(models.Model):
         compute='_compute_total_spent',
         currency_field='currency_id',
     )
-    currency_id = fields.Many2one(
-        'res.currency',
-        default=lambda self: self.env.company.currency_id,
-    )
 
     # === CARVERTICAL ===
     carvertical_last_check = fields.Datetime(
