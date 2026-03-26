@@ -100,4 +100,9 @@
     <menuitem id="garage_menu_insurance_companies" name="Compagnies"
         parent="garage_menu_insurance"
         action="garage_insurance_company_action" sequence="20"/>
+
+    <!-- Configuration : CarVertical -->
+    <menuitem id="garage_menu_carvertical_cache" name="Cache CarVertical"
+        parent="garage_menu_config"
+        action="garage_carvertical_cache_action" sequence="40"/>
 </odoo>

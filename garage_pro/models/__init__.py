@@ -26,3 +26,5 @@ from . import account_move
 from . import quality_checklist
 from . import documentation
 from . import report_revenue
+from . import carvertical_cache
+from . import res_config_settings

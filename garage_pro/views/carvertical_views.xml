@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Wizard CarVertical Lookup — Form                             -->
+    <!-- ============================================================ -->
+    <record id="garage_carvertical_wizard_form" model="ir.ui.view">
+        <field name="name">CarVertical Lookup</field>
+        <field name="model">garage.carvertical.lookup.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="state" invisible="1"/>
+                <group invisible="state != 'input'">
+                    <field name="vin"/>
+                    <field name="vehicle_id" invisible="1"/>
+                </group>
+                <group invisible="state != 'result'">
+                    <group string="Identification">
+                        <field name="result_make" readonly="1"/>
+                        <field name="result_model" readonly="1"/>
+                        <field name="result_year" readonly="1"/>
+                        <field name="result_body_type" readonly="1"/>
+                        <field name="result_color" readonly="1"/>
+                    </group>
+                    <group string="Moteur">
+                        <field name="result_engine_code" readonly="1"/>
+                        <field name="result_displacement" readonly="1"/>
+                        <field name="result_power_kw" readonly="1"/>
+                        <field name="result_fuel_type" readonly="1"/>
+                        <field name="result_transmission" readonly="1"/>
+                        <field name="result_drivetrain" readonly="1"/>
+                    </group>
+                    <group string="Historique">
+                        <field name="result_last_mileage" readonly="1"/>
+                        <field name="result_mileage_tampered" readonly="1"/>
+                        <field name="result_damage_count" readonly="1"/>
+                        <field name="result_recall_count" readonly="1"/>
+                        <field name="result_registration_count" readonly="1"/>
+                    </group>
+                    <group string="Détails">
+                        <field name="result_damage_summary" readonly="1"/>
+                        <field name="result_recall_summary" readonly="1"/>
+                        <field name="result_report_url" widget="url" readonly="1"/>
+                    </group>
+                </group>
+                <group invisible="state != 'error'">
+                    <field name="error_message" readonly="1"/>
+                </group>
+                <footer>
+                    <button string="Rechercher" name="action_search" type="object"
+                        class="btn-primary"
+                        invisible="state != 'input'"/>
+                    <button string="Appliquer au véhicule" name="action_apply_to_vehicle"
+                        type="object" class="btn-primary"
+                        invisible="state != 'result'"/>
+                    <button string="Nouvelle recherche" name="action_search" type="object"
+                        invisible="state not in ('result', 'error')"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Vehicle form — Bouton CarVertical + onglet CarVertical        -->
+    <!-- ============================================================ -->
+    <record id="garage_vehicle_form_carvertical" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.carvertical</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="garage_vehicle_form"/>
+        <field name="arch" type="xml">
+            <!-- Bouton smart CarVertical -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_carvertical_lookup" type="object"
+                        class="oe_stat_button" icon="fa-car"
+                        invisible="not vin_sn">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">CarVertical</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Onglet CarVertical dans le notebook -->
+            <xpath expr="//page[@name='page_notes']" position="before">
+                <page string="CarVertical" name="page_carvertical">
+                    <group>
+                        <group string="Vérification historique">
+                            <field name="carvertical_last_check"/>
+                            <field name="carvertical_mileage_ok"/>
+                            <field name="carvertical_report_url" widget="url"/>
+                        </group>
+                        <group string="Dommages signalés">
+                            <field name="carvertical_damage_history"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="carvertical_last_check">
+                        <strong>Aucune vérification CarVertical effectuée.</strong>
+                        Cliquez sur le bouton « CarVertical » pour lancer une recherche.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- CarVertical Cache — Tree + Form + Action                     -->
+    <!-- ============================================================ -->
+    <record id="garage_carvertical_cache_tree" model="ir.ui.view">
+        <field name="name">garage.carvertical.cache.tree</field>
+        <field name="model">garage.carvertical.cache</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="vin"/>
+                <field name="lookup_date"/>
+                <field name="is_expired"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="garage_carvertical_cache_form" model="ir.ui.view">
+        <field name="name">garage.carvertical.cache.form</field>
+        <field name="model">garage.carvertical.cache</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="vin"/>
+                    <field name="lookup_date"/>
+                    <field name="is_expired"/>
+                </group>
+                <group string="Réponse brute">
+                    <field name="raw_response" readonly="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="garage_carvertical_cache_action" model="ir.actions.act_window">
+        <field name="name">Cache CarVertical</field>
+        <field name="res_model">garage.carvertical.cache</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Configuration — Paramètres CarVertical                       -->
+    <!-- ============================================================ -->
+    <record id="garage_res_config_settings_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.garage</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Garage" string="Garage" groups="garage_pro.group_manager">
+                    <block title="CarVertical" name="carvertical_settings">
+                        <setting string="Clé API CarVertical"
+                                 help="Saisissez votre clé API CarVertical pour activer la recherche d'historique véhicule">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="carvertical_api_key" class="col-lg-3 o_light_label"/>
+                                    <field name="carvertical_api_key"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Recherche automatique"
+                                 help="Lancer automatiquement une recherche CarVertical lors de la saisie d'un VIN">
+                            <field name="carvertical_auto_lookup"/>
+                        </setting>
+                        <setting string="Durée du cache"
+                                 help="Nombre de jours pendant lesquels un résultat CarVertical est considéré comme valide">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="carvertical_cache_days" class="col-lg-3 o_light_label"/>
+                                    <field name="carvertical_cache_days"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

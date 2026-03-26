@@ -72,3 +72,7 @@ access_report_revenue_manager,garage.report.revenue manager,model_garage_report_
 access_report_activity_receptionist,garage.report.activity receptionist,model_garage_report_activity,garage_pro.group_receptionist,1,0,0,0
 access_report_activity_chief,garage.report.activity chief,model_garage_report_activity,garage_pro.group_workshop_chief,1,0,0,0
 access_report_activity_manager,garage.report.activity manager,model_garage_report_activity,garage_pro.group_manager,1,0,0,0
+access_carvertical_cache_receptionist,garage.carvertical.cache receptionist,model_garage_carvertical_cache,garage_pro.group_receptionist,1,0,0,0
+access_carvertical_cache_manager,garage.carvertical.cache manager,model_garage_carvertical_cache,garage_pro.group_manager,1,1,1,1
+access_carvertical_wizard_receptionist,garage.carvertical.lookup.wizard receptionist,model_garage_carvertical_lookup_wizard,garage_pro.group_receptionist,1,1,1,0
+access_carvertical_wizard_manager,garage.carvertical.lookup.wizard manager,model_garage_carvertical_lookup_wizard,garage_pro.group_manager,1,1,1,1

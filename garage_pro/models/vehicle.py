@@ -157,6 +157,25 @@ class GarageVehicle(models.Model):
         string="Nombre d'OR",
     )
 
+    # === CARVERTICAL ===
+    carvertical_last_check = fields.Datetime(
+        string="Dernière vérification CarVertical",
+        readonly=True,
+    )
+    carvertical_report_url = fields.Char(
+        string="Rapport CarVertical",
+        readonly=True,
+    )
+    carvertical_mileage_ok = fields.Boolean(
+        string="Kilométrage vérifié OK",
+        readonly=True,
+        help="Indique que le kilométrage n'a pas été falsifié selon CarVertical",
+    )
+    carvertical_damage_history = fields.Text(
+        string="Historique dommages CarVertical",
+        readonly=True,
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
 
@@ -253,6 +272,22 @@ class GarageVehicle(models.Model):
             'res_model': 'garage.insurance.claim',
             'view_mode': 'tree,form',
             'domain': [('vehicle_id', '=', self.id)],
+        }
+
+    def action_carvertical_lookup(self):
+        """Ouvre le wizard de recherche CarVertical pré-rempli avec le VIN du véhicule."""
+        self.ensure_one()
+        wizard = self.env['garage.carvertical.lookup.wizard'].create({
+            'vehicle_id': self.id,
+            'vin': self.vin_sn or '',
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Recherche CarVertical',
+            'res_model': 'garage.carvertical.lookup.wizard',
+            'res_id': wizard.id,
+            'view_mode': 'form',
+            'target': 'new',
         }
 
     def action_view_repair_orders(self):
