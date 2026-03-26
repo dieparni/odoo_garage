@@ -45,7 +45,7 @@ class GarageReportRevenue(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
                 SELECT
-                    row_number() OVER () AS id,
+                    MIN(rol.id) AS id,
                     ro.actual_end_date::date AS date,
                     to_char(ro.actual_end_date, 'YYYY-MM') AS month,
                     to_char(ro.actual_end_date, 'YYYY') AS year,
@@ -126,7 +126,7 @@ class GarageReportActivity(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
                 SELECT
-                    row_number() OVER () AS id,
+                    MIN(ro.id) AS id,
                     ro.actual_end_date::date AS date,
                     to_char(ro.actual_end_date, 'YYYY-MM') AS month,
                     to_char(ro.actual_end_date, 'YYYY') AS year,

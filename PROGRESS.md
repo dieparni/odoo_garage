@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 9 — 2026-03-26
-## Statut global : Phase 3 terminée (Agents 1 à 9 terminés)
+## Dernier agent : 10 — 2026-03-26
+## Statut global : Phase 4 terminée (Agents 1 à 10 terminés)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -103,11 +103,20 @@
   - `tests/test_quality_docs.py` — 25 tests (checklist auto, items par métier, résultats, crons, templates, actions)
   - Installation OK, 0 erreurs, 169 tests garage_pro passent
 
+- Agent 10 : Reporting & Dashboards (2026-03-26)
+  - `models/report_revenue.py` — garage.report.revenue (vue SQL `_auto = False`, CA par activité/période/client/véhicule)
+  - `models/report_revenue.py` — garage.report.activity (vue SQL `_auto = False`, KPIs atelier : productivité, délai moyen, heures)
+  - IDs déterministes via `MIN(rol.id)` / `MIN(ro.id)` (pas `row_number() OVER ()`)
+  - `views/reporting_views.xml` — search+tree+pivot+graph pour revenue et activity, dashboard action
+  - Menus : Reporting > Tableau de bord, Reporting > Chiffre d'affaires, Reporting > Activité atelier
+  - Sécurité : 6 règles ACL (receptionist/chief/manager) pour 2 modèles report
+  - `tests/test_reporting.py` — 20 tests (vues SQL, agrégation CA, types activité, montants, exclusion draft/annulé, heures, délai moyen, multi-OR)
+  - Installation OK, 0 erreurs, 189 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 10 : Reporting & Dashboards — spec `12_to_16_billing_comms_quality_reporting.md` (Module 16)
 - Agent 11 : CarVertical (Phase 2) — spec `carvertical.md`
 
 ### ⚠️ Problèmes connus
@@ -135,10 +144,9 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 169 tests garage_pro passent (0 fail, 0 error)
-- Phases 1-3 complètes (Agents 1 à 9)
-- Agent 10 doit lire la spec `12_to_16_billing_comms_quality_reporting.md` section Module 16 (Reporting)
-- Agent 10 doit créer : garage.report.revenue (SQL view `_auto = False`), dashboard XML (kanban avec widgets aggregate/pie_chart/bar_chart)
+- 189 tests garage_pro passent (0 fail, 0 error)
+- Phases 1-4 complètes (Agents 1 à 10)
+- Agent 11 doit lire la spec `carvertical.md` (intégration API CarVertical)
 - Les consommations peinture ne décrémentent pas encore le stock
 - Auto-création purchase.order sur rupture stock non implémentée
 - Le rapport facture personnalisé (QWeb) peut être ajouté plus tard

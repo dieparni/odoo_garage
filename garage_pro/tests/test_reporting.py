@@ -124,30 +124,36 @@ class TestGarageReporting(TransactionCase):
     def test_05_revenue_amounts(self):
         """Les montants CA sont correctement agrégés."""
         ro = self._create_delivered_ro()
+        expected_total = sum(ro.line_ids.mapped('amount_total'))
         records = self._search_revenue([
             ('repair_order_id', '=', ro.id),
         ])
         total_revenue = sum(records.mapped('revenue'))
-        # 165 (body) + 110 (paint) + 200 (parts) = 475
-        self.assertAlmostEqual(total_revenue, 475.0, places=2)
+        self.assertAlmostEqual(total_revenue, expected_total, places=2)
 
     def test_06_revenue_bodywork_amount(self):
         """Le CA carrosserie est correct."""
         ro = self._create_delivered_ro()
+        body_line = ro.line_ids.filtered(lambda l: l.line_type == 'labor_body')
+        expected = sum(body_line.mapped('amount_total'))
         body_rec = self._search_revenue([
             ('repair_order_id', '=', ro.id),
             ('activity_type', '=', 'bodywork'),
         ])
-        self.assertAlmostEqual(body_rec.revenue, 165.0, places=2)
+        self.assertEqual(len(body_rec), 1)
+        self.assertAlmostEqual(body_rec.revenue, expected, places=2)
 
     def test_07_revenue_parts_amount(self):
         """Le CA pièces est correct."""
         ro = self._create_delivered_ro()
+        parts_line = ro.line_ids.filtered(lambda l: l.line_type == 'parts')
+        expected = sum(parts_line.mapped('amount_total'))
         parts_rec = self._search_revenue([
             ('repair_order_id', '=', ro.id),
             ('activity_type', '=', 'parts'),
         ])
-        self.assertAlmostEqual(parts_rec.revenue, 200.0, places=2)
+        self.assertEqual(len(parts_rec), 1)
+        self.assertAlmostEqual(parts_rec.revenue, expected, places=2)
 
     def test_08_revenue_excludes_draft(self):
         """Les OR en brouillon n'apparaissent pas dans le rapport CA."""
@@ -196,12 +202,13 @@ class TestGarageReporting(TransactionCase):
              'quantity': 1, 'unit_price': 300.0},
         ]
         ro = self._create_delivered_ro(lines=lines)
+        expected = sum(ro.line_ids.mapped('amount_total'))
         rec = self._search_revenue([
             ('repair_order_id', '=', ro.id),
             ('activity_type', '=', 'subcontract'),
         ])
         self.assertEqual(len(rec), 1)
-        self.assertAlmostEqual(rec.revenue, 300.0, places=2)
+        self.assertAlmostEqual(rec.revenue, expected, places=2)
 
     # ------------------------------------------------------------------
     # Tests rapport activité
@@ -302,9 +309,10 @@ class TestGarageReporting(TransactionCase):
              'quantity': 2, 'unit_price': 80.0},
         ]
         ro = self._create_delivered_ro(lines=lines)
+        expected = sum(ro.line_ids.mapped('amount_total'))
         rec = self._search_revenue([
             ('repair_order_id', '=', ro.id),
             ('activity_type', '=', 'paint'),
         ])
         self.assertEqual(len(rec), 1)
-        self.assertAlmostEqual(rec.revenue, 160.0, places=2)
+        self.assertAlmostEqual(rec.revenue, expected, places=2)
