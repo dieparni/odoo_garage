@@ -29,6 +29,14 @@
     <menuitem id="garage_menu_customers" name="Clients"
         parent="garage_menu_reception"
         action="garage_customer_action" sequence="20"/>
+    <menuitem id="garage_menu_quotations" name="Devis"
+        parent="garage_menu_reception"
+        action="garage_quotation_action" sequence="30"/>
+
+    <!-- Atelier -->
+    <menuitem id="garage_menu_repair_orders" name="Ordres de réparation"
+        parent="garage_menu_workshop"
+        action="garage_repair_order_action" sequence="10"/>
 
     <!-- Assurances -->
     <menuitem id="garage_menu_claims" name="Sinistres"

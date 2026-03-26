@@ -245,7 +245,7 @@
     <record id="garage_claim_action" model="ir.actions.act_window">
         <field name="name">Sinistres</field>
         <field name="res_model">garage.insurance.claim</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Enregistrez votre premier sinistre

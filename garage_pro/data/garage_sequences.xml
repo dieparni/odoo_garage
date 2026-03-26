@@ -16,5 +16,21 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <record id="seq_garage_quotation" model="ir.sequence">
+            <field name="name">Devis garage</field>
+            <field name="code">garage.quotation</field>
+            <field name="prefix">DEV/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_garage_repair_order" model="ir.sequence">
+            <field name="name">Ordre de réparation</field>
+            <field name="code">garage.repair.order</field>
+            <field name="prefix">OR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

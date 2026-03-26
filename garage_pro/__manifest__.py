@@ -38,6 +38,8 @@
         'views/customer_views.xml',
         'views/insurance_views.xml',
         'views/claim_views.xml',
+        'views/quotation_views.xml',
+        'views/repair_order_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

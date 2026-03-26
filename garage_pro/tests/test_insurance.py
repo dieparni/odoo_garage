@@ -124,11 +124,17 @@ class TestGarageInsurance(TransactionCase):
         self.assertEqual(self.claim.franchise_computed, 300.0)
 
     def test_compute_total_approved(self):
-        """Total approuvé = montant + supplément."""
-        self.claim.write({
-            'approved_amount': 2000.0,
-            'supplement_amount': 500.0,
+        """Total approuvé = montant + supplément approuvé."""
+        self.claim.write({'approved_amount': 2000.0})
+        supplement = self.env['garage.insurance.supplement'].create({
+            'claim_id': self.claim.id,
+            'name': 'Supplément test',
+            'amount': 600.0,
+            'approved_amount': 500.0,
+            'state': 'approved',
         })
+        self.claim.invalidate_recordset()
+        self.assertEqual(self.claim.supplement_amount, 500.0)
         self.assertEqual(self.claim.total_approved, 2500.0)
 
     def test_insurance_company_claim_count(self):

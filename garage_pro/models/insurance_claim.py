@@ -154,7 +154,9 @@ class GarageInsuranceClaim(models.Model):
     )
     supplement_amount = fields.Monetary(
         string="Montant supplément",
+        compute='_compute_supplement_amount',
         currency_field='currency_id',
+        store=True,
     )
     total_approved = fields.Monetary(
         string="Total approuvé",
@@ -214,11 +216,20 @@ class GarageInsuranceClaim(models.Model):
             else:
                 rec.franchise_computed = 0.0
 
+    @api.depends('supplement_ids.approved_amount', 'supplement_ids.state')
+    def _compute_supplement_amount(self):
+        for rec in self:
+            rec.supplement_amount = sum(
+                s.approved_amount for s in rec.supplement_ids
+                if s.state == 'approved'
+            )
+
     @api.depends('approved_amount', 'supplement_amount')
     def _compute_total_approved(self):
         for rec in self:
             rec.total_approved = rec.approved_amount + rec.supplement_amount
 
+    @api.depends('supplement_ids')
     def _compute_supplement_count(self):
         for rec in self:
             rec.supplement_count = len(rec.supplement_ids)

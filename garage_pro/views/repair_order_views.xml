@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Ordre de réparation                                   -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_form" model="ir.ui.view">
+        <field name="name">garage.repair.order.form</field>
+        <field name="model">garage.repair.order</field>
+        <field name="arch" type="xml">
+            <form string="Ordre de réparation">
+                <header>
+                    <button name="action_confirm" type="object"
+                            string="Confirmer" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" type="object"
+                            string="Démarrer travaux" class="btn-primary"
+                            invisible="state not in ('confirmed', 'parts_waiting')"/>
+                    <button name="action_enter_paint_booth" type="object"
+                            string="Cabine peinture"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_reassembly" type="object"
+                            string="Remontage"
+                            invisible="state != 'paint_booth'"/>
+                    <button name="action_request_qc" type="object"
+                            string="Demander QC"
+                            invisible="state not in ('in_progress', 'reassembly')"/>
+                    <button name="action_validate_qc" type="object"
+                            string="Valider QC"
+                            invisible="state != 'qc_pending'"/>
+                    <button name="action_ready" type="object"
+                            string="Prêt à livrer" class="btn-primary"
+                            invisible="state != 'qc_done'"/>
+                    <button name="action_deliver" type="object"
+                            string="Livrer" class="btn-primary"
+                            invisible="state != 'ready'"/>
+                    <button name="action_cancel" type="object"
+                            string="Annuler"
+                            invisible="state in ('cancelled', 'delivered', 'invoiced')"
+                            confirm="Confirmer l'annulation de l'OR ?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_progress,qc_pending,ready,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Véhicule">
+                            <field name="vehicle_id"/>
+                            <field name="odometer_at_entry"/>
+                            <field name="odometer_at_exit"/>
+                            <field name="vehicle_location"/>
+                        </group>
+                        <group string="Client &amp; Sinistre">
+                            <field name="customer_id"/>
+                            <field name="invoice_partner_id"/>
+                            <field name="claim_id"/>
+                            <field name="quotation_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="user_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Planning">
+                            <field name="planned_start_date"/>
+                            <field name="planned_end_date"/>
+                            <field name="actual_start_date"/>
+                            <field name="actual_end_date"/>
+                            <field name="estimated_days"/>
+                            <field name="estimated_delivery_date"/>
+                        </group>
+                        <group string="Performance">
+                            <field name="total_allocated_hours"/>
+                            <field name="total_worked_hours"/>
+                            <field name="productivity_rate" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lignes" name="page_lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="line_type"/>
+                                    <field name="name"/>
+                                    <field name="product_id"
+                                           invisible="line_type not in ('parts', 'consumable')"/>
+                                    <field name="damage_zone" optional="hide"/>
+                                    <field name="allocated_time"
+                                           invisible="line_type not in ('labor_body', 'labor_paint', 'labor_mech')"/>
+                                    <field name="hourly_rate"
+                                           invisible="line_type not in ('labor_body', 'labor_paint', 'labor_mech')"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="discount"/>
+                                    <field name="amount_total" sum="Total"/>
+                                    <field name="actual_time"/>
+                                    <field name="is_done"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_untaxed" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_tax"/>
+                                <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="page_notes">
+                            <group>
+                                <field name="internal_notes"
+                                       placeholder="Notes internes..."/>
+                            </group>
+                            <group>
+                                <field name="delivery_notes"
+                                       placeholder="Notes de restitution..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Ordres de réparation                                  -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_tree" model="ir.ui.view">
+        <field name="name">garage.repair.order.tree</field>
+        <field name="model">garage.repair.order</field>
+        <field name="arch" type="xml">
+            <tree string="Ordres de réparation"
+                  decoration-danger="priority == '2'"
+                  decoration-warning="priority == '1'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="claim_id" optional="show"/>
+                <field name="vehicle_location" optional="show"/>
+                <field name="estimated_delivery_date" optional="show"/>
+                <field name="amount_total"/>
+                <field name="priority" widget="priority" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'confirmed')"
+                       decoration-warning="state in ('parts_waiting', 'qc_pending')"
+                       decoration-success="state in ('ready', 'delivered', 'invoiced')"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : OR                                                  -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_search" model="ir.ui.view">
+        <field name="name">garage.repair.order.search</field>
+        <field name="model">garage.repair.order</field>
+        <field name="arch" type="xml">
+            <search string="Ordres de réparation">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="claim_id"/>
+                <separator/>
+                <filter string="En cours" name="filter_in_progress"
+                        domain="[('state', 'in', ('in_progress', 'paint_booth', 'reassembly'))]"/>
+                <filter string="Attente pièces" name="filter_parts"
+                        domain="[('state', '=', 'parts_waiting')]"/>
+                <filter string="Prêts à livrer" name="filter_ready"
+                        domain="[('state', '=', 'ready')]"/>
+                <filter string="Urgents" name="filter_urgent"
+                        domain="[('priority', '!=', '0')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Véhicule" name="group_vehicle"
+                            context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Localisation" name="group_location"
+                            context="{'group_by': 'vehicle_location'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Ordres de réparation                                -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_action" model="ir.actions.act_window">
+        <field name="name">Ordres de réparation</field>
+        <field name="res_model">garage.repair.order</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun ordre de réparation
+            </p>
+            <p>
+                Les OR sont créés à partir des devis acceptés.
+            </p>
+        </field>
+    </record>
+
+</odoo>

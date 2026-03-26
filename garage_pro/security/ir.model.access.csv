@@ -14,3 +14,14 @@ access_claim_receptionist,garage.insurance.claim receptionist,model_garage_insur
 access_claim_manager,garage.insurance.claim manager,model_garage_insurance_claim,garage_pro.group_manager,1,1,1,1
 access_supplement_receptionist,garage.insurance.supplement receptionist,model_garage_insurance_supplement,garage_pro.group_receptionist,1,1,1,0
 access_supplement_manager,garage.insurance.supplement manager,model_garage_insurance_supplement,garage_pro.group_manager,1,1,1,1
+access_quotation_receptionist,garage.quotation receptionist,model_garage_quotation,garage_pro.group_receptionist,1,1,1,0
+access_quotation_manager,garage.quotation manager,model_garage_quotation,garage_pro.group_manager,1,1,1,1
+access_quotation_line_receptionist,garage.quotation.line receptionist,model_garage_quotation_line,garage_pro.group_receptionist,1,1,1,0
+access_quotation_line_manager,garage.quotation.line manager,model_garage_quotation_line,garage_pro.group_manager,1,1,1,1
+access_repair_order_receptionist,garage.repair.order receptionist,model_garage_repair_order,garage_pro.group_receptionist,1,1,0,0
+access_repair_order_technician,garage.repair.order technician,model_garage_repair_order,garage_pro.group_technician,1,1,0,0
+access_repair_order_chief,garage.repair.order chief,model_garage_repair_order,garage_pro.group_workshop_chief,1,1,1,0
+access_repair_order_manager,garage.repair.order manager,model_garage_repair_order,garage_pro.group_manager,1,1,1,1
+access_ro_line_technician,garage.repair.order.line technician,model_garage_repair_order_line,garage_pro.group_technician,1,1,0,0
+access_ro_line_chief,garage.repair.order.line chief,model_garage_repair_order_line,garage_pro.group_workshop_chief,1,1,1,0
+access_ro_line_manager,garage.repair.order.line manager,model_garage_repair_order_line,garage_pro.group_manager,1,1,1,1

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Devis garage                                          -->
+    <!-- ============================================================ -->
+    <record id="garage_quotation_form" model="ir.ui.view">
+        <field name="name">garage.quotation.form</field>
+        <field name="model">garage.quotation</field>
+        <field name="arch" type="xml">
+            <form string="Devis garage">
+                <header>
+                    <button name="action_send" type="object"
+                            string="Envoyer" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object"
+                            string="Accepter" class="btn-primary"
+                            invisible="state != 'sent'"/>
+                    <button name="action_refuse" type="object"
+                            string="Refuser"
+                            invisible="state != 'sent'"/>
+                    <button name="action_convert_to_repair_order" type="object"
+                            string="Convertir en OR" class="btn-primary"
+                            invisible="state != 'approved'"/>
+                    <button name="action_create_supplement" type="object"
+                            string="Créer avenant"
+                            invisible="state not in ('approved', 'converted')"/>
+                    <button name="action_cancel" type="object"
+                            string="Annuler"
+                            invisible="state in ('cancelled', 'converted')"
+                            confirm="Confirmer l'annulation du devis ?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,sent,approved,converted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <field name="is_supplement" invisible="not is_supplement"/>
+                        <span class="badge text-bg-info"
+                              invisible="not is_supplement">
+                            Avenant
+                        </span>
+                    </div>
+                    <group>
+                        <group string="Véhicule">
+                            <field name="vehicle_id"/>
+                            <field name="vehicle_plate"/>
+                            <field name="vehicle_vin"/>
+                            <field name="odometer_at_entry"/>
+                            <field name="vehicle_reception_date"/>
+                        </group>
+                        <group string="Client">
+                            <field name="customer_id"/>
+                            <field name="invoice_partner_id"/>
+                            <field name="claim_id"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Dates">
+                            <field name="date_quotation"/>
+                            <field name="date_validity"/>
+                            <field name="estimated_days"/>
+                            <field name="estimated_delivery_date"/>
+                        </group>
+                        <group string="Remise &amp; Totaux">
+                            <field name="global_discount_rate"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lignes de devis" name="page_lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="line_type"/>
+                                    <field name="name"/>
+                                    <field name="product_id"
+                                           invisible="line_type not in ('parts', 'consumable')"/>
+                                    <field name="damage_zone" optional="hide"/>
+                                    <field name="allocated_time"
+                                           invisible="line_type not in ('labor_body', 'labor_paint', 'labor_mech')"/>
+                                    <field name="hourly_rate"
+                                           invisible="line_type not in ('labor_body', 'labor_paint', 'labor_mech')"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="discount"/>
+                                    <field name="amount_total" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_labor"/>
+                                <field name="amount_parts"/>
+                                <field name="amount_subcontract"/>
+                                <field name="amount_paint_material"/>
+                                <field name="global_discount_amount"
+                                       invisible="not global_discount_rate"/>
+                                <field name="amount_untaxed" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_tax"/>
+                                <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Suppléments" name="page_supplements"
+                              invisible="not supplement_ids and not parent_quotation_id">
+                            <field name="parent_quotation_id"
+                                   invisible="not parent_quotation_id"/>
+                            <field name="supplement_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="amount_total"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes" name="page_notes">
+                            <group>
+                                <field name="internal_notes"
+                                       placeholder="Notes internes..."/>
+                            </group>
+                            <group>
+                                <field name="customer_notes"
+                                       placeholder="Notes imprimées sur le devis..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Devis                                                 -->
+    <!-- ============================================================ -->
+    <record id="garage_quotation_tree" model="ir.ui.view">
+        <field name="name">garage.quotation.tree</field>
+        <field name="model">garage.quotation</field>
+        <field name="arch" type="xml">
+            <tree string="Devis garage"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="date_quotation"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="claim_id" optional="show"/>
+                <field name="amount_total"/>
+                <field name="date_validity" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'sent'"
+                       decoration-success="state in ('approved', 'converted')"
+                       decoration-danger="state in ('refused', 'cancelled')"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Devis                                               -->
+    <!-- ============================================================ -->
+    <record id="garage_quotation_search" model="ir.ui.view">
+        <field name="name">garage.quotation.search</field>
+        <field name="model">garage.quotation</field>
+        <field name="arch" type="xml">
+            <search string="Devis garage">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="claim_id"/>
+                <separator/>
+                <filter string="Brouillon" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Envoyés" name="filter_sent"
+                        domain="[('state', '=', 'sent')]"/>
+                <filter string="Acceptés" name="filter_approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter string="Avec sinistre" name="filter_insurance"
+                        domain="[('is_insurance_claim', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Client" name="group_customer"
+                            context="{'group_by': 'customer_id'}"/>
+                    <filter string="Mois" name="group_month"
+                            context="{'group_by': 'date_quotation:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Devis                                               -->
+    <!-- ============================================================ -->
+    <record id="garage_quotation_action" model="ir.actions.act_window">
+        <field name="name">Devis</field>
+        <field name="res_model">garage.quotation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier devis garage
+            </p>
+        </field>
+    </record>
+
+</odoo>
