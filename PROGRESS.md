@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 10 — 2026-03-26
-## Statut global : Phase 4 terminée (Agents 1 à 10 terminés)
+## Dernier agent : 11 — 2026-03-26
+## Statut global : Phase 5 terminée (Agents 1 à 11 terminés) ✅
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -102,7 +102,6 @@
   - Sécurité : 11 règles ACL (technician/chief/receptionist/manager) pour 3 modèles
   - `tests/test_quality_docs.py` — 25 tests (checklist auto, items par métier, résultats, crons, templates, actions)
   - Installation OK, 0 erreurs, 169 tests garage_pro passent
-
 - Agent 10 : Reporting & Dashboards (2026-03-26)
   - `models/report_revenue.py` — garage.report.revenue (vue SQL `_auto = False`, CA par activité/période/client/véhicule)
   - `models/report_revenue.py` — garage.report.activity (vue SQL `_auto = False`, KPIs atelier : productivité, délai moyen, heures)
@@ -112,12 +111,23 @@
   - Sécurité : 6 règles ACL (receptionist/chief/manager) pour 2 modèles report
   - `tests/test_reporting.py` — 20 tests (vues SQL, agrégation CA, types activité, montants, exclusion draft/annulé, heures, délai moyen, multi-OR)
   - Installation OK, 0 erreurs, 189 tests garage_pro passent
+- Agent 11 : CarVertical — Intégration API (2026-03-26)
+  - `models/carvertical_cache.py` — garage.carvertical.cache (VIN unique, expiration configurable, réponse JSON brute)
+  - `models/res_config_settings.py` — extension res.config.settings (clé API, auto-lookup, durée cache)
+  - `wizard/carvertical_wizard.py` — garage.carvertical.lookup.wizard (workflow input→result/error, parse JSON, mappings fuel/body/transmission/drivetrain, application véhicule, création marque/modèle, cache hit)
+  - 4 champs CarVertical sur fleet.vehicle : `carvertical_last_check`, `carvertical_report_url`, `carvertical_mileage_ok`, `carvertical_damage_history`
+  - Action `action_carvertical_lookup` sur véhicule (ouvre wizard pré-rempli avec VIN)
+  - `views/carvertical_views.xml` — wizard form, cache tree+form+action, onglet CarVertical dans vehicle form, smart button CarVertical, settings Garage dans res.config.settings
+  - Menu : Configuration > Cache CarVertical
+  - Sécurité : 4 règles ACL (receptionist/manager) pour cache + wizard
+  - `tests/test_carvertical.py` — 29 tests (cache, expiration, wizard, validation VIN, parse, mappings, application véhicule, settings, cache hit)
+  - Installation OK, 0 erreurs, 218 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 11 : CarVertical (Phase 2) — spec `carvertical.md`
+- Rien — tous les agents (1-11) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -125,10 +135,11 @@
 - Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré)
 - Rapport facture personnalisé (QWeb inherit) non implémenté
 - Portail client (controllers/portal.py) non implémenté — nécessite `portal` dans depends et templates QWeb
+- `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
 
 ### 📝 Champs différés (dépendent de modèles futurs)
 - `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
-- `vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)
+- ~~`vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)~~ ✅
 - ~~`repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)~~ ✅
 - ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅
 - ~~`repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)~~ ✅
@@ -144,10 +155,10 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 189 tests garage_pro passent (0 fail, 0 error)
-- Phases 1-4 complètes (Agents 1 à 10)
-- Agent 11 doit lire la spec `carvertical.md` (intégration API CarVertical)
+- 218 tests garage_pro passent (0 fail, 0 error)
+- **Toutes les phases (1-5) et tous les agents (1-11) sont terminés**
 - Les consommations peinture ne décrémentent pas encore le stock
 - Auto-création purchase.order sur rupture stock non implémentée
 - Le rapport facture personnalisé (QWeb) peut être ajouté plus tard
 - L'extension portail client (controllers/portal.py) peut être ajoutée dans un agent dédié
+- L'intégration CarVertical nécessite une clé API réelle pour fonctionner en production
