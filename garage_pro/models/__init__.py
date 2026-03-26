@@ -9,3 +9,9 @@ from . import quotation
 from . import quotation_line
 from . import repair_order
 from . import repair_order_line
+from . import bodywork_operation
+from . import paint_formula
+from . import paint_consumption
+from . import paint_operation
+from . import mechanic_operation
+from . import maintenance_plan

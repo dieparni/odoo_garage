@@ -73,6 +73,32 @@ class GarageRepairOrder(models.Model):
         string="Lignes",
     )
 
+    # === OPÉRATIONS MÉTIER ===
+    bodywork_operation_ids = fields.One2many(
+        'garage.bodywork.operation',
+        'repair_order_id',
+        string="Opérations carrosserie",
+    )
+    paint_operation_ids = fields.One2many(
+        'garage.paint.operation',
+        'repair_order_id',
+        string="Opérations peinture",
+    )
+    mechanic_operation_ids = fields.One2many(
+        'garage.mechanic.operation',
+        'repair_order_id',
+        string="Opérations mécanique",
+    )
+    bodywork_count = fields.Integer(
+        compute='_compute_operation_counts',
+    )
+    paint_count = fields.Integer(
+        compute='_compute_operation_counts',
+    )
+    mechanic_count = fields.Integer(
+        compute='_compute_operation_counts',
+    )
+
     # === PLANNING ===
     planned_start_date = fields.Datetime(string="Début planifié")
     planned_end_date = fields.Datetime(string="Fin planifiée")
@@ -159,6 +185,14 @@ class GarageRepairOrder(models.Model):
     # ------------------------------------------------------------------
     # Compute
     # ------------------------------------------------------------------
+
+    @api.depends('bodywork_operation_ids', 'paint_operation_ids',
+                 'mechanic_operation_ids')
+    def _compute_operation_counts(self):
+        for rec in self:
+            rec.bodywork_count = len(rec.bodywork_operation_ids)
+            rec.paint_count = len(rec.paint_operation_ids)
+            rec.mechanic_count = len(rec.mechanic_operation_ids)
 
     @api.depends('line_ids.allocated_time', 'line_ids.actual_time')
     def _compute_hours(self):

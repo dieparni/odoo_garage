@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- CARROSSERIE — Form                                           -->
+    <!-- ============================================================ -->
+    <record id="garage_bodywork_operation_form" model="ir.ui.view">
+        <field name="name">garage.bodywork.operation.form</field>
+        <field name="model">garage.bodywork.operation</field>
+        <field name="arch" type="xml">
+            <form string="Opération carrosserie">
+                <header>
+                    <button name="action_start" type="object"
+                            string="Démarrer" class="btn-primary"
+                            invisible="state != 'todo'"/>
+                    <button name="action_done" type="object"
+                            string="Terminer" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_block" type="object"
+                            string="Bloquer"
+                            invisible="state not in ('todo', 'in_progress')"/>
+                    <button name="action_unblock" type="object"
+                            string="Débloquer"
+                            invisible="state != 'blocked'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="todo,in_progress,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Opération">
+                            <field name="name"/>
+                            <field name="operation_type"/>
+                            <field name="damage_zone"/>
+                            <field name="damage_level"/>
+                            <field name="requires_painting"/>
+                            <field name="paint_operation_id"
+                                   invisible="not paint_operation_id"/>
+                        </group>
+                        <group string="Exécution">
+                            <field name="repair_order_id"/>
+                            <field name="ro_line_id"/>
+                            <field name="technician_id"/>
+                            <field name="allocated_time"/>
+                            <field name="actual_time"/>
+                            <field name="blocked_reason"
+                                   invisible="state != 'blocked'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Photos" name="page_photos">
+                            <group>
+                                <field name="photo_before_ids" widget="many2many_binary"/>
+                                <field name="photo_after_ids" widget="many2many_binary"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="page_notes">
+                            <field name="notes" placeholder="Notes techniques..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- CARROSSERIE — Tree -->
+    <record id="garage_bodywork_operation_tree" model="ir.ui.view">
+        <field name="name">garage.bodywork.operation.tree</field>
+        <field name="model">garage.bodywork.operation</field>
+        <field name="arch" type="xml">
+            <tree string="Opérations carrosserie"
+                  decoration-success="state == 'done'"
+                  decoration-danger="state == 'blocked'">
+                <field name="repair_order_id"/>
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="damage_zone"/>
+                <field name="damage_level"/>
+                <field name="technician_id"/>
+                <field name="allocated_time" sum="Total alloué"/>
+                <field name="actual_time" sum="Total réel"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'todo'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'blocked'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- CARROSSERIE — Search -->
+    <record id="garage_bodywork_operation_search" model="ir.ui.view">
+        <field name="name">garage.bodywork.operation.search</field>
+        <field name="model">garage.bodywork.operation</field>
+        <field name="arch" type="xml">
+            <search string="Opérations carrosserie">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <separator/>
+                <filter string="À faire" name="filter_todo"
+                        domain="[('state', '=', 'todo')]"/>
+                <filter string="En cours" name="filter_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Bloqué" name="filter_blocked"
+                        domain="[('state', '=', 'blocked')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="OR" name="group_ro"
+                            context="{'group_by': 'repair_order_id'}"/>
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Carrossier" name="group_tech"
+                            context="{'group_by': 'technician_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- CARROSSERIE — Action -->
+    <record id="garage_bodywork_operation_action" model="ir.actions.act_window">
+        <field name="name">Carrosserie</field>
+        <field name="res_model">garage.bodywork.operation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune opération de carrosserie
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- PEINTURE — Form                                              -->
+    <!-- ============================================================ -->
+    <record id="garage_paint_operation_form" model="ir.ui.view">
+        <field name="name">garage.paint.operation.form</field>
+        <field name="model">garage.paint.operation</field>
+        <field name="arch" type="xml">
+            <form string="Opération peinture">
+                <header>
+                    <button name="action_start_prep" type="object"
+                            string="Préparation" class="btn-primary"
+                            invisible="state != 'waiting'"/>
+                    <button name="action_enter_booth" type="object"
+                            string="Cabine" class="btn-primary"
+                            invisible="state != 'prep'"/>
+                    <button name="action_drying" type="object"
+                            string="Séchage"
+                            invisible="state != 'booth'"/>
+                    <button name="action_polish" type="object"
+                            string="Polissage"
+                            invisible="state != 'drying'"/>
+                    <button name="action_done" type="object"
+                            string="Terminer" class="btn-primary"
+                            invisible="state != 'polish'"/>
+                    <button name="action_rework" type="object"
+                            string="Reprise"
+                            invisible="state not in ('polish', 'done')"/>
+                    <button name="action_restart" type="object"
+                            string="Reprendre préparation"
+                            invisible="state != 'rework'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="waiting,prep,booth,drying,polish,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Opération">
+                            <field name="name"/>
+                            <field name="operation_type"/>
+                            <field name="zone"/>
+                            <field name="bodywork_operation_id"/>
+                        </group>
+                        <group string="Teinte">
+                            <field name="repair_order_id"/>
+                            <field name="paint_code"/>
+                            <field name="paint_system_id"/>
+                            <field name="formula_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Cabine">
+                            <field name="booth_slot_start"/>
+                            <field name="booth_slot_end"/>
+                            <field name="booth_temperature"/>
+                            <field name="booth_humidity"/>
+                        </group>
+                        <group string="Exécution">
+                            <field name="technician_id"/>
+                            <field name="allocated_time"/>
+                            <field name="actual_time"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_product_cost"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Consommation produits" name="page_consumption">
+                            <field name="product_consumption_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="product_type"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="total_cost" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes qualité" name="page_notes">
+                            <field name="quality_notes"
+                                   placeholder="Notes qualité peinture..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- PEINTURE — Tree -->
+    <record id="garage_paint_operation_tree" model="ir.ui.view">
+        <field name="name">garage.paint.operation.tree</field>
+        <field name="model">garage.paint.operation</field>
+        <field name="arch" type="xml">
+            <tree string="Opérations peinture"
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'rework'">
+                <field name="repair_order_id"/>
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="zone"/>
+                <field name="technician_id"/>
+                <field name="allocated_time" sum="Total alloué"/>
+                <field name="actual_time" sum="Total réel"/>
+                <field name="total_product_cost" sum="Coût produits"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'waiting'"
+                       decoration-warning="state in ('prep', 'booth', 'drying', 'polish')"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'rework'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- PEINTURE — Search -->
+    <record id="garage_paint_operation_search" model="ir.ui.view">
+        <field name="name">garage.paint.operation.search</field>
+        <field name="model">garage.paint.operation</field>
+        <field name="arch" type="xml">
+            <search string="Opérations peinture">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <separator/>
+                <filter string="En attente" name="filter_waiting"
+                        domain="[('state', '=', 'waiting')]"/>
+                <filter string="En cabine" name="filter_booth"
+                        domain="[('state', '=', 'booth')]"/>
+                <filter string="Reprise" name="filter_rework"
+                        domain="[('state', '=', 'rework')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="OR" name="group_ro"
+                            context="{'group_by': 'repair_order_id'}"/>
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Peintre" name="group_tech"
+                            context="{'group_by': 'technician_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- PEINTURE — Action -->
+    <record id="garage_paint_operation_action" model="ir.actions.act_window">
+        <field name="name">Peinture</field>
+        <field name="res_model">garage.paint.operation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune opération de peinture
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- FORMULE PEINTURE — Form / Tree                               -->
+    <!-- ============================================================ -->
+    <record id="garage_paint_formula_form" model="ir.ui.view">
+        <field name="name">garage.paint.formula.form</field>
+        <field name="model">garage.paint.formula</field>
+        <field name="arch" type="xml">
+            <form string="Formule peinture">
+                <sheet>
+                    <group>
+                        <group string="Identification">
+                            <field name="paint_code"/>
+                            <field name="paint_system_id"/>
+                            <field name="formula_reference"/>
+                            <field name="variant_name"/>
+                            <field name="vehicle_id"/>
+                        </group>
+                        <group string="Spectrophotomètre">
+                            <field name="spectro_date"/>
+                            <field name="spectro_result" filename="spectro_file"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="Détail formule">
+                        <field name="formula_detail" nolabel="1"
+                               placeholder="Composition : bases, quantités, ratios de mélange..."/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"
+                               placeholder="Ajustements, remarques..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="garage_paint_formula_tree" model="ir.ui.view">
+        <field name="name">garage.paint.formula.tree</field>
+        <field name="model">garage.paint.formula</field>
+        <field name="arch" type="xml">
+            <tree string="Formules peinture">
+                <field name="paint_code"/>
+                <field name="paint_system_id"/>
+                <field name="formula_reference"/>
+                <field name="variant_name"/>
+                <field name="vehicle_id"/>
+                <field name="spectro_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="garage_paint_formula_action" model="ir.actions.act_window">
+        <field name="name">Formules peinture</field>
+        <field name="res_model">garage.paint.formula</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune formule peinture enregistrée
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- MÉCANIQUE — Form                                             -->
+    <!-- ============================================================ -->
+    <record id="garage_mechanic_operation_form" model="ir.ui.view">
+        <field name="name">garage.mechanic.operation.form</field>
+        <field name="model">garage.mechanic.operation</field>
+        <field name="arch" type="xml">
+            <form string="Opération mécanique">
+                <header>
+                    <button name="action_start" type="object"
+                            string="Démarrer" class="btn-primary"
+                            invisible="state != 'todo'"/>
+                    <button name="action_wait_parts" type="object"
+                            string="Attente pièces"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_done" type="object"
+                            string="Terminer" class="btn-primary"
+                            invisible="state not in ('in_progress', 'waiting_parts')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="todo,in_progress,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Opération">
+                            <field name="name"/>
+                            <field name="operation_category"/>
+                            <field name="operation_type"/>
+                            <field name="repair_order_id"/>
+                        </group>
+                        <group string="Exécution">
+                            <field name="technician_id"/>
+                            <field name="allocated_time"/>
+                            <field name="actual_time"/>
+                            <field name="is_scheduled_maintenance"/>
+                            <field name="maintenance_plan_item_id"
+                                   invisible="not is_scheduled_maintenance"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Diagnostic" name="page_diag"
+                              invisible="operation_category != 'diagnostic'">
+                            <group>
+                                <field name="obd_codes"/>
+                                <field name="obd_codes_cleared"/>
+                            </group>
+                            <field name="diagnosis_result"
+                                   placeholder="Résultat du diagnostic..."/>
+                        </page>
+                        <page string="Pneumatiques" name="page_tires"
+                              invisible="operation_category != 'tires'">
+                            <group>
+                                <group>
+                                    <field name="tire_brand"/>
+                                    <field name="tire_size"/>
+                                    <field name="tire_dot"/>
+                                </group>
+                                <group>
+                                    <field name="tire_tread_depth"/>
+                                    <field name="tire_position"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Entretien" name="page_maint"
+                              invisible="not is_scheduled_maintenance">
+                            <group>
+                                <field name="next_maintenance_km"/>
+                                <field name="next_maintenance_date"/>
+                            </group>
+                        </page>
+                        <page string="Notes" name="page_notes">
+                            <field name="notes" placeholder="Notes techniques..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- MÉCANIQUE — Tree -->
+    <record id="garage_mechanic_operation_tree" model="ir.ui.view">
+        <field name="name">garage.mechanic.operation.tree</field>
+        <field name="model">garage.mechanic.operation</field>
+        <field name="arch" type="xml">
+            <tree string="Opérations mécanique"
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'waiting_parts'">
+                <field name="repair_order_id"/>
+                <field name="name"/>
+                <field name="operation_category"/>
+                <field name="operation_type"/>
+                <field name="technician_id"/>
+                <field name="allocated_time" sum="Total alloué"/>
+                <field name="actual_time" sum="Total réel"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'todo'"
+                       decoration-warning="state in ('in_progress', 'waiting_parts')"
+                       decoration-success="state == 'done'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- MÉCANIQUE — Search -->
+    <record id="garage_mechanic_operation_search" model="ir.ui.view">
+        <field name="name">garage.mechanic.operation.search</field>
+        <field name="model">garage.mechanic.operation</field>
+        <field name="arch" type="xml">
+            <search string="Opérations mécanique">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <separator/>
+                <filter string="À faire" name="filter_todo"
+                        domain="[('state', '=', 'todo')]"/>
+                <filter string="En cours" name="filter_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Attente pièces" name="filter_parts"
+                        domain="[('state', '=', 'waiting_parts')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="OR" name="group_ro"
+                            context="{'group_by': 'repair_order_id'}"/>
+                    <filter string="Catégorie" name="group_cat"
+                            context="{'group_by': 'operation_category'}"/>
+                    <filter string="Mécanicien" name="group_tech"
+                            context="{'group_by': 'technician_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- MÉCANIQUE — Action -->
+    <record id="garage_mechanic_operation_action" model="ir.actions.act_window">
+        <field name="name">Mécanique</field>
+        <field name="res_model">garage.mechanic.operation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune opération mécanique
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- PLAN D'ENTRETIEN — Form / Tree                               -->
+    <!-- ============================================================ -->
+    <record id="garage_maintenance_plan_form" model="ir.ui.view">
+        <field name="name">garage.maintenance.plan.form</field>
+        <field name="model">garage.maintenance.plan</field>
+        <field name="arch" type="xml">
+            <form string="Plan d'entretien">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="vehicle_id"/>
+                    </group>
+                    <field name="item_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="interval_km"/>
+                            <field name="interval_months"/>
+                            <field name="last_done_km"/>
+                            <field name="last_done_date"/>
+                            <field name="next_due_km"/>
+                            <field name="next_due_date"/>
+                            <field name="is_overdue" widget="boolean_toggle"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="notes" placeholder="Notes constructeur..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="garage_maintenance_plan_tree" model="ir.ui.view">
+        <field name="name">garage.maintenance.plan.tree</field>
+        <field name="model">garage.maintenance.plan</field>
+        <field name="arch" type="xml">
+            <tree string="Plans d'entretien">
+                <field name="vehicle_id"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="garage_maintenance_plan_action" model="ir.actions.act_window">
+        <field name="name">Plans d'entretien</field>
+        <field name="res_model">garage.maintenance.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun plan d'entretien
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit OR form : ajouter onglets métier                     -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_form_inherit_trades" model="ir.ui.view">
+        <field name="name">garage.repair.order.form.inherit.trades</field>
+        <field name="model">garage.repair.order</field>
+        <field name="inherit_id" ref="garage_repair_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_notes']" position="before">
+                <page string="Carrosserie" name="page_bodywork">
+                    <field name="bodywork_operation_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="operation_type"/>
+                            <field name="damage_zone"/>
+                            <field name="damage_level"/>
+                            <field name="technician_id"/>
+                            <field name="allocated_time" sum="Total"/>
+                            <field name="actual_time" sum="Total"/>
+                            <field name="requires_painting"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'todo'"
+                                   decoration-warning="state == 'in_progress'"
+                                   decoration-success="state == 'done'"
+                                   decoration-danger="state == 'blocked'"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Peinture" name="page_paint">
+                    <field name="paint_operation_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="operation_type"/>
+                            <field name="zone"/>
+                            <field name="technician_id"/>
+                            <field name="allocated_time" sum="Total"/>
+                            <field name="actual_time" sum="Total"/>
+                            <field name="total_product_cost" sum="Coût"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'waiting'"
+                                   decoration-warning="state in ('prep', 'booth', 'drying', 'polish')"
+                                   decoration-success="state == 'done'"
+                                   decoration-danger="state == 'rework'"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Mécanique" name="page_mechanic">
+                    <field name="mechanic_operation_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="operation_category"/>
+                            <field name="operation_type"/>
+                            <field name="technician_id"/>
+                            <field name="allocated_time" sum="Total"/>
+                            <field name="actual_time" sum="Total"/>
+                            <field name="state" widget="badge"
+                                   decoration-info="state == 'todo'"
+                                   decoration-warning="state in ('in_progress', 'waiting_parts')"
+                                   decoration-success="state == 'done'"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

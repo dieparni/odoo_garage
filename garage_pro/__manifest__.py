@@ -24,6 +24,7 @@
         'fleet',
         'mail',
         'account',
+        'hr',
     ],
     'data': [
         # Sécurité (TOUJOURS en premier)
@@ -40,6 +41,7 @@
         'views/claim_views.xml',
         'views/quotation_views.xml',
         'views/repair_order_views.xml',
+        'views/trade_views.xml',
         'views/menus.xml',
     ],
     'installable': True,
