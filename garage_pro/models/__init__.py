@@ -18,3 +18,4 @@ from . import maintenance_plan
 from . import workshop_post
 from . import technician
 from . import planning_slot
+from . import product_template

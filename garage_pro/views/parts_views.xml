@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- PIÈCES GARAGE — Tree (vue filtrée de product.template)       -->
+    <!-- ============================================================ -->
+    <record id="garage_product_template_tree" model="ir.ui.view">
+        <field name="name">product.template.garage.tree</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree string="Pièces garage">
+                <field name="default_code"/>
+                <field name="name"/>
+                <field name="garage_part_category"/>
+                <field name="oem_reference" optional="show"/>
+                <field name="tecdoc_reference" optional="hide"/>
+                <field name="compatible_vehicle_models" optional="hide"/>
+                <field name="is_consignment"/>
+                <field name="list_price"/>
+                <field name="standard_price" optional="show"/>
+                <field name="categ_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- PIÈCES GARAGE — Form extension -->
+    <record id="garage_product_template_form" model="ir.ui.view">
+        <field name="name">product.template.garage.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_information']" position="after">
+                <page string="Garage" name="page_garage"
+                      invisible="not is_garage_part">
+                    <group>
+                        <group string="Classification garage">
+                            <field name="is_garage_part"/>
+                            <field name="garage_part_category"/>
+                        </group>
+                        <group string="Références">
+                            <field name="oem_reference"/>
+                            <field name="tecdoc_reference"/>
+                            <field name="compatible_vehicle_models"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Consigne" invisible="not is_consignment">
+                            <field name="is_consignment"/>
+                            <field name="consignment_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- PIÈCES GARAGE — Search -->
+    <record id="garage_product_template_search" model="ir.ui.view">
+        <field name="name">product.template.garage.search</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="Pièces garage">
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="oem_reference"/>
+                <field name="tecdoc_reference"/>
+                <separator/>
+                <filter string="OEM" name="filter_oem"
+                        domain="[('garage_part_category', '=', 'oem')]"/>
+                <filter string="Aftermarket" name="filter_aftermarket"
+                        domain="[('garage_part_category', '=', 'aftermarket')]"/>
+                <filter string="Occasion" name="filter_used"
+                        domain="[('garage_part_category', '=', 'used')]"/>
+                <filter string="Consommables" name="filter_consumable"
+                        domain="[('garage_part_category', '=', 'consumable')]"/>
+                <filter string="Peinture" name="filter_paint"
+                        domain="[('garage_part_category', '=', 'paint')]"/>
+                <filter string="Consignées" name="filter_consignment"
+                        domain="[('is_consignment', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Catégorie garage" name="group_garage_categ"
+                            context="{'group_by': 'garage_part_category'}"/>
+                    <filter string="Catégorie produit" name="group_categ"
+                            context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- PIÈCES GARAGE — Action -->
+    <record id="garage_product_action" model="ir.actions.act_window">
+        <field name="name">Pièces garage</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_garage_part', '=', True)]</field>
+        <field name="context">{'default_is_garage_part': True, 'default_type': 'product',
+            'search_default_filter_oem': 0}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('garage_product_template_tree')})]"/>
+        <field name="search_view_id" ref="garage_product_template_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajouter une pièce garage
+            </p>
+            <p>
+                Pièces OEM, aftermarket, occasion, consommables, produits peinture…
+            </p>
+        </field>
+    </record>
+
+</odoo>

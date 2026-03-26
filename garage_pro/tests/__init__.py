@@ -4,3 +4,4 @@ from . import test_insurance
 from . import test_quotation
 from . import test_trades
 from . import test_planning
+from . import test_parts

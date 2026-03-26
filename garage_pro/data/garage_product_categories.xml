@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Catégories de produits garage -->
+        <record id="garage_product_categ_parts" model="product.category">
+            <field name="name">Pièces garage</field>
+        </record>
+        <record id="garage_product_categ_oem" model="product.category">
+            <field name="name">Pièces OEM</field>
+            <field name="parent_id" ref="garage_product_categ_parts"/>
+        </record>
+        <record id="garage_product_categ_aftermarket" model="product.category">
+            <field name="name">Pièces aftermarket</field>
+            <field name="parent_id" ref="garage_product_categ_parts"/>
+        </record>
+        <record id="garage_product_categ_used" model="product.category">
+            <field name="name">Pièces occasion</field>
+            <field name="parent_id" ref="garage_product_categ_parts"/>
+        </record>
+        <record id="garage_product_categ_exchange" model="product.category">
+            <field name="name">Échange standard</field>
+            <field name="parent_id" ref="garage_product_categ_parts"/>
+        </record>
+        <record id="garage_product_categ_paint" model="product.category">
+            <field name="name">Produits peinture</field>
+        </record>
+        <record id="garage_product_categ_consumable" model="product.category">
+            <field name="name">Consommables atelier</field>
+        </record>
+    </data>
+</odoo>

@@ -64,6 +64,11 @@
         parent="garage_menu_config"
         action="garage_workshop_post_action" sequence="30"/>
 
+    <!-- Pièces & Stock -->
+    <menuitem id="garage_menu_parts" name="Pièces"
+        parent="garage_menu_stock"
+        action="garage_product_action" sequence="10"/>
+
     <!-- Assurances -->
     <menuitem id="garage_menu_claims" name="Sinistres"
         parent="garage_menu_insurance"

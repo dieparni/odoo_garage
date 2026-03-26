@@ -25,6 +25,9 @@
         'mail',
         'account',
         'hr',
+        'stock',
+        'purchase',
+        'product',
     ],
     'data': [
         # Sécurité (TOUJOURS en premier)
@@ -33,6 +36,7 @@
 
         # Données
         'data/garage_sequences.xml',
+        'data/garage_product_categories.xml',
 
         # Vues
         'views/vehicle_views.xml',
@@ -43,6 +47,7 @@
         'views/repair_order_views.xml',
         'views/trade_views.xml',
         'views/planning_views.xml',
+        'views/parts_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

@@ -32,5 +32,12 @@
             <field name="padding">4</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_garage_subcontract_order" model="ir.sequence">
+            <field name="name">Bon de sous-traitance</field>
+            <field name="code">garage.subcontract.order</field>
+            <field name="prefix">ST/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

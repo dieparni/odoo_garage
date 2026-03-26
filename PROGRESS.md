@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 4 — 2026-03-26
-## Statut global : Phase 2 en cours (Agent 4 terminé)
+## Dernier agent : 5 — 2026-03-26
+## Statut global : Phase 2 en cours (Agent 5 terminé)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -43,14 +43,24 @@
   - `hr` ajouté aux depends (technician_id sur les 3 opérations)
   - `tests/test_trades.py` — 23 tests (workflows, auto-paint, consumption, maintenance)
   - Installation OK, 0 erreurs, 75 tests passent
+- Agent 5 : Planning & Ressources (2026-03-26)
+  - `models/workshop_post.py` — garage.workshop.post (9 types de postes, capacité, goulot)
+  - `models/technician.py` — extension hr.employee (spécialité, habilitation VE, coût horaire, capacité)
+  - `models/planning_slot.py` — garage.planning.slot (workflow 4 états, contrainte chevauchement, durée compute)
+  - Champs différés sur repair_order : `workshop_chief_id`, `technician_ids` (M2M), `planning_slot_ids`, `planning_slot_count`
+  - `views/planning_views.xml` — form+tree+search+calendar pour planning_slot, form+tree pour workshop_post, tree+action techniciens
+  - Onglet Planning + section Équipe dans OR form
+  - Menus : Atelier > Planning, Atelier > Techniciens, Config > Postes de travail
+  - Sécurité : 6 règles ACL (technician/chief/manager) pour workshop_post + planning_slot
+  - `tests/test_planning.py` — 21 tests (postes, techniciens, créneaux, chevauchement, workflow, adjacence)
+  - Installation OK, 0 erreurs, 97 tests passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 5 : Planning & Ressources — spec `08_09_10_11_planning_stock_sub_courtesy.md`
-- Agent 6 : Pièces & Stock — idem
-- Agent 7 : Sous-traitance & Courtoisie — idem
+- Agent 6 : Pièces & Stock — spec `08_09_10_11_planning_stock_sub_courtesy.md` (Module 09)
+- Agent 7 : Sous-traitance & Courtoisie — spec `08_09_10_11_planning_stock_sub_courtesy.md` (Modules 10+11)
 - Agent 8 : Facturation multi-payeur — spec `12_to_16_billing_comms_quality_reporting.md`
 - Agent 9 : Communication, Qualité, Documentation — idem
 - Agent 10 : Reporting & Dashboards — idem
@@ -65,8 +75,8 @@
 ### 📝 Champs différés (dépendent de modèles futurs)
 - `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
 - `vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)
-- `repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)
-- `repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)
+- ~~`repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)~~ ✅ fait
+- ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅ fait
 - `repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)
 - `repair_order.courtesy_loan_id`, `has_courtesy_vehicle` → garage.courtesy.loan (Agent 7)
 - `repair_order.quality_check_id`, `qc_validated*` → garage.quality.checklist (Agent 9)
@@ -79,10 +89,11 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 75 tests passent (0 fail, 0 error)
-- Phase 1 complète + Agent 4 (métiers) terminé
-- `hr` est maintenant dans les depends (pour technician_id sur les opérations)
-- Agent 5 doit lire la spec `08_09_10_11_planning_stock_sub_courtesy.md` pour le planning
-- Les actions QC (action_request_qc, action_validate_qc) sont simplifiées — à enrichir avec Agent 9
-- La facturation (action_create_invoice) est différée à Agent 8
-- Les consommations peinture ne décrémentent pas encore le stock (Agent 6)
+- 97 tests passent (0 fail, 0 error)
+- Phase 1 complète + Agents 4-5 terminés
+- `hr` est dans les depends (pour technician_id et extension hr.employee)
+- Agent 6 doit lire la spec `08_09_10_11_planning_stock_sub_courtesy.md` — Module 09 (Pièces & Stock)
+- Agent 6 doit ajouter `stock` et `purchase` aux depends du manifest
+- Les consommations peinture ne décrémentent pas encore le stock (à faire en Agent 6)
+- L'extension product.template (is_garage_part, garage_part_category, oem_reference…) est dans la spec Module 09
+- Les catégories produits (OEM, aftermarket, peinture, consommable) sont à créer en data XML
