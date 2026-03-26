@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Rapport QWeb : Ordre de réparation (garage.repair.order)
+         ================================================================ -->
+
+    <record id="action_report_garage_repair_order" model="ir.actions.report">
+        <field name="name">Ordre de réparation</field>
+        <field name="model">garage.repair.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garage_pro.report_garage_repair_order</field>
+        <field name="report_file">garage_pro.report_garage_repair_order</field>
+        <field name="binding_model_id" ref="model_garage_repair_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_garage_repair_order">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- ===== TITRE ===== -->
+                        <h2 class="mt-4">
+                            Ordre de Réparation <span t-field="o.name"/>
+                        </h2>
+                        <div class="mb-2">
+                            <span class="badge" t-attf-style="background-color: #6c757d; font-size: 0.9em;">
+                                <span t-field="o.state"/>
+                            </span>
+                            <span t-if="o.priority == '1'" class="badge bg-warning ms-1">Urgent</span>
+                            <span t-if="o.priority == '2'" class="badge bg-danger ms-1">Très urgent</span>
+                        </div>
+
+                        <!-- ===== EN-TÊTE 2 COLONNES ===== -->
+                        <div class="row mt-4 mb-3">
+                            <div class="col-6">
+                                <strong>Client</strong><br/>
+                                <span t-field="o.customer_id.name"/><br/>
+                                <t t-if="o.customer_id.street">
+                                    <span t-field="o.customer_id.street"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.zip or o.customer_id.city">
+                                    <span t-field="o.customer_id.zip"/>
+                                    <span t-field="o.customer_id.city"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.phone">
+                                    Tél : <span t-field="o.customer_id.phone"/><br/>
+                                </t>
+                                <t t-if="o.invoice_partner_id and o.invoice_partner_id != o.customer_id">
+                                    <br/><strong>Facturer à :</strong><br/>
+                                    <span t-field="o.invoice_partner_id.name"/>
+                                </t>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr t-if="o.quotation_id">
+                                        <td class="text-muted">Devis d'origine</td>
+                                        <td><span t-field="o.quotation_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="o.planned_start_date">
+                                        <td class="text-muted">Début planifié</td>
+                                        <td><span t-field="o.planned_start_date" t-options='{"widget": "date"}'/></td>
+                                    </tr>
+                                    <tr t-if="o.estimated_delivery_date">
+                                        <td class="text-muted">Restitution estimée</td>
+                                        <td><span t-field="o.estimated_delivery_date"/></td>
+                                    </tr>
+                                    <tr t-if="o.workshop_chief_id">
+                                        <td class="text-muted">Chef d'atelier</td>
+                                        <td><span t-field="o.workshop_chief_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="o.user_id">
+                                        <td class="text-muted">Responsable</td>
+                                        <td><span t-field="o.user_id.name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== VÉHICULE ===== -->
+                        <table class="table table-sm table-bordered mb-3" style="background-color: #f8f9fa;">
+                            <tr>
+                                <td class="text-muted" style="width:20%;">Véhicule</td>
+                                <td>
+                                    <span t-field="o.vehicle_id.model_id.brand_id.name"/>
+                                    <span t-field="o.vehicle_id.model_id.name"/>
+                                </td>
+                                <td class="text-muted" style="width:15%;">Immatriculation</td>
+                                <td><span t-field="o.vehicle_id.license_plate"/></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">VIN</td>
+                                <td><span t-field="o.vehicle_id.vin_sn"/></td>
+                                <td class="text-muted">Km entrée</td>
+                                <td>
+                                    <span t-field="o.odometer_at_entry"/>
+                                    <span t-if="o.odometer_at_entry"> km</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ===== SINISTRE ===== -->
+                        <div t-if="o.claim_id" class="mb-3">
+                            <table class="table table-sm table-bordered" style="background-color: #fff3cd;">
+                                <tr>
+                                    <td class="text-muted" style="width:20%;">N° sinistre</td>
+                                    <td><span t-field="o.claim_id.name"/></td>
+                                    <td class="text-muted" style="width:20%;">Assurance</td>
+                                    <td><span t-field="o.claim_id.insurance_company_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ===== LIGNES DE TRAVAUX ===== -->
+                        <h5 class="mt-3">Détail des travaux</h5>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-end">Qté / Heures</th>
+                                    <th class="text-end">Prix unit.</th>
+                                    <th class="text-end" t-if="any(l.discount for l in o.line_ids)">Remise</th>
+                                    <th class="text-end">Total HT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span t-field="line.name"/>
+                                            <br t-if="line.damage_zone"/>
+                                            <small t-if="line.damage_zone" class="text-muted">
+                                                Zone : <span t-field="line.damage_zone"/>
+                                            </small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.line_type"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-if="line.line_type in ('labor_body', 'labor_paint', 'labor_mech') and line.allocated_time">
+                                                <span t-field="line.allocated_time" t-options='{"widget": "float", "precision": 2}'/> h
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="line.quantity"/>
+                                            </t>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-if="line.line_type in ('labor_body', 'labor_paint', 'labor_mech') and line.hourly_rate">
+                                                <span t-field="line.hourly_rate" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>/h
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </t>
+                                        </td>
+                                        <td class="text-end" t-if="any(l.discount for l in o.line_ids)">
+                                            <span t-if="line.discount" t-field="line.discount" t-options='{"widget": "float", "precision": 1}'/>
+                                            <span t-if="line.discount">%</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- ===== TOTAUX ===== -->
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <!-- Récapitulatif temps -->
+                                <t t-if="o.total_allocated_hours">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td class="text-muted">Heures allouées</td>
+                                            <td><span t-field="o.total_allocated_hours" t-options='{"widget": "float", "precision": 2}'/> h</td>
+                                        </tr>
+                                        <tr t-if="o.total_worked_hours">
+                                            <td class="text-muted">Heures travaillées</td>
+                                            <td><span t-field="o.total_worked_hours" t-options='{"widget": "float", "precision": 2}'/> h</td>
+                                        </tr>
+                                    </table>
+                                </t>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-muted">Total HT</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">TVA (21%)</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="fw-bold" style="border-top: 2px solid #000;">
+                                        <td>Total TTC</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== TECHNICIENS AFFECTÉS ===== -->
+                        <div t-if="o.technician_ids" class="mt-3">
+                            <strong>Techniciens affectés :</strong>
+                            <t t-foreach="o.technician_ids" t-as="tech">
+                                <span t-field="tech.name"/><t t-if="not tech_last">, </t>
+                            </t>
+                        </div>
+
+                        <!-- ===== NOTES ===== -->
+                        <div t-if="o.delivery_notes" class="mt-4">
+                            <strong>Notes de restitution :</strong>
+                            <div t-field="o.delivery_notes"/>
+                        </div>
+
+                        <!-- ===== SIGNATURE ===== -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <p>Reçu en bon état<br/><br/><br/>
+                                _______________________________<br/>
+                                <small>Date et signature du client</small></p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p>Pour le garage<br/><br/><br/>
+                                _______________________________<br/>
+                                <small><span t-field="o.company_id.name"/></small></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

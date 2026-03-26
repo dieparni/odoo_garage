@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Rapport QWeb : Devis garage (garage.quotation)
+         ================================================================ -->
+
+    <record id="action_report_garage_quotation" model="ir.actions.report">
+        <field name="name">Devis garage</field>
+        <field name="model">garage.quotation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">garage_pro.report_garage_quotation</field>
+        <field name="report_file">garage_pro.report_garage_quotation</field>
+        <field name="binding_model_id" ref="model_garage_quotation"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_garage_quotation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- ===== TITRE ===== -->
+                        <h2 class="mt-4">
+                            <span t-if="o.is_supplement">Avenant</span>
+                            <span t-else="">Devis</span>
+                            <span t-field="o.name"/>
+                        </h2>
+
+                        <!-- ===== INFO CLIENT / VÉHICULE ===== -->
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <strong>Client</strong><br/>
+                                <span t-field="o.customer_id.name"/><br/>
+                                <t t-if="o.customer_id.street">
+                                    <span t-field="o.customer_id.street"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.zip or o.customer_id.city">
+                                    <span t-field="o.customer_id.zip"/>
+                                    <span t-field="o.customer_id.city"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.country_id">
+                                    <span t-field="o.customer_id.country_id.name"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.vat">
+                                    TVA : <span t-field="o.customer_id.vat"/><br/>
+                                </t>
+                                <t t-if="o.customer_id.phone">
+                                    Tél : <span t-field="o.customer_id.phone"/>
+                                </t>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="text-muted">Date du devis</td>
+                                        <td><span t-field="o.date_quotation"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Validité</td>
+                                        <td><span t-field="o.date_validity"/></td>
+                                    </tr>
+                                    <tr t-if="o.estimated_delivery_date">
+                                        <td class="text-muted">Restitution estimée</td>
+                                        <td><span t-field="o.estimated_delivery_date"/></td>
+                                    </tr>
+                                    <tr t-if="o.estimated_days">
+                                        <td class="text-muted">Durée estimée</td>
+                                        <td><span t-field="o.estimated_days"/> jours ouvrés</td>
+                                    </tr>
+                                    <tr t-if="o.user_id">
+                                        <td class="text-muted">Responsable</td>
+                                        <td><span t-field="o.user_id.name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== INFO VÉHICULE ===== -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered" style="background-color: #f8f9fa;">
+                                    <tr>
+                                        <td class="text-muted" style="width:25%;">Véhicule</td>
+                                        <td>
+                                            <span t-field="o.vehicle_id.model_id.brand_id.name"/>
+                                            <span t-field="o.vehicle_id.model_id.name"/>
+                                        </td>
+                                        <td class="text-muted" style="width:20%;">Immatriculation</td>
+                                        <td><span t-field="o.vehicle_plate"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">VIN</td>
+                                        <td><span t-field="o.vehicle_vin"/></td>
+                                        <td class="text-muted">Km à l'entrée</td>
+                                        <td>
+                                            <span t-field="o.odometer_at_entry"/>
+                                            <span t-if="o.odometer_at_entry"> km</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== SINISTRE (si applicable) ===== -->
+                        <div t-if="o.claim_id" class="row mb-4">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered" style="background-color: #fff3cd;">
+                                    <tr>
+                                        <td class="text-muted" style="width:25%;">N° sinistre</td>
+                                        <td><span t-field="o.claim_id.name"/></td>
+                                        <td class="text-muted" style="width:25%;">Assurance</td>
+                                        <td><span t-field="o.claim_id.insurance_company_id.name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== LIGNES MAIN D'OEUVRE ===== -->
+                        <t t-set="labor_lines" t-value="o.line_ids.filtered(lambda l: l.line_type in ('labor_body', 'labor_paint', 'labor_mech'))"/>
+                        <t t-if="labor_lines">
+                            <h5 class="mt-3">Main d'oeuvre</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center">Type</th>
+                                        <th class="text-end">Heures</th>
+                                        <th class="text-end">Taux horaire</th>
+                                        <th class="text-end" t-if="any(l.discount for l in labor_lines)">Remise</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="labor_lines" t-as="line">
+                                        <tr>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-center"><span t-field="line.line_type"/></td>
+                                            <td class="text-end"><span t-field="line.allocated_time" t-options='{"widget": "float", "precision": 2}'/> h</td>
+                                            <td class="text-end"><span t-field="line.hourly_rate" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td class="text-end" t-if="any(l.discount for l in labor_lines)">
+                                                <span t-if="line.discount" t-field="line.discount" t-options='{"widget": "float", "precision": 1}'/>%
+                                            </td>
+                                            <td class="text-end"><span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="99" class="text-end">
+                                            Sous-total MO : <span t-field="o.amount_labor" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+
+                        <!-- ===== LIGNES PIÈCES ===== -->
+                        <t t-set="parts_lines" t-value="o.line_ids.filtered(lambda l: l.line_type == 'parts')"/>
+                        <t t-if="parts_lines">
+                            <h5 class="mt-3">Pièces détachées</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center">Qté</th>
+                                        <th class="text-end">Prix unit.</th>
+                                        <th class="text-end" t-if="any(l.discount for l in parts_lines)">Remise</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="parts_lines" t-as="line">
+                                        <tr>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-center"><span t-field="line.quantity"/></td>
+                                            <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td class="text-end" t-if="any(l.discount for l in parts_lines)">
+                                                <span t-if="line.discount" t-field="line.discount" t-options='{"widget": "float", "precision": 1}'/>%
+                                            </td>
+                                            <td class="text-end"><span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="99" class="text-end">
+                                            Sous-total pièces : <span t-field="o.amount_parts" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+
+                        <!-- ===== LIGNES MATIÈRE PEINTURE ===== -->
+                        <t t-set="paint_lines" t-value="o.line_ids.filtered(lambda l: l.line_type == 'paint_material')"/>
+                        <t t-if="paint_lines">
+                            <h5 class="mt-3">Matière peinture</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center">Qté</th>
+                                        <th class="text-end">Prix unit.</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="paint_lines" t-as="line">
+                                        <tr>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-center"><span t-field="line.quantity"/></td>
+                                            <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td class="text-end"><span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="99" class="text-end">
+                                            Sous-total peinture : <span t-field="o.amount_paint_material" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+
+                        <!-- ===== LIGNES SOUS-TRAITANCE ===== -->
+                        <t t-set="sub_lines" t-value="o.line_ids.filtered(lambda l: l.line_type == 'subcontract')"/>
+                        <t t-if="sub_lines">
+                            <h5 class="mt-3">Sous-traitance</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center">Qté</th>
+                                        <th class="text-end">Prix unit.</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sub_lines" t-as="line">
+                                        <tr>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-center"><span t-field="line.quantity"/></td>
+                                            <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td class="text-end"><span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="99" class="text-end">
+                                            Sous-total sous-traitance : <span t-field="o.amount_subcontract" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+
+                        <!-- ===== LIGNES AUTRES (consommables, divers) ===== -->
+                        <t t-set="other_lines" t-value="o.line_ids.filtered(lambda l: l.line_type in ('consumable', 'misc'))"/>
+                        <t t-if="other_lines">
+                            <h5 class="mt-3">Divers</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center">Qté</th>
+                                        <th class="text-end">Prix unit.</th>
+                                        <th class="text-end">Total HT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="other_lines" t-as="line">
+                                        <tr>
+                                            <td><span t-field="line.name"/></td>
+                                            <td class="text-center"><span t-field="line.quantity"/></td>
+                                            <td class="text-end"><span t-field="line.unit_price" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                            <td class="text-end"><span t-field="line.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- ===== TOTAUX ===== -->
+                        <div class="row mt-4">
+                            <div class="col-6"/>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-muted">Total HT</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.global_discount_amount">
+                                        <td class="text-muted">
+                                            Remise (<span t-field="o.global_discount_rate" t-options='{"widget": "float", "precision": 1}'/>%)
+                                        </td>
+                                        <td class="text-end text-danger">
+                                            -<span t-field="o.global_discount_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">TVA (21%)</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr class="fw-bold" style="border-top: 2px solid #000;">
+                                        <td>Total TTC</td>
+                                        <td class="text-end">
+                                            <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ===== NOTES CLIENT ===== -->
+                        <div t-if="o.customer_notes" class="mt-4">
+                            <strong>Conditions et remarques :</strong>
+                            <div t-field="o.customer_notes"/>
+                        </div>
+
+                        <!-- ===== SIGNATURE ===== -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <p>Bon pour accord<br/><br/><br/>
+                                _______________________________<br/>
+                                <small>Date et signature du client</small></p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p>Pour le garage<br/><br/><br/>
+                                _______________________________<br/>
+                                <small><span t-field="o.company_id.name"/></small></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

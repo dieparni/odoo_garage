@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         Rapport QWeb : Extension facture Odoo avec infos garage
+         Hérite de account.report_invoice_document pour ajouter le bloc
+         véhicule / OR / sinistre sur les factures garage.
+         ================================================================ -->
+
+    <template id="report_invoice_garage_fields"
+              inherit_id="account.report_invoice_document"
+              priority="99">
+
+        <!-- Insérer un bloc info garage juste après l'adresse (informations div) -->
+        <xpath expr="//div[@id='informations']" position="after">
+            <t t-if="o.is_garage_invoice">
+                <div class="row mt-3 mb-3" id="garage_info_block">
+                    <div class="col-12">
+                        <table class="table table-sm table-bordered" style="background-color: #f8f9fa;">
+                            <tr t-if="o.garage_repair_order_id">
+                                <td class="text-muted" style="width:25%;">Ordre de réparation</td>
+                                <td><span t-field="o.garage_repair_order_id.name"/></td>
+                                <td class="text-muted" style="width:25%;">Type facture</td>
+                                <td><span t-field="o.garage_invoice_type"/></td>
+                            </tr>
+                            <tr t-if="o.garage_vehicle_id">
+                                <td class="text-muted">Véhicule</td>
+                                <td>
+                                    <span t-field="o.garage_vehicle_id.model_id.brand_id.name"/>
+                                    <span t-field="o.garage_vehicle_id.model_id.name"/>
+                                </td>
+                                <td class="text-muted">Immatriculation</td>
+                                <td><span t-field="o.garage_license_plate"/></td>
+                            </tr>
+                            <tr t-if="o.garage_claim_id">
+                                <td class="text-muted">N° sinistre</td>
+                                <td><span t-field="o.garage_claim_id.name"/></td>
+                                <td class="text-muted">Assurance</td>
+                                <td><span t-field="o.garage_claim_id.insurance_company_id.name"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
+        <!-- Mention franchise en bas de facture si applicable -->
+        <xpath expr="//div[@id='total']" position="after">
+            <t t-if="o.is_garage_invoice and o.garage_invoice_type == 'franchise'">
+                <p class="mt-2">
+                    <small class="text-muted">
+                        Cette facture correspond à la franchise du sinistre
+                        <span t-field="o.garage_claim_id.name"/>.
+                    </small>
+                </p>
+            </t>
+            <t t-if="o.is_garage_invoice and o.garage_invoice_type == 'insurance'">
+                <p class="mt-2">
+                    <small class="text-muted">
+                        Facture adressée à l'assurance dans le cadre du sinistre
+                        <span t-field="o.garage_claim_id.name"/>.
+                    </small>
+                </p>
+            </t>
+        </xpath>
+
+    </template>
+
+</odoo>
