@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Extension fleet.vehicle                               -->
+    <!-- ============================================================ -->
+    <record id="garage_vehicle_form" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.garage</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Référence garage après le name -->
+            <xpath expr="//field[@name='license_plate']" position="after">
+                <field name="garage_ref" readonly="1"/>
+            </xpath>
+
+            <!-- Notebook pages garage -->
+            <xpath expr="//notebook" position="inside">
+                <!-- Onglet Carrosserie / Peinture -->
+                <page string="Carrosserie / Peinture" name="page_body_paint">
+                    <group>
+                        <group string="Carrosserie">
+                            <field name="body_type"/>
+                            <field name="first_registration_date"/>
+                            <field name="registration_country_id"/>
+                        </group>
+                        <group string="Peinture">
+                            <field name="paint_code"/>
+                            <field name="paint_color_name"/>
+                            <field name="paint_system_id"/>
+                        </group>
+                    </group>
+                </page>
+
+                <!-- Onglet Mécanique -->
+                <page string="Mécanique" name="page_mechanic">
+                    <group>
+                        <group string="Moteur">
+                            <field name="engine_code"/>
+                            <field name="engine_displacement"/>
+                            <field name="power_kw"/>
+                            <field name="power_cv"/>
+                        </group>
+                        <group string="Transmission">
+                            <field name="transmission_type"/>
+                            <field name="drive_type"/>
+                        </group>
+                    </group>
+                    <group string="Électrique / Hybride"
+                           invisible="not is_electric">
+                        <group>
+                            <field name="is_electric" invisible="1"/>
+                            <field name="battery_capacity_kwh"/>
+                            <field name="charge_connector_type"/>
+                        </group>
+                    </group>
+                </page>
+
+                <!-- Onglet Contrôle technique & Garantie -->
+                <page string="CT &amp; Garantie" name="page_ct_warranty">
+                    <group>
+                        <group string="Contrôle technique">
+                            <field name="ct_last_date"/>
+                            <field name="ct_next_date"/>
+                            <field name="ct_result"/>
+                        </group>
+                        <group string="Garantie">
+                            <field name="warranty_end_date"/>
+                            <field name="is_under_warranty"/>
+                        </group>
+                    </group>
+                </page>
+
+                <!-- Onglet Propriété -->
+                <page string="Propriété" name="page_ownership">
+                    <group>
+                        <group>
+                            <field name="ownership_type"/>
+                            <field name="owner_id"/>
+                            <field name="leasing_company_id"
+                                   invisible="ownership_type not in ('leasing', 'lld')"/>
+                        </group>
+                    </group>
+                </page>
+
+                <!-- Onglet Notes -->
+                <page string="Notes internes" name="page_notes">
+                    <field name="internal_notes"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Extension fleet.vehicle                               -->
+    <!-- ============================================================ -->
+    <record id="garage_vehicle_tree" model="ir.ui.view">
+        <field name="name">fleet.vehicle.tree.garage</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='license_plate']" position="after">
+                <field name="vin_sn" string="VIN" optional="show"/>
+                <field name="body_type" optional="hide"/>
+                <field name="paint_code" optional="hide"/>
+                <field name="garage_ref" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Extension fleet.vehicle                             -->
+    <!-- ============================================================ -->
+    <record id="garage_vehicle_search" model="ir.ui.view">
+        <field name="name">fleet.vehicle.search.garage</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="vin_sn" string="VIN"/>
+                <field name="paint_code"/>
+                <field name="engine_code"/>
+                <separator/>
+                <filter string="Sous garantie" name="filter_warranty"
+                        domain="[('is_under_warranty', '=', True)]"/>
+                <filter string="Électrique/Hybride" name="filter_electric"
+                        domain="[('is_electric', '=', True)]"/>
+                <separator/>
+                <filter string="Berline" name="filter_sedan"
+                        domain="[('body_type', '=', 'sedan')]"/>
+                <filter string="SUV" name="filter_suv"
+                        domain="[('body_type', '=', 'suv')]"/>
+                <filter string="Utilitaire" name="filter_utilitaire"
+                        domain="[('body_type', '=', 'utilitaire')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Type carrosserie" name="group_body"
+                            context="{'group_by': 'body_type'}"/>
+                    <filter string="Propriété" name="group_ownership"
+                            context="{'group_by': 'ownership_type'}"/>
+                    <filter string="Système peinture" name="group_paint"
+                            context="{'group_by': 'paint_system_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Véhicules Garage                                    -->
+    <!-- ============================================================ -->
+    <record id="garage_vehicle_action" model="ir.actions.act_window">
+        <field name="name">Véhicules</field>
+        <field name="res_model">fleet.vehicle</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier véhicule
+            </p>
+            <p>
+                Enregistrez les véhicules de vos clients avec leurs
+                caractéristiques techniques et historique.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu racine -->
+    <menuitem id="garage_menu_root"
+        name="Garage"
+        sequence="30"
+        web_icon="garage_pro,static/description/icon.png"/>
+
+    <!-- Niveau 1 -->
+    <menuitem id="garage_menu_reception" name="Réception"
+        parent="garage_menu_root" sequence="10"/>
+    <menuitem id="garage_menu_workshop" name="Atelier"
+        parent="garage_menu_root" sequence="20"/>
+    <menuitem id="garage_menu_insurance" name="Assurances"
+        parent="garage_menu_root" sequence="30"/>
+    <menuitem id="garage_menu_billing" name="Facturation"
+        parent="garage_menu_root" sequence="40"/>
+    <menuitem id="garage_menu_stock" name="Pièces &amp; Stock"
+        parent="garage_menu_root" sequence="50"/>
+    <menuitem id="garage_menu_reporting" name="Reporting"
+        parent="garage_menu_root" sequence="60"/>
+    <menuitem id="garage_menu_config" name="Configuration"
+        parent="garage_menu_root" sequence="90"/>
+
+    <!-- Réception -->
+    <menuitem id="garage_menu_vehicles" name="Véhicules"
+        parent="garage_menu_reception"
+        action="garage_vehicle_action" sequence="10"/>
+    <menuitem id="garage_menu_customers" name="Clients"
+        parent="garage_menu_reception"
+        action="garage_customer_action" sequence="20"/>
+</odoo>

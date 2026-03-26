@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vehicle_receptionist,fleet.vehicle receptionist,fleet.model_fleet_vehicle,garage_pro.group_receptionist,1,1,1,0
+access_vehicle_manager,fleet.vehicle manager,fleet.model_fleet_vehicle,garage_pro.group_manager,1,1,1,1
+access_paint_system_receptionist,garage.paint.system receptionist,model_garage_paint_system,garage_pro.group_receptionist,1,0,0,0
+access_paint_system_manager,garage.paint.system manager,model_garage_paint_system,garage_pro.group_manager,1,1,1,1

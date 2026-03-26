@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Extension res.partner                                 -->
+    <!-- ============================================================ -->
+    <record id="garage_customer_form" model="ir.ui.view">
+        <field name="name">res.partner.form.garage</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Bannière client bloqué -->
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-danger" role="alert"
+                     invisible="not is_blocked_garage">
+                    <strong>Client bloqué :</strong>
+                    <field name="blocked_reason" readonly="1"/>
+                </div>
+            </xpath>
+
+            <!-- Bouton smart Véhicules -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_vehicles" type="object"
+                        class="oe_stat_button" icon="fa-car"
+                        invisible="not is_garage_customer">
+                    <field name="vehicle_count" widget="statinfo"
+                           string="Véhicules"/>
+                </button>
+            </xpath>
+
+            <!-- Checkbox client garage après le nom -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_garage_customer"/>
+            </xpath>
+
+            <!-- Onglets Garage dans le notebook -->
+            <xpath expr="//notebook" position="inside">
+                <!-- Garage — Général -->
+                <page string="Garage" name="page_garage"
+                      invisible="not is_garage_customer">
+                    <group>
+                        <group string="Identification">
+                            <field name="garage_customer_type"/>
+                            <field name="garage_price_list"/>
+                            <field name="garage_discount_rate"/>
+                        </group>
+                        <group string="Facturation garage">
+                            <field name="garage_payment_term_id"/>
+                            <field name="garage_credit_limit"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Préférences">
+                            <field name="preferred_language"/>
+                            <field name="preferred_contact_method"/>
+                            <field name="receive_maintenance_alerts"/>
+                            <field name="receive_ct_alerts"/>
+                        </group>
+                        <group string="Contentieux">
+                            <field name="is_blocked_garage"/>
+                            <field name="blocked_reason"
+                                   invisible="not is_blocked_garage"/>
+                        </group>
+                    </group>
+                </page>
+
+                <!-- Garage — Véhicules -->
+                <page string="Véhicules" name="page_garage_vehicles"
+                      invisible="not is_garage_customer">
+                    <field name="garage_vehicle_ids">
+                        <tree>
+                            <field name="license_plate"/>
+                            <field name="model_id"/>
+                            <field name="vin_sn" string="VIN"/>
+                            <field name="body_type"/>
+                        </tree>
+                    </field>
+                    <separator string="Véhicules possédés (propriétaire)"/>
+                    <field name="owned_vehicle_ids">
+                        <tree>
+                            <field name="license_plate"/>
+                            <field name="model_id"/>
+                            <field name="driver_id" string="Conducteur"/>
+                        </tree>
+                    </field>
+                </page>
+
+                <!-- Garage — Flotte -->
+                <page string="Flotte" name="page_garage_fleet"
+                      invisible="garage_customer_type != 'fleet_manager'">
+                    <group>
+                        <group>
+                            <field name="fleet_approval_required"/>
+                            <field name="fleet_approval_threshold"
+                                   invisible="not fleet_approval_required"/>
+                        </group>
+                    </group>
+                    <field name="fleet_contact_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Extension res.partner                                 -->
+    <!-- ============================================================ -->
+    <record id="garage_customer_tree" model="ir.ui.view">
+        <field name="name">res.partner.tree.garage</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="garage_customer_type" optional="hide"/>
+                <field name="vehicle_count" string="Véhicules" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Extension res.partner                               -->
+    <!-- ============================================================ -->
+    <record id="garage_customer_search" model="ir.ui.view">
+        <field name="name">res.partner.search.garage</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Clients garage" name="filter_garage"
+                        domain="[('is_garage_customer', '=', True)]"/>
+                <filter string="Bloqués" name="filter_blocked"
+                        domain="[('is_blocked_garage', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Clients Garage                                      -->
+    <!-- ============================================================ -->
+    <record id="garage_customer_action" model="ir.actions.act_window">
+        <field name="name">Clients Garage</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('is_garage_customer', '=', True)]</field>
+        <field name="context">{'default_is_garage_customer': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier client garage
+            </p>
+        </field>
+    </record>
+
+</odoo>

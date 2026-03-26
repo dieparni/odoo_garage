@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_garage" model="ir.module.category">
+        <field name="name">Garage</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="group_receptionist" model="res.groups">
+        <field name="name">Réceptionniste</field>
+        <field name="category_id" ref="module_category_garage"/>
+        <field name="comment">Peut créer des devis, accueillir les clients, consulter le planning.</field>
+    </record>
+
+    <record id="group_technician" model="res.groups">
+        <field name="name">Technicien</field>
+        <field name="category_id" ref="module_category_garage"/>
+        <field name="implied_ids" eval="[(4, ref('group_receptionist'))]"/>
+        <field name="comment">Peut pointer son temps, consommer des pièces, mettre à jour l'avancement.</field>
+    </record>
+
+    <record id="group_workshop_chief" model="res.groups">
+        <field name="name">Chef d'atelier</field>
+        <field name="category_id" ref="module_category_garage"/>
+        <field name="implied_ids" eval="[(4, ref('group_technician'))]"/>
+        <field name="comment">Peut gérer le planning, valider le QC, affecter les techniciens.</field>
+    </record>
+
+    <record id="group_accountant" model="res.groups">
+        <field name="name">Comptable garage</field>
+        <field name="category_id" ref="module_category_garage"/>
+        <field name="implied_ids" eval="[(4, ref('group_receptionist'))]"/>
+        <field name="comment">Peut créer des factures, gérer les paiements, suivre les créances assurance.</field>
+    </record>
+
+    <record id="group_manager" model="res.groups">
+        <field name="name">Gérant</field>
+        <field name="category_id" ref="module_category_garage"/>
+        <field name="implied_ids" eval="[(4, ref('group_workshop_chief')), (4, ref('group_accountant'))]"/>
+        <field name="comment">Accès complet : configuration, reporting, tous les modules.</field>
+    </record>
+</odoo>
