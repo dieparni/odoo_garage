@@ -179,6 +179,21 @@ class GarageInsuranceClaim(models.Model):
         currency_field='currency_id',
     )
 
+    # === DIFFÉRENCE ASSURANCE ===
+    insurance_shortfall = fields.Monetary(
+        string="Différence assurance",
+        compute='_compute_insurance_shortfall',
+        currency_field='currency_id',
+        store=True,
+        help="Montant non couvert si l'assurance paie moins que le total approuvé",
+    )
+    shortfall_action = fields.Selection([
+        ('none', 'Aucune'),
+        ('absorbed', 'Absorbé par le garage (perte)'),
+        ('refund_client', 'Refacturé au client'),
+        ('contested', "Contesté (relance assurance)"),
+    ], string="Traitement différence", default='none', tracking=True)
+
     # === VEI ===
     is_vei = fields.Boolean(string="Véhicule Économiquement Irréparable")
     vei_vehicle_value = fields.Monetary(
@@ -270,6 +285,15 @@ class GarageInsuranceClaim(models.Model):
                 for inv in invoices
                 if inv.payment_state in ('paid', 'in_payment')
             )
+
+    @api.depends('total_approved', 'paid_amount')
+    def _compute_insurance_shortfall(self):
+        for rec in self:
+            if rec.total_approved and rec.paid_amount:
+                diff = rec.total_approved - rec.paid_amount
+                rec.insurance_shortfall = diff if diff > 0 else 0.0
+            else:
+                rec.insurance_shortfall = 0.0
 
     @api.depends('document_ids')
     def _compute_document_count(self):

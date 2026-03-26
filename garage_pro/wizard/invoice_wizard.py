@@ -22,6 +22,7 @@ class GarageInvoiceWizard(models.TransientModel):
         ('deposit', 'Acompte client'),
         ('partial', 'Facture partielle (lignes terminées)'),
         ('courtesy_charge', 'Facturation courtoisie (dépassement)'),
+        ('shortfall_client', 'Différence assurance → client'),
     ], string="Scénario de facturation", required=True,
         default='client_full')
 
@@ -110,6 +111,8 @@ class GarageInvoiceWizard(models.TransientModel):
             invoices = self._create_partial_invoice(ro)
         elif self.invoice_scenario == 'courtesy_charge':
             invoices = self._create_courtesy_invoice(ro)
+        elif self.invoice_scenario == 'shortfall_client':
+            invoices = self._create_shortfall_client_invoice(ro)
 
         if not invoices:
             raise UserError("Aucune facture n'a pu être créée.")
@@ -168,7 +171,7 @@ class GarageInvoiceWizard(models.TransientModel):
 
     def _base_invoice_vals(self, ro, partner, garage_type):
         """Valeurs de base communes à toutes les factures garage."""
-        return {
+        vals = {
             'move_type': 'out_invoice',
             'partner_id': partner.id,
             'garage_repair_order_id': ro.id,
@@ -177,6 +180,11 @@ class GarageInvoiceWizard(models.TransientModel):
             'invoice_origin': ro.name,
             'ref': ro.name,
         }
+        # Appliquer la position fiscale du partenaire (ex: intracommunautaire LU)
+        fp = self.env['account.fiscal.position']._get_fiscal_position(partner)
+        if fp:
+            vals['fiscal_position_id'] = fp.id
+        return vals
 
     def _create_client_full_invoice(self, ro):
         """Scénario 1 : facture client intégrale."""
@@ -299,3 +307,29 @@ class GarageInvoiceWizard(models.TransientModel):
             'price_unit': rate,
         })]
         return self.env['account.move'].create(vals)
+
+    def _create_shortfall_client_invoice(self, ro):
+        """Scénario 9 : différence assurance refacturée au client."""
+        if not ro.claim_id:
+            raise UserError(
+                "L'OR doit être lié à un sinistre pour facturer "
+                "la différence assurance."
+            )
+        claim = ro.claim_id
+        shortfall = claim.insurance_shortfall
+        if not shortfall or shortfall <= 0:
+            raise UserError(
+                "Aucune différence assurance à facturer."
+            )
+
+        vals = self._base_invoice_vals(ro, ro.customer_id, 'client_full')
+        vals['invoice_line_ids'] = [(0, 0, {
+            'name': "Complément sinistre %s — différence non couverte par "
+                    "l'assurance" % claim.name,
+            'quantity': 1,
+            'price_unit': shortfall,
+        })]
+        invoice = self.env['account.move'].create(vals)
+        # Marquer le traitement sur le sinistre
+        claim.write({'shortfall_action': 'refund_client'})
+        return invoice

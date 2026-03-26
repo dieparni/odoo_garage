@@ -397,3 +397,59 @@ class TestGarageBilling(TransactionCase):
         self.assertEqual(
             action['context']['default_repair_order_id'], ro.id
         )
+
+    # ------------------------------------------------------------------
+    # Tests fiscal position on invoice
+    # ------------------------------------------------------------------
+
+    def test_wizard_applies_fiscal_position(self):
+        """Le wizard applique la position fiscale du partenaire."""
+        fp = self.env['account.fiscal.position'].create({
+            'name': 'Intracom LU Test',
+            'auto_apply': True,
+            'vat_required': True,
+        })
+        lu_partner = self.env['res.partner'].create({
+            'name': 'Client LU',
+            'is_garage_customer': True,
+            'property_account_position_id': fp.id,
+        })
+        ro = self._create_repair_order()
+        ro.write({'customer_id': lu_partner.id})
+        self._advance_ro_to_delivered(ro)
+
+        wizard = self.env['garage.invoice.wizard'].create({
+            'repair_order_id': ro.id,
+            'invoice_scenario': 'client_full',
+        })
+        action = wizard.action_create_invoices()
+        invoice = self.env['account.move'].browse(action['res_id'])
+        self.assertEqual(invoice.fiscal_position_id, fp)
+
+    # ------------------------------------------------------------------
+    # Tests shortfall invoice scenario
+    # ------------------------------------------------------------------
+
+    def test_wizard_shortfall_no_claim_error(self):
+        """Erreur si scénario shortfall sans sinistre."""
+        ro = self._create_repair_order(with_claim=False)
+        self._advance_ro_to_delivered(ro)
+
+        wizard = self.env['garage.invoice.wizard'].create({
+            'repair_order_id': ro.id,
+            'invoice_scenario': 'shortfall_client',
+        })
+        with self.assertRaises(UserError):
+            wizard.action_create_invoices()
+
+    def test_insurance_shortfall_fields(self):
+        """Les champs shortfall sont présents sur le sinistre."""
+        claim = self.env['garage.insurance.claim'].create({
+            'vehicle_id': self.vehicle.id,
+            'customer_id': self.partner.id,
+            'insurance_company_id': self.insurance.id,
+            'claim_date': date(2026, 1, 20),
+            'claim_type': 'collision',
+        })
+        self.assertEqual(claim.insurance_shortfall, 0.0)
+        self.assertEqual(claim.shortfall_action, 'none')

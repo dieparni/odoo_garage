@@ -160,6 +160,10 @@
                                 <group string="Suivi facturation">
                                     <field name="invoiced_amount"/>
                                     <field name="paid_amount"/>
+                                    <field name="insurance_shortfall"
+                                           invisible="insurance_shortfall == 0"/>
+                                    <field name="shortfall_action"
+                                           invisible="insurance_shortfall == 0"/>
                                 </group>
                             </group>
                         </page>

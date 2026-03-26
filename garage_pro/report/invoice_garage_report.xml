@@ -44,7 +44,46 @@
             </t>
         </xpath>
 
-        <!-- Mention franchise en bas de facture si applicable -->
+        <!-- Récapitulatif par catégorie (depuis les lignes de l'OR) -->
+        <xpath expr="//div[@id='total']" position="before">
+            <t t-if="o.is_garage_invoice and o.garage_repair_order_id and o.garage_repair_order_id.line_ids">
+                <t t-set="ro_lines" t-value="o.garage_repair_order_id.line_ids"/>
+                <t t-set="categories" t-value="[
+                    ('labor_body', 'Main d\'œuvre carrosserie'),
+                    ('labor_paint', 'Main d\'œuvre peinture'),
+                    ('labor_mech', 'Main d\'œuvre mécanique'),
+                    ('parts', 'Pièces détachées'),
+                    ('paint_material', 'Matière peinture'),
+                    ('subcontract', 'Sous-traitance'),
+                    ('consumable', 'Consommables'),
+                    ('misc', 'Divers'),
+                ]"/>
+                <div class="mt-3 mb-2">
+                    <strong>Récapitulatif par catégorie</strong>
+                    <table class="table table-sm mt-1">
+                        <thead>
+                            <tr>
+                                <th>Catégorie</th>
+                                <th class="text-end">Montant HT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="categories" t-as="cat">
+                                <t t-set="cat_lines" t-value="ro_lines.filtered(lambda l: l.line_type == cat[0])"/>
+                                <tr t-if="cat_lines">
+                                    <td t-out="cat[1]"/>
+                                    <td class="text-end">
+                                        <t t-out="'%.2f €' % sum(l.subtotal for l in cat_lines)"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </xpath>
+
+        <!-- Mention franchise / assurance / autoliquidation en bas de facture -->
         <xpath expr="//div[@id='total']" position="after">
             <t t-if="o.is_garage_invoice and o.garage_invoice_type == 'franchise'">
                 <p class="mt-2">
@@ -59,6 +98,19 @@
                     <small class="text-muted">
                         Facture adressée à l'assurance dans le cadre du sinistre
                         <span t-field="o.garage_claim_id.name"/>.
+                    </small>
+                </p>
+            </t>
+            <!-- Mention autoliquidation si position fiscale intracommunautaire -->
+            <t t-if="o.is_garage_invoice and o.fiscal_position_id and o.fiscal_position_id.vat_required">
+                <p class="mt-2">
+                    <strong>Autoliquidation de la TVA — art. 44 CTVA</strong><br/>
+                    <small class="text-muted">
+                        Livraison intracommunautaire exonérée de TVA.
+                        La taxe est due par le preneur (autoliquidation).
+                        <t t-if="o.fiscal_position_id.note">
+                            <br/><t t-out="o.fiscal_position_id.note"/>
+                        </t>
                     </small>
                 </p>
             </t>

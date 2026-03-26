@@ -74,14 +74,14 @@ class GarageMaintenancePlanItem(models.Model):
                  'interval_months')
     def _compute_next(self):
         for rec in self:
-            if rec.interval_km and rec.last_done_km:
-                rec.next_due_km = rec.last_done_km + rec.interval_km
+            if rec.interval_km:
+                rec.next_due_km = (rec.last_done_km or 0) + rec.interval_km
             else:
                 rec.next_due_km = 0
-            if rec.last_done_date and rec.interval_months:
+            if rec.interval_months:
+                base_date = rec.last_done_date or fields.Date.today()
                 rec.next_due_date = (
-                    rec.last_done_date
-                    + relativedelta(months=rec.interval_months)
+                    base_date + relativedelta(months=rec.interval_months)
                 )
             else:
                 rec.next_due_date = False
