@@ -6,3 +6,4 @@ from . import test_trades
 from . import test_planning
 from . import test_parts
 from . import test_subcontract_courtesy
+from . import test_billing

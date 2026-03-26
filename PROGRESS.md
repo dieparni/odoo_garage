@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 7 — 2026-03-26
-## Statut global : Phase 3 en cours (Agents 5-6-7 terminés)
+## Dernier agent : 8 — 2026-03-26
+## Statut global : Phase 3 en cours (Agents 5-6-7-8 terminés)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -75,20 +75,32 @@
   - Sécurité : 7 règles ACL (receptionist/chief/manager) pour 3 modèles
   - `tests/test_subcontract_courtesy.py` — 20 tests (workflows, retard, facturation jours, dommage, compteurs)
   - Installation OK, 0 erreurs, 124 tests passent
+- Agent 8 : Facturation multi-payeur (2026-03-26)
+  - `models/account_move.py` — extension account.move (garage_repair_order_id, garage_claim_id, garage_invoice_type, is_garage_invoice)
+  - `wizard/invoice_wizard.py` — garage.invoice.wizard (6 scénarios : client_full, insurance_split, insurance_only, deposit, partial, courtesy_charge)
+  - Champs différés sur repair_order : `invoice_ids`, `invoice_count`, `invoice_status`
+  - Champs différés sur customer : `total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date`, `garage_invoice_count`
+  - Actions OR : `action_open_invoice_wizard`, `action_view_invoices`, `action_create_credit_note`
+  - `views/billing_views.xml` — wizard form, inherit account.move form+tree, inherit OR form (bouton Facturer + onglet Factures), inherit customer form (stats facturation)
+  - Menu : Facturation > Factures (action filtrée sur is_garage_invoice)
+  - Sécurité : 2 règles ACL (receptionist/manager) pour le wizard
+  - `tests/test_billing.py` — 20 tests (scénarios client/assurance/franchise/acompte/partiel/avoir, erreurs, stats)
+  - Installation OK, 0 erreurs, 144 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 8 : Facturation multi-payeur — spec `12_to_16_billing_comms_quality_reporting.md`
-- Agent 9 : Communication, Qualité, Documentation — idem
-- Agent 10 : Reporting & Dashboards — idem
+- Agent 9 : Communication, Qualité, Documentation — spec `12_to_16_billing_comms_quality_reporting.md` (Modules 13-14-15)
+- Agent 10 : Reporting & Dashboards — spec `12_to_16_billing_comms_quality_reporting.md` (Module 16)
 - Agent 11 : CarVertical (Phase 2) — spec `carvertical.md`
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - TVA fixée à 21% en dur — à rendre configurable via ir.config_parameter
 - portal.mixin non inclus sur quotation/OR (nécessite module portal, à ajouter avec Agent 9)
+- Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré — à faire manuellement ou via Agent 9)
+- Rapport facture personnalisé (QWeb inherit) non implémenté — à ajouter avec Agent 9
 
 ### 📝 Champs différés (dépendent de modèles futurs)
 - `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
@@ -97,21 +109,22 @@
 - ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅
 - ~~`repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)~~ ✅
 - ~~`repair_order.courtesy_loan_id`, `has_courtesy_vehicle` → garage.courtesy.loan (Agent 7)~~ ✅
+- ~~`repair_order.invoice_ids`, `invoice_count`, `invoice_status` → account.move (Agent 8)~~ ✅
+- ~~`customer.total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date` → Agent 8~~ ✅
 - `repair_order.quality_check_id`, `qc_validated*` → garage.quality.checklist (Agent 9)
 - `repair_order.documentation_ids`, `photo_count` → garage.documentation (Agent 9)
-- `repair_order.invoice_ids`, `invoice_count`, `invoice_status`, `margin*` → account.move (Agent 8)
+- `repair_order.margin*` → compute basé sur invoice_ids (à enrichir)
 - `ro_line.stock_move_ids`, `parts_received` → stock.move (Agent 6 — à enrichir)
 - `claim.document_ids` → garage.documentation (Agent 9)
-- `customer.total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date` → Agent 8
 - `paint_consumption` → stock.move pour décrémentation stock (à enrichir)
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 124 tests passent (0 fail, 0 error)
-- Phases 1-2 complètes + Agent 7 (sous-traitance/courtoisie) terminé
-- `stock`, `purchase`, `product` sont dans les depends
-- Agent 8 doit lire la spec `12_to_16_billing_comms_quality_reporting.md` pour la facturation
-- Agent 8 : facturation multi-payeur (client + assurance + franchise), acomptes, avoir, TVA intracom Luxembourg
-- L'extension `account.move` est nécessaire pour le split client/assurance
-- Les consommations peinture ne décrémentent pas encore le stock (peut être enrichi)
-- Auto-création purchase.order sur rupture stock non implémentée (workflow complexe)
+- 144 tests garage_pro passent (0 fail, 0 error)
+- Phases 1-3 complètes (Agents 1 à 8)
+- Agent 9 doit lire la spec `12_to_16_billing_comms_quality_reporting.md` sections Module 13 (Communication), Module 14 (Qualité), Module 15 (Documentation)
+- Agent 9 doit créer : mail.template (3 templates), ir.cron (4 crons), garage.quality.checklist + item, garage.documentation, controllers/portal.py
+- Ajouter `portal` aux depends pour l'extension portail client
+- Les consommations peinture ne décrémentent pas encore le stock
+- Auto-création purchase.order sur rupture stock non implémentée
+- Le rapport facture personnalisé (QWeb) peut être ajouté en Agent 9 (section docs/reporting)
