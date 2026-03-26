@@ -120,11 +120,39 @@
         </field>
     </record>
 
+    <!-- CARROSSERIE — Kanban -->
+    <record id="garage_bodywork_operation_kanban" model="ir.ui.view">
+        <field name="name">garage.bodywork.operation.kanban</field>
+        <field name="model">garage.bodywork.operation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <field name="damage_zone"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong><field name="name"/></strong>
+                                <div><field name="repair_order_id"/></div>
+                                <div class="text-muted" t-if="record.technician_id.value">
+                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- CARROSSERIE — Action -->
     <record id="garage_bodywork_operation_action" model="ir.actions.act_window">
         <field name="name">Carrosserie</field>
         <field name="res_model">garage.bodywork.operation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -278,11 +306,39 @@
         </field>
     </record>
 
+    <!-- PEINTURE — Kanban -->
+    <record id="garage_paint_operation_kanban" model="ir.ui.view">
+        <field name="name">garage.paint.operation.kanban</field>
+        <field name="model">garage.paint.operation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <field name="zone"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong><field name="name"/></strong>
+                                <div><field name="repair_order_id"/></div>
+                                <div class="text-muted" t-if="record.technician_id.value">
+                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- PEINTURE — Action -->
     <record id="garage_paint_operation_action" model="ir.actions.act_window">
         <field name="name">Peinture</field>
         <field name="res_model">garage.paint.operation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucune opération de peinture
@@ -486,11 +542,39 @@
         </field>
     </record>
 
+    <!-- MÉCANIQUE — Kanban -->
+    <record id="garage_mechanic_operation_kanban" model="ir.ui.view">
+        <field name="name">garage.mechanic.operation.kanban</field>
+        <field name="model">garage.mechanic.operation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="technician_id"/>
+                <field name="operation_category"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong><field name="name"/></strong>
+                                <div><field name="repair_order_id"/></div>
+                                <div class="text-muted" t-if="record.technician_id.value">
+                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <!-- MÉCANIQUE — Action -->
     <record id="garage_mechanic_operation_action" model="ir.actions.act_window">
         <field name="name">Mécanique</field>
         <field name="res_model">garage.mechanic.operation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

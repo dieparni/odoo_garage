@@ -21,6 +21,13 @@
                 <t t-set="text">Consultez et acceptez vos devis</t>
                 <t t-set="placeholder_count" t-value="'quotation_count'"/>
             </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/garage_pro/static/description/icon.png'"/>
+                <t t-set="title">Factures garage</t>
+                <t t-set="url" t-value="'/my/garage-invoices'"/>
+                <t t-set="text">Consultez vos factures</t>
+                <t t-set="placeholder_count" t-value="'garage_invoice_count'"/>
+            </t>
         </xpath>
     </template>
 
@@ -237,6 +244,10 @@
                                 </div>
                             </t>
                         </div>
+                        <a t-attf-href="/my/repair-orders/#{order.id}/documents"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fa fa-folder-open"/> Voir tous les documents
+                        </a>
                     </t>
                 </div>
             </div>
@@ -451,6 +462,212 @@
             <div class="mt-3">
                 <a href="/my/garage-quotations" class="btn btn-secondary">
                     <i class="fa fa-arrow-left"/> Retour à la liste
+                </a>
+            </div>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Liste des factures garage                                   -->
+    <!-- ============================================================ -->
+    <template id="portal_my_garage_invoices" name="Mes factures garage">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Factures garage</t>
+            </t>
+
+            <t t-if="not invoices">
+                <div class="alert alert-info" role="alert">
+                    Aucune facture trouvée.
+                </div>
+            </t>
+
+            <t t-if="invoices">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Référence</th>
+                                <th>Véhicule</th>
+                                <th>Date</th>
+                                <th>Statut paiement</th>
+                                <th class="text-end">Montant</th>
+                                <th class="text-end">Restant dû</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="invoices" t-as="inv">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/garage-invoices/#{inv.id}">
+                                            <t t-out="inv.name"/>
+                                        </a>
+                                    </td>
+                                    <td><t t-out="inv.garage_license_plate"/></td>
+                                    <td><t t-out="inv.invoice_date"/></td>
+                                    <td>
+                                        <span t-attf-class="badge #{
+                                            'bg-success' if inv.payment_state in ('paid', 'in_payment') else
+                                            'bg-warning' if inv.payment_state == 'partial' else
+                                            'bg-secondary'
+                                        }">
+                                            <t t-out="dict(inv._fields['payment_state'].selection).get(inv.payment_state, inv.payment_state)"/>
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-out="inv.amount_total" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-out="inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Détail d'une facture garage                                  -->
+    <!-- ============================================================ -->
+    <template id="portal_garage_invoice_detail" name="Détail facture garage">
+        <t t-call="portal.portal_layout">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="mb-0"><t t-out="invoice.name"/></h4>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span t-attf-class="badge fs-6 #{
+                                'bg-success' if invoice.payment_state in ('paid', 'in_payment') else
+                                'bg-warning' if invoice.payment_state == 'partial' else
+                                'bg-secondary'
+                            }">
+                                <t t-out="dict(invoice._fields['payment_state'].selection).get(invoice.payment_state, invoice.payment_state)"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Informations</h5>
+                            <table class="table table-sm table-borderless">
+                                <tr t-if="invoice.invoice_date">
+                                    <td class="fw-bold">Date</td>
+                                    <td><t t-out="invoice.invoice_date"/></td>
+                                </tr>
+                                <tr t-if="invoice.garage_license_plate">
+                                    <td class="fw-bold">Véhicule</td>
+                                    <td><t t-out="invoice.garage_license_plate"/></td>
+                                </tr>
+                                <tr t-if="invoice.invoice_origin">
+                                    <td class="fw-bold">Origine</td>
+                                    <td><t t-out="invoice.invoice_origin"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Montants</h5>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="fw-bold">Total TTC</td>
+                                    <td><t t-out="invoice.amount_total" t-options="{'widget': 'monetary', 'display_currency': invoice.currency_id}"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Restant dû</td>
+                                    <td><t t-out="invoice.amount_residual" t-options="{'widget': 'monetary', 'display_currency': invoice.currency_id}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <h5>Lignes de facture</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-center">Qté</th>
+                                    <th class="text-end">Prix unit.</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="invoice.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="line">
+                                    <tr>
+                                        <td><t t-out="line.name"/></td>
+                                        <td class="text-center"><t t-out="line.quantity"/></td>
+                                        <td class="text-end">
+                                            <t t-out="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': invoice.currency_id}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-out="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': invoice.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="/my/garage-invoices" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"/> Retour à la liste
+                </a>
+            </div>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Documents / Photos d'un OR                                  -->
+    <!-- ============================================================ -->
+    <template id="portal_repair_order_documents" name="Documents OR">
+        <t t-call="portal.portal_layout">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        Documents — <t t-out="order.name"/>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <t t-if="not documents">
+                        <div class="alert alert-info">
+                            Aucun document disponible.
+                        </div>
+                    </t>
+                    <t t-if="documents">
+                        <div class="row">
+                            <t t-foreach="documents" t-as="doc">
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-file-o fa-3x mb-2"/>
+                                            <p class="mb-0"><t t-out="doc.name"/></p>
+                                            <small class="text-muted">
+                                                <t t-out="dict(doc._fields['doc_type'].selection).get(doc.doc_type)"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a t-attf-href="/my/repair-orders/#{order.id}" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"/> Retour à l'OR
                 </a>
             </div>
         </t>

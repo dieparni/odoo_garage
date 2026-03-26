@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 20 (audit spec final) — 2026-03-26
-## Statut global : Tous agents terminés (1-20) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20
+## Dernier agent : 21 (comblement gaps spec-vs-implémentation) — 2026-03-26
+## Statut global : Tous agents terminés (1-21) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20 + gaps spec 21
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -217,6 +217,26 @@
   - Filtre "Suppléments en cours" + "Travaux en cours" ajoutés à la recherche sinistres
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 21 : Comblement gaps spec-vs-implémentation (2026-03-26)
+  - **Sinistre workflow complet** : `action_invoice()`, `action_mark_paid()`, `action_approve_waived()` (expertise dispensée)
+  - Auto-transition sinistre → `invoiced` lors de la facturation OR (via invoice wizard)
+  - Auto-transition sinistre → `paid` lors du paiement complet des factures (via account_move.write)
+  - Boutons "Marquer facturé", "Marquer payé", "Approuver (sans expertise)" dans claim form
+  - Affichage `invoiced_amount` / `paid_amount` dans l'onglet Financier du sinistre
+  - **Email assurance** : CC automatique vers `claims_email` lors de l'envoi du devis (`action_send`)
+  - **Approbation flotte** : blocage conversion devis→OR si montant > seuil + gestionnaire défini
+  - **Plafond crédit** : blocage conversion devis→OR si encours + devis > `garage_credit_limit`
+  - **Email VEI** : notification client par email lors du classement en perte totale + template `email_template_claim_vei`
+  - **Auto-flag `is_garage_customer`** : le partner est automatiquement marqué à la création d'un devis
+  - **CarVertical auto-lookup** : déclenchement automatique de la recherche à l'écriture du VIN (si activé en config)
+  - **RGPD** : `action_anonymize()` sur res.partner (anonymisation complète, irréversible, bloque les OR en cours)
+  - **Habilitation VE** : vérification `has_ev_certification` du technicien au démarrage des opérations carrosserie/peinture/mécanique sur véhicules électriques
+  - **Kanban** : vues kanban pour carrosserie, peinture, mécanique (groupées par statut) + planning slots
+  - **Portail factures** : liste + détail factures garage dans le portail client
+  - **Portail documents** : page dédiée aux documents/photos d'un OR
+  - Bouton "Anonymiser (RGPD)" dans la fiche client (groupe manager uniquement, avec confirmation)
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
@@ -227,6 +247,9 @@
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - ~~TVA fixée à 21% en dur~~ ✅ Agent 14 — configurable via ir.config_parameter
 - Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré)
+- Données de démo (véhicules, systèmes peinture) non créées (nice-to-have)
+- Vue Gantt planning non implémentée (fonctionnalité Odoo Enterprise)
+- Dashboard KPIs détaillés (taux occupation postes, aging créances, etc.) non implémentés en widgets
 - ~~Rapport facture personnalisé (QWeb inherit) non implémenté~~ ✅ Agent 13
 - ~~Portail client (controllers/portal.py) non implémenté~~ ✅ Agent 14
 - `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
@@ -251,7 +274,7 @@
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
 - **288 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
-- **Tous les agents (1-20) sont terminés** — conformité spec validée + audit final
+- **Tous les agents (1-21) sont terminés** — conformité spec validée + audit final + gaps comblés
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
