@@ -215,7 +215,7 @@
   - Vue Kanban sinistres — groupée par statut, carte avec référence/véhicule/client/montant/date
   - Action sinistres mise à jour : `tree,kanban,form`
   - Filtre "Suppléments en cours" + "Travaux en cours" ajoutés à la recherche sinistres
-  - Installation OK, 0 erreurs, 358 tests garage_pro passent
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
@@ -250,7 +250,7 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **358 tests garage_pro passent** (0 fail, 0 error)
+- **288 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
 - **Tous les agents (1-20) sont terminés** — conformité spec validée + audit final
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
