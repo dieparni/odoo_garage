@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 12 (champs différés) — 2026-03-26
-## Statut global : Phase 5 terminée + champs différés complétés ✅
+## Dernier agent : 13 (rapports QWeb) — 2026-03-26
+## Statut global : Phase 5 terminée + champs différés + rapports QWeb ✅
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -134,18 +134,26 @@
   - Vues : marge dans OR form footer + OR tree, cost_price/parts_received dans OR line tree
   - `tests/test_deferred.py` — 16 tests (formules, marge, stock moves, consommation peinture)
   - Installation OK, 0 erreurs, 234 tests garage_pro passent
+- Agent 13 : Rapports QWeb (2026-03-26)
+  - `report/quotation_report.xml` — rapport PDF devis (infos client/véhicule/sinistre, lignes par catégorie MO/pièces/peinture/sous-traitance/divers, totaux HT/TVA/TTC, remise, zone signature)
+  - `report/repair_order_report.xml` — rapport PDF OR (état, client, véhicule, sinistre, toutes lignes avec zones dommage, heures allouées/travaillées, totaux, techniciens, signature restitution)
+  - `report/invoice_garage_report.xml` — inherit account.report_invoice_document (bloc véhicule/OR/sinistre/type facture, mentions franchise et assurance)
+  - `report/quality_checklist_report.xml` — rapport PDF checklist QC (résultat global badge couleur, items avec coloration NOK, statistiques OK/NOK/NA, signature contrôleur/chef)
+  - Binding `report` sur les 3 modèles → menu Imprimer automatique dans les form views
+  - `tests/test_reports.py` — 12 tests (existence actions, rendu HTML, contenu véhicule/lignes/totaux/items QC)
+  - Installation OK, 0 erreurs, 246 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-12) sont terminés
+- Rien — tous les agents (1-13) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - TVA fixée à 21% en dur — à rendre configurable via ir.config_parameter
 - Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré)
-- Rapport facture personnalisé (QWeb inherit) non implémenté
+- ~~Rapport facture personnalisé (QWeb inherit) non implémenté~~ ✅ Agent 13
 - Portail client (controllers/portal.py) non implémenté — nécessite `portal` dans depends et templates QWeb
 - `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
 
@@ -167,10 +175,10 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 234 tests garage_pro passent (0 fail, 0 error)
-- **Toutes les phases (1-5) et tous les agents (1-12) sont terminés**
+- 246 tests garage_pro passent (0 fail, 0 error)
+- **Toutes les phases (1-5) et tous les agents (1-13) sont terminés**
 - **Tous les champs différés sont implémentés** — plus rien en attente
+- **4 rapports QWeb implémentés** : devis, OR, facture garage (inherit), checklist QC
 - Auto-création purchase.order sur rupture stock non implémentée
-- Le rapport facture personnalisé (QWeb) peut être ajouté plus tard
 - L'extension portail client (controllers/portal.py) peut être ajoutée dans un agent dédié
 - L'intégration CarVertical nécessite une clé API réelle pour fonctionner en production

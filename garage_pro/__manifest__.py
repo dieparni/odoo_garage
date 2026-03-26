@@ -40,6 +40,12 @@
         'data/garage_mail_templates.xml',
         'data/garage_crons.xml',
 
+        # Rapports
+        'report/quotation_report.xml',
+        'report/repair_order_report.xml',
+        'report/invoice_garage_report.xml',
+        'report/quality_checklist_report.xml',
+
         # Vues
         'views/vehicle_views.xml',
         'views/customer_views.xml',
