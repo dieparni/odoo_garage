@@ -515,12 +515,18 @@ class GarageRepairOrder(models.Model):
                     )
 
     def action_start(self):
-        """Confirmé/Attente pièces → En cours."""
+        """Confirmé/Attente pièces → En cours. Notifie le client."""
         self.write({
             'state': 'in_progress',
             'actual_start_date': fields.Datetime.now(),
             'vehicle_location': 'workshop',
         })
+        template = self.env.ref(
+            'garage_pro.email_template_or_in_progress', raise_if_not_found=False
+        )
+        if template:
+            for rec in self:
+                template.send_mail(rec.id, force_send=False)
 
     def action_enter_paint_booth(self):
         """En cours → En cabine."""
@@ -545,8 +551,14 @@ class GarageRepairOrder(models.Model):
         self.write({'state': 'qc_done'})
 
     def action_ready(self):
-        """QC validé → Prêt à livrer."""
+        """QC validé → Prêt à livrer. Notifie le client."""
         self.write({'state': 'ready'})
+        template = self.env.ref(
+            'garage_pro.email_template_or_ready', raise_if_not_found=False
+        )
+        if template:
+            for rec in self:
+                template.send_mail(rec.id, force_send=False)
 
     def action_deliver(self):
         """Prêt → Livré. Restitution du véhicule."""

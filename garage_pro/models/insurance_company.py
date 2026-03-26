@@ -98,6 +98,12 @@ class GarageInsuranceCompany(models.Model):
         string="Sinistres",
     )
     claim_count = fields.Integer(compute='_compute_claim_count')
+    total_outstanding = fields.Monetary(
+        string="Encours total",
+        compute='_compute_total_outstanding',
+        currency_field='currency_id',
+        help="Montant total des factures impayées liées à cette compagnie",
+    )
 
     currency_id = fields.Many2one(
         'res.currency',
@@ -116,6 +122,23 @@ class GarageInsuranceCompany(models.Model):
             rec.claim_count = self.env['garage.insurance.claim'].search_count([
                 ('insurance_company_id', '=', rec.id),
             ])
+
+    def _compute_total_outstanding(self):
+        """Calcule l'encours : factures ouvertes liées aux sinistres de cette compagnie."""
+        for rec in self:
+            claims = self.env['garage.insurance.claim'].search([
+                ('insurance_company_id', '=', rec.id),
+            ])
+            if claims:
+                invoices = self.env['account.move'].search([
+                    ('garage_claim_id', 'in', claims.ids),
+                    ('move_type', '=', 'out_invoice'),
+                    ('payment_state', 'not in', ('paid', 'reversed')),
+                    ('state', '=', 'posted'),
+                ])
+                rec.total_outstanding = sum(invoices.mapped('amount_residual'))
+            else:
+                rec.total_outstanding = 0.0
 
     # ------------------------------------------------------------------
     # Actions

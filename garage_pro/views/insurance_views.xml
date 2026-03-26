@@ -16,6 +16,11 @@
                             <field name="claim_count" widget="statinfo"
                                    string="Sinistres"/>
                         </button>
+                        <button class="oe_stat_button" icon="fa-euro"
+                                disabled="1">
+                            <field name="total_outstanding" widget="statinfo"
+                                   string="Encours"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <label for="name"/>
@@ -107,6 +112,7 @@
                 <field name="hourly_rate_bodywork"/>
                 <field name="hourly_rate_paint"/>
                 <field name="claim_count" string="Sinistres"/>
+                <field name="total_outstanding" string="Encours" optional="show"/>
             </tree>
         </field>
     </record>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Système de peinture                                   -->
+    <!-- ============================================================ -->
+    <record id="garage_paint_system_form" model="ir.ui.view">
+        <field name="name">garage.paint.system.form</field>
+        <field name="model">garage.paint.system</field>
+        <field name="arch" type="xml">
+            <form string="Système de peinture">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Ex: Standox"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="supplier_id"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Système de peinture                                   -->
+    <!-- ============================================================ -->
+    <record id="garage_paint_system_tree" model="ir.ui.view">
+        <field name="name">garage.paint.system.tree</field>
+        <field name="model">garage.paint.system</field>
+        <field name="arch" type="xml">
+            <tree string="Systèmes de peinture" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="supplier_id"/>
+                <field name="active" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Systèmes de peinture                                -->
+    <!-- ============================================================ -->
+    <record id="garage_paint_system_action" model="ir.actions.act_window">
+        <field name="name">Systèmes de peinture</field>
+        <field name="res_model">garage.paint.system</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajoutez votre premier système de peinture (Standox, Sikkens, PPG...)
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Paramètres Garage (ouvre les settings natifs)        -->
+    <!-- ============================================================ -->
+    <record id="garage_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Paramètres Garage</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'garage_pro'}</field>
+    </record>
+
+</odoo>

@@ -167,7 +167,11 @@ class GarageQuotation(models.Model):
     )
     date_validity = fields.Date(
         string="Date de validité",
-        default=lambda self: fields.Date.today() + timedelta(days=30),
+        default=lambda self: fields.Date.today() + timedelta(
+            days=int(self.env['ir.config_parameter'].sudo().get_param(
+                'garage_pro.quotation_validity_days', '30'
+            ))
+        ),
     )
     date_sent = fields.Datetime(string="Date d'envoi")
     date_approved = fields.Datetime(string="Date d'acceptation")
@@ -292,11 +296,17 @@ class GarageQuotation(models.Model):
     # ------------------------------------------------------------------
 
     def action_send(self):
-        """Brouillon → Envoyé."""
+        """Brouillon → Envoyé. Envoie le mail au client."""
         self.write({
             'state': 'sent',
             'date_sent': fields.Datetime.now(),
         })
+        template = self.env.ref(
+            'garage_pro.email_template_quotation_sent', raise_if_not_found=False
+        )
+        if template:
+            for rec in self:
+                template.send_mail(rec.id, force_send=False)
 
     def action_approve(self):
         """Envoyé → Accepté."""
