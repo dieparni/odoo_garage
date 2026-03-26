@@ -70,6 +70,7 @@
         'views/documentation_views.xml',
         'views/reporting_views.xml',
         'views/carvertical_views.xml',
+        'views/config_views.xml',
         'views/portal_templates.xml',
         'views/menus.xml',
     ],

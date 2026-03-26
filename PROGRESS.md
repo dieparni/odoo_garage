@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 17 (spec compliance) — 2026-03-26
-## Statut global : Tous agents terminés (1-14) ✅ — bugfix 15 + gaps 16 + compliance 17
+## Dernier agent : 18 (gaps fonctionnels spec) — 2026-03-26
+## Statut global : Tous agents terminés (1-18) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -182,11 +182,20 @@
   - `tests/test_config_wizard.py` — 15 tests (config defaults, ir.rules, wizard courtoisie)
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 18 : Gaps fonctionnels spec (2026-03-26)
+  - Mail templates : `send_mail()` appelé sur `quotation.action_send()`, `repair_order.action_start()`, `repair_order.action_ready()`
+  - `garage.paint.system` : form+tree+action+menu Configuration > Systèmes de peinture
+  - `insurance.company.total_outstanding` : champ monétaire calculé (encours factures impayées) + stat button + colonne tree
+  - `quotation.date_validity` : utilise `ir.config_parameter` `garage_pro.quotation_validity_days` au lieu de 30j en dur
+  - `group_accountant` : 3 ACL ajoutées (report_revenue, report_activity, invoice_wizard)
+  - `config_views.xml` : action Paramètres Garage + menu Configuration > Paramètres
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-17) sont terminés
+- Rien — tous les agents (1-18) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -216,7 +225,7 @@
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
 - **288 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-17) sont terminés** — aucun gap spec restant
+- **Tous les agents (1-18) sont terminés** — aucun gap spec restant
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos

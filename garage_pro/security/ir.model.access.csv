@@ -56,6 +56,7 @@ access_courtesy_vehicle_manager,garage.courtesy.vehicle manager,model_garage_cou
 access_courtesy_loan_receptionist,garage.courtesy.loan receptionist,model_garage_courtesy_loan,garage_pro.group_receptionist,1,1,1,0
 access_courtesy_loan_manager,garage.courtesy.loan manager,model_garage_courtesy_loan,garage_pro.group_manager,1,1,1,1
 access_invoice_wizard_receptionist,garage.invoice.wizard receptionist,model_garage_invoice_wizard,garage_pro.group_receptionist,1,1,1,0
+access_invoice_wizard_accountant,garage.invoice.wizard accountant,model_garage_invoice_wizard,garage_pro.group_accountant,1,1,1,0
 access_invoice_wizard_manager,garage.invoice.wizard manager,model_garage_invoice_wizard,garage_pro.group_manager,1,1,1,1
 access_quality_checklist_technician,garage.quality.checklist technician,model_garage_quality_checklist,garage_pro.group_technician,1,1,0,0
 access_quality_checklist_chief,garage.quality.checklist chief,model_garage_quality_checklist,garage_pro.group_workshop_chief,1,1,1,0
@@ -68,9 +69,11 @@ access_documentation_technician,garage.documentation technician,model_garage_doc
 access_documentation_manager,garage.documentation manager,model_garage_documentation,garage_pro.group_manager,1,1,1,1
 access_report_revenue_receptionist,garage.report.revenue receptionist,model_garage_report_revenue,garage_pro.group_receptionist,1,0,0,0
 access_report_revenue_chief,garage.report.revenue chief,model_garage_report_revenue,garage_pro.group_workshop_chief,1,0,0,0
+access_report_revenue_accountant,garage.report.revenue accountant,model_garage_report_revenue,garage_pro.group_accountant,1,0,0,0
 access_report_revenue_manager,garage.report.revenue manager,model_garage_report_revenue,garage_pro.group_manager,1,0,0,0
 access_report_activity_receptionist,garage.report.activity receptionist,model_garage_report_activity,garage_pro.group_receptionist,1,0,0,0
 access_report_activity_chief,garage.report.activity chief,model_garage_report_activity,garage_pro.group_workshop_chief,1,0,0,0
+access_report_activity_accountant,garage.report.activity accountant,model_garage_report_activity,garage_pro.group_accountant,1,0,0,0
 access_report_activity_manager,garage.report.activity manager,model_garage_report_activity,garage_pro.group_manager,1,0,0,0
 access_carvertical_cache_receptionist,garage.carvertical.cache receptionist,model_garage_carvertical_cache,garage_pro.group_receptionist,1,0,0,0
 access_carvertical_cache_manager,garage.carvertical.cache manager,model_garage_carvertical_cache,garage_pro.group_manager,1,1,1,1

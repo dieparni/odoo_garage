@@ -56,7 +56,13 @@
         parent="garage_menu_workshop"
         action="garage_technician_action" sequence="55"/>
 
-    <!-- Configuration : formules peinture -->
+    <!-- Configuration -->
+    <menuitem id="garage_menu_config_settings" name="Paramètres"
+        parent="garage_menu_config"
+        action="garage_config_settings_action" sequence="5"/>
+    <menuitem id="garage_menu_paint_systems" name="Systèmes de peinture"
+        parent="garage_menu_config"
+        action="garage_paint_system_action" sequence="10"/>
     <menuitem id="garage_menu_paint_formulas" name="Formules peinture"
         parent="garage_menu_config"
         action="garage_paint_formula_action" sequence="20"/>
