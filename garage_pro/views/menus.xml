@@ -37,6 +37,9 @@
     <menuitem id="garage_menu_repair_orders" name="Ordres de réparation"
         parent="garage_menu_workshop"
         action="garage_repair_order_action" sequence="10"/>
+    <menuitem id="garage_menu_planning" name="Planning"
+        parent="garage_menu_workshop"
+        action="garage_planning_slot_action" sequence="15"/>
     <menuitem id="garage_menu_bodywork" name="Carrosserie"
         parent="garage_menu_workshop"
         action="garage_bodywork_operation_action" sequence="20"/>
@@ -49,11 +52,17 @@
     <menuitem id="garage_menu_maintenance_plans" name="Plans d'entretien"
         parent="garage_menu_workshop"
         action="garage_maintenance_plan_action" sequence="50"/>
+    <menuitem id="garage_menu_technicians" name="Techniciens"
+        parent="garage_menu_workshop"
+        action="garage_technician_action" sequence="55"/>
 
     <!-- Configuration : formules peinture -->
     <menuitem id="garage_menu_paint_formulas" name="Formules peinture"
         parent="garage_menu_config"
         action="garage_paint_formula_action" sequence="20"/>
+    <menuitem id="garage_menu_workshop_posts" name="Postes de travail"
+        parent="garage_menu_config"
+        action="garage_workshop_post_action" sequence="30"/>
 
     <!-- Assurances -->
     <menuitem id="garage_menu_claims" name="Sinistres"

@@ -42,6 +42,7 @@
         'views/quotation_views.xml',
         'views/repair_order_views.xml',
         'views/trade_views.xml',
+        'views/planning_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

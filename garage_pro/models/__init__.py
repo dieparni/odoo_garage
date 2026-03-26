@@ -15,3 +15,6 @@ from . import paint_consumption
 from . import paint_operation
 from . import mechanic_operation
 from . import maintenance_plan
+from . import workshop_post
+from . import technician
+from . import planning_slot

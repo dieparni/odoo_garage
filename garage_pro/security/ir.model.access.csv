@@ -42,3 +42,9 @@ access_maint_plan_receptionist,garage.maintenance.plan receptionist,model_garage
 access_maint_plan_manager,garage.maintenance.plan manager,model_garage_maintenance_plan,garage_pro.group_manager,1,1,1,1
 access_maint_plan_item_receptionist,garage.maintenance.plan.item receptionist,model_garage_maintenance_plan_item,garage_pro.group_receptionist,1,0,0,0
 access_maint_plan_item_manager,garage.maintenance.plan.item manager,model_garage_maintenance_plan_item,garage_pro.group_manager,1,1,1,1
+access_workshop_post_technician,garage.workshop.post technician,model_garage_workshop_post,garage_pro.group_technician,1,0,0,0
+access_workshop_post_chief,garage.workshop.post chief,model_garage_workshop_post,garage_pro.group_workshop_chief,1,1,0,0
+access_workshop_post_manager,garage.workshop.post manager,model_garage_workshop_post,garage_pro.group_manager,1,1,1,1
+access_planning_slot_technician,garage.planning.slot technician,model_garage_planning_slot,garage_pro.group_technician,1,1,0,0
+access_planning_slot_chief,garage.planning.slot chief,model_garage_planning_slot,garage_pro.group_workshop_chief,1,1,1,0
+access_planning_slot_manager,garage.planning.slot manager,model_garage_planning_slot,garage_pro.group_manager,1,1,1,1

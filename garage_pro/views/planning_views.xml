@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- POSTE DE TRAVAIL — Form                                      -->
+    <!-- ============================================================ -->
+    <record id="garage_workshop_post_form" model="ir.ui.view">
+        <field name="name">garage.workshop.post.form</field>
+        <field name="model">garage.workshop.post</field>
+        <field name="arch" type="xml">
+            <form string="Poste de travail">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Ex : Pont 1, Cabine peinture"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Caractéristiques">
+                            <field name="code"/>
+                            <field name="post_type"/>
+                            <field name="capacity"/>
+                            <field name="is_bottleneck"/>
+                            <field name="active"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Notes">
+                            <field name="notes" placeholder="Équipement, limitations..."/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- POSTE DE TRAVAIL — Tree -->
+    <record id="garage_workshop_post_tree" model="ir.ui.view">
+        <field name="name">garage.workshop.post.tree</field>
+        <field name="model">garage.workshop.post</field>
+        <field name="arch" type="xml">
+            <tree string="Postes de travail">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="post_type"/>
+                <field name="capacity"/>
+                <field name="is_bottleneck"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- POSTE DE TRAVAIL — Search -->
+    <record id="garage_workshop_post_search" model="ir.ui.view">
+        <field name="name">garage.workshop.post.search</field>
+        <field name="model">garage.workshop.post</field>
+        <field name="arch" type="xml">
+            <search string="Postes de travail">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Goulots" name="filter_bottleneck"
+                        domain="[('is_bottleneck', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Type" name="group_type"
+                            context="{'group_by': 'post_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- POSTE DE TRAVAIL — Action -->
+    <record id="garage_workshop_post_action" model="ir.actions.act_window">
+        <field name="name">Postes de travail</field>
+        <field name="res_model">garage.workshop.post</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un poste de travail
+            </p>
+            <p>
+                Ponts, cabines de peinture, marbre, zones polyvalentes…
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- CRÉNEAU PLANNING — Form                                      -->
+    <!-- ============================================================ -->
+    <record id="garage_planning_slot_form" model="ir.ui.view">
+        <field name="name">garage.planning.slot.form</field>
+        <field name="model">garage.planning.slot</field>
+        <field name="arch" type="xml">
+            <form string="Créneau planning">
+                <header>
+                    <button name="action_start" type="object"
+                            string="Démarrer" class="btn-primary"
+                            invisible="state != 'planned'"/>
+                    <button name="action_done" type="object"
+                            string="Terminer" class="btn-primary"
+                            invisible="state != 'in_progress'"/>
+                    <button name="action_cancel" type="object"
+                            string="Annuler"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset" type="object"
+                            string="Replanifier"
+                            invisible="state not in ('done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,in_progress,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Affectation">
+                            <field name="repair_order_id"/>
+                            <field name="post_id"/>
+                            <field name="technician_id"/>
+                            <field name="operation_type"/>
+                        </group>
+                        <group string="Horaire">
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="duration_hours"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Informations">
+                            <field name="vehicle_plate"/>
+                            <field name="customer_name"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notes sur le créneau..."/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- CRÉNEAU PLANNING — Tree -->
+    <record id="garage_planning_slot_tree" model="ir.ui.view">
+        <field name="name">garage.planning.slot.tree</field>
+        <field name="model">garage.planning.slot</field>
+        <field name="arch" type="xml">
+            <tree string="Planning atelier"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'in_progress'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="repair_order_id"/>
+                <field name="vehicle_plate"/>
+                <field name="post_id"/>
+                <field name="technician_id"/>
+                <field name="operation_type"/>
+                <field name="duration_hours" sum="Total heures"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'planned'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- CRÉNEAU PLANNING — Search -->
+    <record id="garage_planning_slot_search" model="ir.ui.view">
+        <field name="name">garage.planning.slot.search</field>
+        <field name="model">garage.planning.slot</field>
+        <field name="arch" type="xml">
+            <search string="Planning atelier">
+                <field name="repair_order_id"/>
+                <field name="post_id"/>
+                <field name="technician_id"/>
+                <field name="vehicle_plate"/>
+                <separator/>
+                <filter string="Aujourd'hui" name="filter_today"
+                        domain="[('start_datetime', '&gt;=', (context_today()).strftime('%%Y-%%m-%%d')),
+                                 ('start_datetime', '&lt;', (context_today() + datetime.timedelta(days=1)).strftime('%%Y-%%m-%%d'))]"/>
+                <filter string="Cette semaine" name="filter_this_week"
+                        domain="[('start_datetime', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%%Y-%%m-%%d')),
+                                 ('start_datetime', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%%Y-%%m-%%d'))]"/>
+                <separator/>
+                <filter string="Planifié" name="filter_planned"
+                        domain="[('state', '=', 'planned')]"/>
+                <filter string="En cours" name="filter_in_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Poste" name="group_post"
+                            context="{'group_by': 'post_id'}"/>
+                    <filter string="Technicien" name="group_technician"
+                            context="{'group_by': 'technician_id'}"/>
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Type d'opération" name="group_operation"
+                            context="{'group_by': 'operation_type'}"/>
+                    <filter string="Date début" name="group_date"
+                            context="{'group_by': 'start_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- CRÉNEAU PLANNING — Calendar -->
+    <record id="garage_planning_slot_calendar" model="ir.ui.view">
+        <field name="name">garage.planning.slot.calendar</field>
+        <field name="model">garage.planning.slot</field>
+        <field name="arch" type="xml">
+            <calendar string="Planning atelier"
+                      date_start="start_datetime"
+                      date_stop="end_datetime"
+                      color="post_id"
+                      mode="week"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="repair_order_id"/>
+                <field name="vehicle_plate"/>
+                <field name="post_id"/>
+                <field name="technician_id"/>
+                <field name="operation_type"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- CRÉNEAU PLANNING — Action -->
+    <record id="garage_planning_slot_action" model="ir.actions.act_window">
+        <field name="name">Planning atelier</field>
+        <field name="res_model">garage.planning.slot</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="context">{'search_default_filter_planned': 1, 'search_default_filter_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Planifier un créneau
+            </p>
+            <p>
+                Affectez un OR à un poste et un technicien sur un créneau horaire.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- TECHNICIENS — Tree (vue filtrée de hr.employee)              -->
+    <!-- ============================================================ -->
+    <record id="garage_technician_tree" model="ir.ui.view">
+        <field name="name">hr.employee.garage.technician.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <tree string="Techniciens atelier">
+                <field name="name"/>
+                <field name="job_title"/>
+                <field name="garage_skill"/>
+                <field name="has_ev_certification"/>
+                <field name="daily_capacity_hours"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- TECHNICIENS — Action -->
+    <record id="garage_technician_action" model="ir.actions.act_window">
+        <field name="name">Techniciens</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_garage_technician', '=', True)]</field>
+        <field name="context">{'default_is_garage_technician': True}</field>
+    </record>
+
+</odoo>

@@ -108,6 +108,28 @@ class GarageRepairOrder(models.Model):
     estimated_delivery_date = fields.Date(
         string="Date restitution estimée",
     )
+    workshop_chief_id = fields.Many2one(
+        'hr.employee',
+        string="Chef d'atelier",
+        domain="[('is_garage_technician', '=', True)]",
+        tracking=True,
+    )
+    technician_ids = fields.Many2many(
+        'hr.employee',
+        'garage_ro_technician_rel',
+        'repair_order_id',
+        'employee_id',
+        string="Techniciens affectés",
+        domain="[('is_garage_technician', '=', True)]",
+    )
+    planning_slot_ids = fields.One2many(
+        'garage.planning.slot',
+        'repair_order_id',
+        string="Créneaux planning",
+    )
+    planning_slot_count = fields.Integer(
+        compute='_compute_planning_slot_count',
+    )
 
     # === VÉHICULE ===
     odometer_at_entry = fields.Integer(string="Km à l'entrée")
@@ -193,6 +215,11 @@ class GarageRepairOrder(models.Model):
             rec.bodywork_count = len(rec.bodywork_operation_ids)
             rec.paint_count = len(rec.paint_operation_ids)
             rec.mechanic_count = len(rec.mechanic_operation_ids)
+
+    @api.depends('planning_slot_ids')
+    def _compute_planning_slot_count(self):
+        for rec in self:
+            rec.planning_slot_count = len(rec.planning_slot_ids)
 
     @api.depends('line_ids.allocated_time', 'line_ids.actual_time')
     def _compute_hours(self):
