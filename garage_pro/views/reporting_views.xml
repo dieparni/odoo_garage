@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--  RAPPORT CA (garage.report.revenue)                         -->
+    <!-- ============================================================ -->
+
+    <!-- Search -->
+    <record id="garage_report_revenue_search" model="ir.ui.view">
+        <field name="name">garage.report.revenue.search</field>
+        <field name="model">garage.report.revenue</field>
+        <field name="arch" type="xml">
+            <search string="Recherche CA">
+                <field name="date"/>
+                <field name="activity_type"/>
+                <field name="customer_id"/>
+                <field name="vehicle_id"/>
+                <separator/>
+                <filter name="filter_bodywork" string="Carrosserie"
+                    domain="[('activity_type', '=', 'bodywork')]"/>
+                <filter name="filter_paint" string="Peinture"
+                    domain="[('activity_type', '=', 'paint')]"/>
+                <filter name="filter_mechanic" string="Mécanique"
+                    domain="[('activity_type', '=', 'mechanic')]"/>
+                <filter name="filter_parts" string="Pièces"
+                    domain="[('activity_type', '=', 'parts')]"/>
+                <filter name="filter_subcontract" string="Sous-traitance"
+                    domain="[('activity_type', '=', 'subcontract')]"/>
+                <separator/>
+                <filter name="filter_this_month" string="Ce mois"
+                    domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().day - 1)).strftime('%%Y-%%m-%%d'))]"/>
+                <filter name="filter_this_year" string="Cette année"
+                    domain="[('year', '=', time.strftime('%%Y'))]"/>
+                <separator/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_activity" string="Activité"
+                        context="{'group_by': 'activity_type'}"/>
+                    <filter name="group_month" string="Mois"
+                        context="{'group_by': 'month'}"/>
+                    <filter name="group_year" string="Année"
+                        context="{'group_by': 'year'}"/>
+                    <filter name="group_customer" string="Client"
+                        context="{'group_by': 'customer_id'}"/>
+                    <filter name="group_vehicle" string="Véhicule"
+                        context="{'group_by': 'vehicle_id'}"/>
+                    <filter name="group_state" string="Statut OR"
+                        context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree -->
+    <record id="garage_report_revenue_tree" model="ir.ui.view">
+        <field name="name">garage.report.revenue.tree</field>
+        <field name="model">garage.report.revenue</field>
+        <field name="arch" type="xml">
+            <tree string="Rapport CA" create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="month"/>
+                <field name="activity_type"/>
+                <field name="customer_id"/>
+                <field name="vehicle_id"/>
+                <field name="revenue" sum="Total CA"/>
+                <field name="cost" sum="Total coût"/>
+                <field name="margin" sum="Total marge"/>
+                <field name="margin_rate" avg="Taux moyen"/>
+                <field name="ro_count" sum="Total OR"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Pivot -->
+    <record id="garage_report_revenue_pivot" model="ir.ui.view">
+        <field name="name">garage.report.revenue.pivot</field>
+        <field name="model">garage.report.revenue</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse CA">
+                <field name="month" type="col"/>
+                <field name="activity_type" type="row"/>
+                <field name="revenue" type="measure"/>
+                <field name="ro_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph -->
+    <record id="garage_report_revenue_graph" model="ir.ui.view">
+        <field name="name">garage.report.revenue.graph</field>
+        <field name="model">garage.report.revenue</field>
+        <field name="arch" type="xml">
+            <graph string="CA par activité" type="bar" stacked="1">
+                <field name="month" type="row"/>
+                <field name="activity_type" type="col"/>
+                <field name="revenue" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="garage_report_revenue_action" model="ir.actions.act_window">
+        <field name="name">Chiffre d'affaires</field>
+        <field name="res_model">garage.report.revenue</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="garage_report_revenue_search"/>
+        <field name="context">{'search_default_group_activity': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune donnée de CA disponible.
+            </p>
+            <p>Les données apparaissent une fois que des OR sont livrés ou facturés.</p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  RAPPORT ACTIVITÉ (garage.report.activity)                  -->
+    <!-- ============================================================ -->
+
+    <!-- Search -->
+    <record id="garage_report_activity_search" model="ir.ui.view">
+        <field name="name">garage.report.activity.search</field>
+        <field name="model">garage.report.activity</field>
+        <field name="arch" type="xml">
+            <search string="Recherche activité">
+                <field name="date"/>
+                <separator/>
+                <filter name="filter_this_month" string="Ce mois"
+                    domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().day - 1)).strftime('%%Y-%%m-%%d'))]"/>
+                <filter name="filter_this_year" string="Cette année"
+                    domain="[('year', '=', time.strftime('%%Y'))]"/>
+                <separator/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_month" string="Mois"
+                        context="{'group_by': 'month'}"/>
+                    <filter name="group_year" string="Année"
+                        context="{'group_by': 'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree -->
+    <record id="garage_report_activity_tree" model="ir.ui.view">
+        <field name="name">garage.report.activity.tree</field>
+        <field name="model">garage.report.activity</field>
+        <field name="arch" type="xml">
+            <tree string="Activité atelier" create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="month"/>
+                <field name="ro_count" sum="Total OR"/>
+                <field name="total_allocated_hours" sum="Total alloué"/>
+                <field name="total_worked_hours" sum="Total travaillé"/>
+                <field name="productivity_rate" avg="Taux moyen"/>
+                <field name="avg_repair_days" avg="Délai moyen"/>
+                <field name="amount_untaxed" sum="Total CA"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Pivot -->
+    <record id="garage_report_activity_pivot" model="ir.ui.view">
+        <field name="name">garage.report.activity.pivot</field>
+        <field name="model">garage.report.activity</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse activité">
+                <field name="month" type="col"/>
+                <field name="ro_count" type="measure"/>
+                <field name="total_worked_hours" type="measure"/>
+                <field name="productivity_rate" type="measure"/>
+                <field name="avg_repair_days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph -->
+    <record id="garage_report_activity_graph" model="ir.ui.view">
+        <field name="name">garage.report.activity.graph</field>
+        <field name="model">garage.report.activity</field>
+        <field name="arch" type="xml">
+            <graph string="Productivité" type="line">
+                <field name="month" type="row"/>
+                <field name="productivity_rate" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="garage_report_activity_action" model="ir.actions.act_window">
+        <field name="name">Activité atelier</field>
+        <field name="res_model">garage.report.activity</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="search_view_id" ref="garage_report_activity_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune donnée d'activité disponible.
+            </p>
+            <p>Les données apparaissent une fois que des OR sont terminés.</p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  DASHBOARD — Vue kanban avec KPIs                           -->
+    <!-- ============================================================ -->
+
+    <record id="garage_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Tableau de bord Garage</field>
+        <field name="res_model">garage.repair.order</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{
+            'search_default_filter_active': 1,
+        }</field>
+        <field name="domain">[('state', 'not in', ['cancelled'])]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun OR en cours.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  MENUS REPORTING                                            -->
+    <!-- ============================================================ -->
+
+    <menuitem id="garage_menu_report_dashboard" name="Tableau de bord"
+        parent="garage_menu_reporting"
+        action="garage_dashboard_action" sequence="10"/>
+
+    <menuitem id="garage_menu_report_revenue" name="Chiffre d'affaires"
+        parent="garage_menu_reporting"
+        action="garage_report_revenue_action" sequence="20"/>
+
+    <menuitem id="garage_menu_report_activity" name="Activité atelier"
+        parent="garage_menu_reporting"
+        action="garage_report_activity_action" sequence="30"/>
+
+</odoo>
