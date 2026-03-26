@@ -286,6 +286,8 @@ class TestGarageQualityDocs(TransactionCase):
     def test_cron_vehicle_not_picked_up(self):
         """Cron crée une activité sur les OR 'ready' depuis > 7 jours."""
         self.repair_order.write({'state': 'ready'})
+        # Flush ORM writes avant SQL brut
+        self.env.flush_all()
         # Simuler un write_date ancien via SQL
         old_date = fields.Datetime.now() - timedelta(days=8)
         self.env.cr.execute(
@@ -311,6 +313,8 @@ class TestGarageQualityDocs(TransactionCase):
         })
         claim.action_declare()
         claim.action_request_expertise()
+        # Flush ORM writes avant SQL brut
+        self.env.flush_all()
         # Simuler un write_date ancien via SQL
         old_date = fields.Datetime.now() - timedelta(days=6)
         self.env.cr.execute(
