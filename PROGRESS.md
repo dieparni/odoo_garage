@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 16 (gap spec closure) — 2026-03-26
-## Statut global : Tous agents terminés (1-14) ✅ — bugfix 15 + gaps 16 comblés
+## Dernier agent : 17 (spec compliance) — 2026-03-26
+## Statut global : Tous agents terminés (1-14) ✅ — bugfix 15 + gaps 16 + compliance 17
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -169,11 +169,24 @@
   - `tests/test_gaps.py` — 11 tests (total_spent, insurance split, start_work, supplement wizard)
   - Installation OK, 0 erreurs, 273 tests garage_pro passent
 
+- Agent 17 : Conformité spec — fichiers manquants (2026-03-26)
+  - `data/garage_config_defaults.xml` — 5 paramètres par défaut (taux horaires carrosserie/peinture/mécanique, TVA, validité devis)
+  - `security/garage_pro_rules.xml` — 3 règles ir.rule multi-société (devis, OR, sous-traitance)
+  - `wizard/courtesy_return_wizard.py` — garage.courtesy.return.wizard (km retour, carburant, état des lieux, dommage)
+  - `wizard/courtesy_return_wizard.xml` — form wizard + action
+  - Bouton "Restituer" dans courtesy loan form ouvre le wizard (au lieu de l'action directe)
+  - `res_config_settings.py` — ajout taux horaires + validité devis dans Configuration > Garage
+  - Vues settings : sections "Taux horaires" et "Validité devis" dans Configuration > Garage
+  - Sécurité : 2 règles ACL pour le wizard restitution courtoisie
+  - Manifest mis à jour : `garage_pro_rules.xml`, `garage_config_defaults.xml`, `courtesy_return_wizard.xml`
+  - `tests/test_config_wizard.py` — 15 tests (config defaults, ir.rules, wizard courtoisie)
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-14) sont terminés
+- Rien — tous les agents (1-17) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -202,12 +215,15 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **273 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-14) sont terminés** + bugfix agent 15 + gaps agent 16
+- **288 tests garage_pro passent** (0 fail, 0 error)
+- **Tous les agents (1-17) sont terminés** — aucun gap spec restant
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
 - **TVA configurable** via Configuration > Garage > Facturation
+- **Taux horaires configurables** via Configuration > Garage > Taux horaires
 - **Auto-PO** sur rupture stock à la confirmation d'OR (avec fallback gracieux)
+- **Règles multi-société** (ir.rule) sur devis, OR, sous-traitance
+- **Wizard restitution courtoisie** avec état des lieux retour complet
 - L'intégration CarVertical nécessite une clé API réelle pour fonctionner en production
 - Position fiscale intracommunautaire Luxembourg reste à créer si chart of accounts est configuré

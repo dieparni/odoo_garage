@@ -14,3 +14,4 @@ from . import test_deferred
 from . import test_reports
 from . import test_portal_vat_po
 from . import test_gaps
+from . import test_config_wizard
