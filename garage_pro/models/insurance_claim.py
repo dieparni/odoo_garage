@@ -63,6 +63,14 @@ class GarageInsuranceClaim(models.Model):
         string="Expert assigné",
         domain="[('company_id', '=', insurance_company_id)]",
     )
+    quotation_id = fields.Many2one(
+        'garage.quotation',
+        string="Devis principal",
+    )
+    repair_order_id = fields.Many2one(
+        'garage.repair.order',
+        string="Ordre de réparation",
+    )
 
     # === SINISTRE ===
     claim_date = fields.Date(

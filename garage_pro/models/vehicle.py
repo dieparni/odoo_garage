@@ -147,6 +147,15 @@ class GarageVehicle(models.Model):
         compute='_compute_claim_count',
         string="Nombre de sinistres",
     )
+    repair_order_ids = fields.One2many(
+        'garage.repair.order',
+        'vehicle_id',
+        string="Ordres de réparation",
+    )
+    repair_order_count = fields.Integer(
+        compute='_compute_repair_order_count',
+        string="Nombre d'OR",
+    )
 
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
@@ -163,6 +172,12 @@ class GarageVehicle(models.Model):
     def _compute_claim_count(self):
         for rec in self:
             rec.claim_count = self.env['garage.insurance.claim'].search_count([
+                ('vehicle_id', '=', rec.id),
+            ])
+
+    def _compute_repair_order_count(self):
+        for rec in self:
+            rec.repair_order_count = self.env['garage.repair.order'].search_count([
                 ('vehicle_id', '=', rec.id),
             ])
 
@@ -236,6 +251,17 @@ class GarageVehicle(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Sinistres',
             'res_model': 'garage.insurance.claim',
+            'view_mode': 'tree,form',
+            'domain': [('vehicle_id', '=', self.id)],
+        }
+
+    def action_view_repair_orders(self):
+        """Ouvre la liste des OR liés à ce véhicule."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Ordres de réparation',
+            'res_model': 'garage.repair.order',
             'view_mode': 'tree,form',
             'domain': [('vehicle_id', '=', self.id)],
         }

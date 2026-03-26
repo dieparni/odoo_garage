@@ -57,6 +57,16 @@ class ResPartner(models.Model):
         string="Nombre de véhicules",
     )
 
+    # === ORDRES DE RÉPARATION ===
+    repair_order_ids = fields.One2many(
+        'garage.repair.order',
+        'customer_id',
+        string="Ordres de réparation",
+    )
+    repair_order_count = fields.Integer(
+        compute='_compute_ro_count',
+    )
+
     # === FACTURATION GARAGE ===
     garage_payment_term_id = fields.Many2one(
         'account.payment.term',
@@ -158,6 +168,12 @@ class ResPartner(models.Model):
                 ('owner_id', '=', rec.id),
             ])
 
+    def _compute_ro_count(self):
+        for rec in self:
+            rec.repair_order_count = self.env['garage.repair.order'].search_count([
+                ('customer_id', '=', rec.id),
+            ])
+
     # ------------------------------------------------------------------
     # Contraintes
     # ------------------------------------------------------------------
@@ -173,6 +189,17 @@ class ResPartner(models.Model):
     # ------------------------------------------------------------------
     # Actions
     # ------------------------------------------------------------------
+
+    def action_view_repair_orders(self):
+        """Ouvre la liste des OR liés à ce partenaire."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Ordres de réparation',
+            'res_model': 'garage.repair.order',
+            'view_mode': 'tree,form',
+            'domain': [('customer_id', '=', self.id)],
+        }
 
     def action_view_vehicles(self):
         """Ouvre la liste des véhicules liés à ce partenaire."""

@@ -5,3 +5,7 @@ from . import insurance_company
 from . import insurance_expert
 from . import insurance_claim
 from . import insurance_supplement
+from . import quotation
+from . import quotation_line
+from . import repair_order
+from . import repair_order_line
