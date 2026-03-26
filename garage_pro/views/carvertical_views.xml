@@ -151,6 +151,17 @@
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app data-string="Garage" string="Garage" groups="garage_pro.group_manager">
+                    <block title="Facturation" name="billing_settings">
+                        <setting string="Taux TVA par défaut"
+                                 help="Taux de TVA appliqué sur les devis et ordres de réparation (ex: 21% pour la Belgique)">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="garage_default_vat_rate" class="col-lg-3 o_light_label"/>
+                                    <field name="garage_default_vat_rate"/> %
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
                     <block title="CarVertical" name="carvertical_settings">
                         <setting string="Clé API CarVertical"
                                  help="Saisissez votre clé API CarVertical pour activer la recherche d'historique véhicule">

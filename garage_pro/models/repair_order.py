@@ -369,9 +369,14 @@ class GarageRepairOrder(models.Model):
 
     @api.depends('line_ids.amount_total')
     def _compute_amounts(self):
+        vat_rate = float(
+            self.env['ir.config_parameter'].sudo().get_param(
+                'garage_pro.default_vat_rate', '21.0'
+            )
+        ) / 100.0
         for rec in self:
             rec.amount_untaxed = sum(rec.line_ids.mapped('amount_total'))
-            rec.amount_tax = rec.amount_untaxed * 0.21
+            rec.amount_tax = rec.amount_untaxed * vat_rate
             rec.amount_total = rec.amount_untaxed + rec.amount_tax
 
     @api.model
@@ -397,8 +402,81 @@ class GarageRepairOrder(models.Model):
     # ------------------------------------------------------------------
 
     def action_confirm(self):
-        """Brouillon → Confirmé."""
+        """Brouillon → Confirmé. Vérifie la disponibilité des pièces."""
         self.write({'state': 'confirmed'})
+        for rec in self:
+            missing_lines = rec.line_ids.filtered(
+                lambda l: (l.line_type == 'parts'
+                           and l.product_id
+                           and l.product_id.qty_available < l.quantity)
+            )
+            if missing_lines:
+                rec.write({'state': 'parts_waiting'})
+                rec._create_auto_purchase_orders(missing_lines)
+                rec.activity_schedule(
+                    'mail.mail_activity_data_todo',
+                    summary="Pièces manquantes — %s" % rec.name,
+                    note="Pièces à commander : %s" % ', '.join(
+                        missing_lines.mapped('name')
+                    ),
+                )
+
+    def _create_auto_purchase_orders(self, missing_lines):
+        """Crée des bons de commande fournisseur brouillon pour les pièces manquantes."""
+        self.ensure_one()
+        # Grouper par fournisseur (seller_id sur le product.template)
+        supplier_lines = {}
+        for line in missing_lines:
+            seller = line.product_id.seller_ids[:1]
+            partner = seller.partner_id if seller else False
+            if partner:
+                supplier_lines.setdefault(partner.id, {
+                    'partner': partner,
+                    'lines': self.env['garage.repair.order.line'],
+                })
+                supplier_lines[partner.id]['lines'] |= line
+            else:
+                # Pas de fournisseur défini — juste une notification
+                self.message_post(
+                    body="Aucun fournisseur défini pour la pièce « %s ». "
+                         "Commande manuelle requise." % line.name,
+                    message_type='notification',
+                )
+
+        PurchaseOrder = self.env['purchase.order']
+        for data in supplier_lines.values():
+            po_lines = []
+            for line in data['lines']:
+                qty_needed = line.quantity - line.product_id.qty_available
+                if qty_needed <= 0:
+                    continue
+                po_lines.append((0, 0, {
+                    'product_id': line.product_id.id,
+                    'name': line.name,
+                    'product_qty': qty_needed,
+                    'product_uom': (
+                        line.product_id.uom_po_id.id
+                        or line.product_id.uom_id.id
+                    ),
+                    'price_unit': (
+                        line.product_id.seller_ids[:1].price
+                        if line.product_id.seller_ids
+                        else line.cost_price
+                    ),
+                }))
+            if po_lines:
+                po = PurchaseOrder.create({
+                    'partner_id': data['partner'].id,
+                    'origin': self.name,
+                    'order_line': po_lines,
+                })
+                self.message_post(
+                    body="Commande fournisseur <a href='#' "
+                         "data-oe-model='purchase.order' "
+                         "data-oe-id='%d'>%s</a> créée automatiquement."
+                         % (po.id, po.name),
+                    message_type='notification',
+                )
 
     def action_start(self):
         """Confirmé/Attente pièces → En cours."""

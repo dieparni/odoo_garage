@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Compteurs page d'accueil portail                             -->
+    <!-- ============================================================ -->
+    <template id="portal_my_home_garage" name="Garage Pro - Accueil portail"
+              inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/garage_pro/static/description/icon.png'"/>
+                <t t-set="title">Ordres de réparation</t>
+                <t t-set="url" t-value="'/my/repair-orders'"/>
+                <t t-set="text">Suivez l'avancement de vos réparations</t>
+                <t t-set="placeholder_count" t-value="'repair_order_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/garage_pro/static/description/icon.png'"/>
+                <t t-set="title">Devis garage</t>
+                <t t-set="url" t-value="'/my/garage-quotations'"/>
+                <t t-set="text">Consultez et acceptez vos devis</t>
+                <t t-set="placeholder_count" t-value="'quotation_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Liste des OR                                                 -->
+    <!-- ============================================================ -->
+    <template id="portal_my_repair_orders" name="Mes ordres de réparation">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Ordres de réparation</t>
+            </t>
+
+            <t t-if="not orders">
+                <div class="alert alert-info" role="alert">
+                    Aucun ordre de réparation trouvé.
+                </div>
+            </t>
+
+            <t t-if="orders">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Référence</th>
+                                <th>Véhicule</th>
+                                <th>Immatriculation</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th class="text-end">Total TTC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="orders" t-as="order">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/repair-orders/#{order.id}">
+                                            <t t-out="order.name"/>
+                                        </a>
+                                    </td>
+                                    <td><t t-out="order.vehicle_id.display_name"/></td>
+                                    <td><t t-out="order.vehicle_id.license_plate"/></td>
+                                    <td>
+                                        <span t-attf-class="badge #{
+                                            'bg-success' if order.state in ('ready', 'delivered') else
+                                            'bg-primary' if order.state in ('in_progress', 'paint_booth', 'reassembly') else
+                                            'bg-warning' if order.state in ('qc_pending', 'parts_waiting') else
+                                            'bg-info' if order.state in ('confirmed', 'qc_done') else
+                                            'bg-secondary'
+                                        }">
+                                            <t t-out="dict(order._fields['state'].selection).get(order.state)"/>
+                                        </span>
+                                    </td>
+                                    <td><t t-out="order.create_date" t-options="{'widget': 'date'}"/></td>
+                                    <td class="text-end">
+                                        <t t-out="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Détail d'un OR                                               -->
+    <!-- ============================================================ -->
+    <template id="portal_repair_order_detail" name="Détail ordre de réparation">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert" groups="garage_pro.group_manager">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t t-set="backend_url" t-value="'/web#model=garage.repair.order&amp;id=%d' % order.id"/>
+                </t>
+            </t>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="mb-0">
+                                <t t-out="order.name"/>
+                            </h4>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span t-attf-class="badge fs-6 #{
+                                'bg-success' if order.state in ('ready', 'delivered') else
+                                'bg-primary' if order.state in ('in_progress', 'paint_booth', 'reassembly') else
+                                'bg-warning' if order.state in ('qc_pending', 'parts_waiting') else
+                                'bg-info' if order.state in ('confirmed', 'qc_done') else
+                                'bg-secondary'
+                            }">
+                                <t t-out="dict(order._fields['state'].selection).get(order.state)"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Informations véhicule -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Véhicule</h5>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="fw-bold">Véhicule</td>
+                                    <td><t t-out="order.vehicle_id.display_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Immatriculation</td>
+                                    <td><t t-out="order.vehicle_id.license_plate"/></td>
+                                </tr>
+                                <tr t-if="order.odometer_at_entry">
+                                    <td class="fw-bold">Km à l'entrée</td>
+                                    <td><t t-out="order.odometer_at_entry"/> km</td>
+                                </tr>
+                                <tr t-if="order.vehicle_location">
+                                    <td class="fw-bold">Localisation</td>
+                                    <td><t t-out="dict(order._fields['vehicle_location'].selection).get(order.vehicle_location)"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Dates</h5>
+                            <table class="table table-sm table-borderless">
+                                <tr t-if="order.create_date">
+                                    <td class="fw-bold">Date de création</td>
+                                    <td><t t-out="order.create_date" t-options="{'widget': 'date'}"/></td>
+                                </tr>
+                                <tr t-if="order.estimated_delivery_date">
+                                    <td class="fw-bold">Restitution estimée</td>
+                                    <td><t t-out="order.estimated_delivery_date"/></td>
+                                </tr>
+                                <tr t-if="order.actual_end_date">
+                                    <td class="fw-bold">Restitution réelle</td>
+                                    <td><t t-out="order.actual_end_date" t-options="{'widget': 'date'}"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Lignes de réparation -->
+                    <h5>Détail des travaux</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th class="text-center">Qté</th>
+                                    <th class="text-end">Prix unit.</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="order.line_ids" t-as="line">
+                                    <tr>
+                                        <td><t t-out="line.name"/></td>
+                                        <td>
+                                            <t t-out="dict(line._fields['line_type'].selection).get(line.line_type)"/>
+                                        </td>
+                                        <td class="text-center"><t t-out="line.quantity"/></td>
+                                        <td class="text-end">
+                                            <t t-out="line.unit_price" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-out="line.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                    <td class="text-end fw-bold">
+                                        <t t-out="order.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">TVA</td>
+                                    <td class="text-end">
+                                        <t t-out="order.amount_tax" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td colspan="4" class="text-end fw-bold fs-5">Total TTC</td>
+                                    <td class="text-end fw-bold fs-5">
+                                        <t t-out="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Photos / Documents -->
+                    <t t-if="order.documentation_ids">
+                        <h5 class="mt-4">Photos / Documents</h5>
+                        <div class="row">
+                            <t t-foreach="order.documentation_ids.filtered(lambda d: d.is_visible_portal)" t-as="doc">
+                                <div class="col-md-4 col-sm-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-file-o fa-3x mb-2"/>
+                                            <p class="mb-0"><t t-out="doc.name"/></p>
+                                            <small class="text-muted">
+                                                <t t-out="dict(doc._fields['doc_type'].selection).get(doc.doc_type)"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="/my/repair-orders" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"/> Retour à la liste
+                </a>
+            </div>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Liste des devis                                              -->
+    <!-- ============================================================ -->
+    <template id="portal_my_quotations" name="Mes devis garage">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Devis garage</t>
+            </t>
+
+            <t t-if="not quotations">
+                <div class="alert alert-info" role="alert">
+                    Aucun devis trouvé.
+                </div>
+            </t>
+
+            <t t-if="quotations">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Référence</th>
+                                <th>Véhicule</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Validité</th>
+                                <th class="text-end">Total TTC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="quotations" t-as="quot">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/garage-quotations/#{quot.id}">
+                                            <t t-out="quot.name"/>
+                                        </a>
+                                    </td>
+                                    <td><t t-out="quot.vehicle_id.display_name"/></td>
+                                    <td>
+                                        <span t-attf-class="badge #{
+                                            'bg-success' if quot.state == 'approved' else
+                                            'bg-primary' if quot.state == 'sent' else
+                                            'bg-danger' if quot.state == 'refused' else
+                                            'bg-info' if quot.state == 'converted' else
+                                            'bg-secondary'
+                                        }">
+                                            <t t-out="dict(quot._fields['state'].selection).get(quot.state)"/>
+                                        </span>
+                                    </td>
+                                    <td><t t-out="quot.date_quotation"/></td>
+                                    <td><t t-out="quot.date_validity"/></td>
+                                    <td class="text-end">
+                                        <t t-out="quot.amount_total" t-options="{'widget': 'monetary', 'display_currency': quot.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- Détail d'un devis                                            -->
+    <!-- ============================================================ -->
+    <template id="portal_quotation_detail" name="Détail devis garage">
+        <t t-call="portal.portal_layout">
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="mb-0">
+                                <t t-out="quotation.name"/>
+                                <small t-if="quotation.is_supplement" class="text-muted"> (Supplément)</small>
+                            </h4>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span t-attf-class="badge fs-6 #{
+                                'bg-success' if quotation.state == 'approved' else
+                                'bg-primary' if quotation.state == 'sent' else
+                                'bg-danger' if quotation.state == 'refused' else
+                                'bg-info' if quotation.state == 'converted' else
+                                'bg-secondary'
+                            }">
+                                <t t-out="dict(quotation._fields['state'].selection).get(quotation.state)"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Informations -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Véhicule</h5>
+                            <p>
+                                <t t-out="quotation.vehicle_id.display_name"/>
+                                <br/>
+                                Immatriculation : <t t-out="quotation.vehicle_plate"/>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Dates</h5>
+                            <p>
+                                Devis du : <t t-out="quotation.date_quotation"/><br/>
+                                Validité : <t t-out="quotation.date_validity"/>
+                                <t t-if="quotation.estimated_delivery_date">
+                                    <br/>Restitution estimée : <t t-out="quotation.estimated_delivery_date"/>
+                                </t>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Lignes -->
+                    <h5>Détail du devis</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th class="text-center">Qté</th>
+                                    <th class="text-end">Prix unit.</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="quotation.line_ids" t-as="line">
+                                    <tr>
+                                        <td><t t-out="line.name"/></td>
+                                        <td>
+                                            <t t-out="dict(line._fields['line_type'].selection).get(line.line_type)"/>
+                                        </td>
+                                        <td class="text-center"><t t-out="line.quantity"/></td>
+                                        <td class="text-end">
+                                            <t t-out="line.unit_price" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-out="line.amount_total" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr t-if="quotation.global_discount_amount">
+                                    <td colspan="4" class="text-end">Remise (<t t-out="quotation.global_discount_rate"/>%)</td>
+                                    <td class="text-end text-danger">
+                                        -<t t-out="quotation.global_discount_amount" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total HT</td>
+                                    <td class="text-end fw-bold">
+                                        <t t-out="quotation.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">TVA</td>
+                                    <td class="text-end">
+                                        <t t-out="quotation.amount_tax" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td colspan="4" class="text-end fw-bold fs-5">Total TTC</td>
+                                    <td class="text-end fw-bold fs-5">
+                                        <t t-out="quotation.amount_total" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Notes client -->
+                    <t t-if="quotation.customer_notes">
+                        <h5 class="mt-3">Remarques</h5>
+                        <div t-out="quotation.customer_notes"/>
+                    </t>
+
+                    <!-- Boutons Accepter / Refuser -->
+                    <t t-if="quotation.state == 'sent'">
+                        <div class="mt-4 text-center">
+                            <a t-attf-href="/my/garage-quotations/#{quotation.id}/accept"
+                               class="btn btn-success btn-lg me-2">
+                                <i class="fa fa-check"/> Accepter le devis
+                            </a>
+                            <a t-attf-href="/my/garage-quotations/#{quotation.id}/refuse"
+                               class="btn btn-outline-danger btn-lg">
+                                <i class="fa fa-times"/> Refuser le devis
+                            </a>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="/my/garage-quotations" class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"/> Retour à la liste
+                </a>
+            </div>
+        </t>
+    </template>
+
+</odoo>

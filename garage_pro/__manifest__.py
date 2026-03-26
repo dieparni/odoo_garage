@@ -28,6 +28,7 @@
         'stock',
         'purchase',
         'product',
+        'portal',
     ],
     'data': [
         # Sécurité (TOUJOURS en premier)
@@ -63,6 +64,7 @@
         'views/documentation_views.xml',
         'views/reporting_views.xml',
         'views/carvertical_views.xml',
+        'views/portal_templates.xml',
         'views/menus.xml',
     ],
     'installable': True,

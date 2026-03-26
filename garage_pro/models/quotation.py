@@ -237,8 +237,12 @@ class GarageQuotation(models.Model):
             )
             rec.global_discount_amount = discount
             rec.amount_untaxed = subtotal - discount
-            # TVA 21% Belgique — à rendre configurable via ir.config_parameter
-            rec.amount_tax = rec.amount_untaxed * 0.21
+            vat_rate = float(
+                self.env['ir.config_parameter'].sudo().get_param(
+                    'garage_pro.default_vat_rate', '21.0'
+                )
+            ) / 100.0
+            rec.amount_tax = rec.amount_untaxed * vat_rate
             rec.amount_total = rec.amount_untaxed + rec.amount_tax
 
     @api.depends('claim_id')
