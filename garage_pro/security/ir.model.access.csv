@@ -78,3 +78,5 @@ access_carvertical_wizard_receptionist,garage.carvertical.lookup.wizard receptio
 access_carvertical_wizard_manager,garage.carvertical.lookup.wizard manager,model_garage_carvertical_lookup_wizard,garage_pro.group_manager,1,1,1,1
 access_supplement_wizard_receptionist,garage.insurance.supplement.wizard receptionist,model_garage_insurance_supplement_wizard,garage_pro.group_receptionist,1,1,1,0
 access_supplement_wizard_manager,garage.insurance.supplement.wizard manager,model_garage_insurance_supplement_wizard,garage_pro.group_manager,1,1,1,1
+access_courtesy_return_wizard_receptionist,garage.courtesy.return.wizard receptionist,model_garage_courtesy_return_wizard,garage_pro.group_receptionist,1,1,1,0
+access_courtesy_return_wizard_manager,garage.courtesy.return.wizard manager,model_garage_courtesy_return_wizard,garage_pro.group_manager,1,1,1,1

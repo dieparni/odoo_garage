@@ -35,12 +35,17 @@
         # Sécurité (TOUJOURS en premier)
         'security/garage_pro_groups.xml',
         'security/ir.model.access.csv',
+        'security/garage_pro_rules.xml',
 
         # Données
         'data/garage_sequences.xml',
         'data/garage_product_categories.xml',
         'data/garage_mail_templates.xml',
         'data/garage_crons.xml',
+        'data/garage_config_defaults.xml',
+
+        # Wizards (avant les vues pour les références d'action)
+        'wizard/courtesy_return_wizard.xml',
 
         # Rapports
         'report/quotation_report.xml',

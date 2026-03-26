@@ -161,6 +161,44 @@
                                 </div>
                             </div>
                         </setting>
+                        <setting string="Validité devis"
+                                 help="Nombre de jours de validité par défaut pour les nouveaux devis">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="garage_quotation_validity_days" class="col-lg-3 o_light_label"/>
+                                    <field name="garage_quotation_validity_days"/> jours
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Taux horaires" name="hourly_rate_settings">
+                        <setting string="Carrosserie"
+                                 help="Taux horaire par défaut pour les travaux de carrosserie">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="garage_default_hourly_rate_body" class="col-lg-3 o_light_label"/>
+                                    <field name="garage_default_hourly_rate_body"/> €/h
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Peinture"
+                                 help="Taux horaire par défaut pour les travaux de peinture">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="garage_default_hourly_rate_paint" class="col-lg-3 o_light_label"/>
+                                    <field name="garage_default_hourly_rate_paint"/> €/h
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Mécanique"
+                                 help="Taux horaire par défaut pour les travaux de mécanique">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="garage_default_hourly_rate_mech" class="col-lg-3 o_light_label"/>
+                                    <field name="garage_default_hourly_rate_mech"/> €/h
+                                </div>
+                            </div>
+                        </setting>
                     </block>
                     <block title="CarVertical" name="carvertical_settings">
                         <setting string="Clé API CarVertical"

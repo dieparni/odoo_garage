@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="garage_default_hourly_body" model="ir.config_parameter">
+            <field name="key">garage_pro.default_hourly_rate_body</field>
+            <field name="value">55.0</field>
+        </record>
+        <record id="garage_default_hourly_paint" model="ir.config_parameter">
+            <field name="key">garage_pro.default_hourly_rate_paint</field>
+            <field name="value">55.0</field>
+        </record>
+        <record id="garage_default_hourly_mech" model="ir.config_parameter">
+            <field name="key">garage_pro.default_hourly_rate_mech</field>
+            <field name="value">60.0</field>
+        </record>
+        <record id="garage_default_vat_rate" model="ir.config_parameter">
+            <field name="key">garage_pro.default_vat_rate</field>
+            <field name="value">21.0</field>
+        </record>
+        <record id="garage_default_quotation_validity_days" model="ir.config_parameter">
+            <field name="key">garage_pro.quotation_validity_days</field>
+            <field name="value">30</field>
+        </record>
+    </data>
+</odoo>

@@ -16,6 +16,31 @@ class ResConfigSettings(models.TransientModel):
         help="Taux de TVA appliqué sur les devis et OR (ex: 21 pour la Belgique)",
     )
 
+    # === Taux horaires ===
+    garage_default_hourly_rate_body = fields.Float(
+        string="Taux horaire carrosserie (€/h)",
+        config_parameter='garage_pro.default_hourly_rate_body',
+        default=55.0,
+    )
+    garage_default_hourly_rate_paint = fields.Float(
+        string="Taux horaire peinture (€/h)",
+        config_parameter='garage_pro.default_hourly_rate_paint',
+        default=55.0,
+    )
+    garage_default_hourly_rate_mech = fields.Float(
+        string="Taux horaire mécanique (€/h)",
+        config_parameter='garage_pro.default_hourly_rate_mech',
+        default=60.0,
+    )
+
+    # === Devis ===
+    garage_quotation_validity_days = fields.Integer(
+        string="Validité devis (jours)",
+        config_parameter='garage_pro.quotation_validity_days',
+        default=30,
+        help="Nombre de jours de validité par défaut pour les devis",
+    )
+
     # === CarVertical ===
     carvertical_api_key = fields.Char(
         string="Clé API CarVertical",

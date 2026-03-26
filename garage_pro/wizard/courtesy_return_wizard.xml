@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="garage_courtesy_return_wizard_form" model="ir.ui.view">
+        <field name="name">garage.courtesy.return.wizard.form</field>
+        <field name="model">garage.courtesy.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Restitution véhicule de courtoisie">
+                <group>
+                    <group string="Prêt">
+                        <field name="loan_id"/>
+                        <field name="courtesy_vehicle_id"/>
+                        <field name="customer_id"/>
+                    </group>
+                    <group string="État au retour">
+                        <field name="km_end"/>
+                        <field name="fuel_level_end"/>
+                        <field name="has_damage"/>
+                        <field name="damage_description"
+                               invisible="not has_damage"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="condition_end"
+                           placeholder="Décrire l'état du véhicule au retour..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_return" type="object"
+                            string="Confirmer la restitution" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="garage_courtesy_return_wizard_action" model="ir.actions.act_window">
+        <field name="name">Restitution courtoisie</field>
+        <field name="res_model">garage.courtesy.return.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

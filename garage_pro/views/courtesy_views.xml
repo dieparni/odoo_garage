@@ -115,7 +115,8 @@
                     <button name="action_activate" type="object"
                             string="Activer le prêt" class="btn-primary"
                             invisible="state != 'reserved'"/>
-                    <button name="action_return" type="object"
+                    <button name="%(garage_courtesy_return_wizard_action)d"
+                            type="action"
                             string="Restituer" class="btn-primary"
                             invisible="state != 'active'"/>
                     <button name="action_cancel" type="object"
