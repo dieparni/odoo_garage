@@ -55,6 +55,7 @@
         'views/billing_views.xml',
         'views/quality_views.xml',
         'views/documentation_views.xml',
+        'views/reporting_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

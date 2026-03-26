@@ -8,3 +8,4 @@ from . import test_parts
 from . import test_subcontract_courtesy
 from . import test_billing
 from . import test_quality_docs
+from . import test_reporting
