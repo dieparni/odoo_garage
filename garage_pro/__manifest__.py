@@ -27,6 +27,7 @@
         'hr',
         'stock',
         'purchase',
+        'purchase_stock',
         'product',
         'portal',
     ],

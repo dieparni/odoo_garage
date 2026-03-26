@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 14 (TVA, auto-PO, portail) — 2026-03-26
-## Statut global : Tous agents terminés (1-14) ✅
+## Dernier agent : 15 (bugfix auto-PO) — 2026-03-26
+## Statut global : Tous agents terminés (1-14) ✅ — bugfix appliqué
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -147,7 +147,7 @@
   - Champ `garage_default_vat_rate` dans `res.config.settings` (section Facturation dans Configuration > Garage)
   - `quotation._compute_amounts` et `repair_order._compute_amounts` utilisent le taux configurable (défaut 21%)
   - `repair_order.action_confirm()` vérifie la disponibilité pièces → passe en `parts_waiting` si rupture
-  - `repair_order._create_auto_purchase_orders()` crée PO fournisseur brouillon automatiquement (groupé par fournisseur, avec savepoint pour robustesse)
+  - `repair_order._create_auto_purchase_orders()` crée PO fournisseur brouillon automatiquement (groupé par fournisseur, avec savepoint pour robustesse, picking_type_id résolu)
   - Notification activité + message si pièce sans fournisseur
   - `controllers/portal.py` — GaragePortal étend CustomerPortal (compteurs, liste OR, détail OR, liste devis, détail devis, accepter/refuser devis)
   - `views/portal_templates.xml` — 5 templates QWeb (accueil, liste OR, détail OR, liste devis, détail devis avec boutons accepter/refuser)
@@ -168,6 +168,7 @@
 - ~~Rapport facture personnalisé (QWeb inherit) non implémenté~~ ✅ Agent 13
 - ~~Portail client (controllers/portal.py) non implémenté~~ ✅ Agent 14
 - `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
+- ~~Auto-PO silencieusement en échec (picking_type_id absent)~~ ✅ Agent 15 — `purchase_stock` ajouté aux depends + picking_type résolu explicitement
 
 ### 📝 Champs différés (dépendent de modèles futurs)
 - ~~`vehicle.paint_formula_ids` → garage.paint.formula~~ ✅ Agent 12
@@ -188,7 +189,7 @@
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
 - **262 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-14) sont terminés**
+- **Tous les agents (1-14) sont terminés** + bugfix agent 15
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
