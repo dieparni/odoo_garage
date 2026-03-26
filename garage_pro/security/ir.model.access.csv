@@ -55,3 +55,5 @@ access_courtesy_vehicle_receptionist,garage.courtesy.vehicle receptionist,model_
 access_courtesy_vehicle_manager,garage.courtesy.vehicle manager,model_garage_courtesy_vehicle,garage_pro.group_manager,1,1,1,1
 access_courtesy_loan_receptionist,garage.courtesy.loan receptionist,model_garage_courtesy_loan,garage_pro.group_receptionist,1,1,1,0
 access_courtesy_loan_manager,garage.courtesy.loan manager,model_garage_courtesy_loan,garage_pro.group_manager,1,1,1,1
+access_invoice_wizard_receptionist,garage.invoice.wizard receptionist,model_garage_invoice_wizard,garage_pro.group_receptionist,1,1,1,0
+access_invoice_wizard_manager,garage.invoice.wizard manager,model_garage_invoice_wizard,garage_pro.group_manager,1,1,1,1

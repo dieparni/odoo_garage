@@ -50,6 +50,7 @@
         'views/parts_views.xml',
         'views/subcontract_views.xml',
         'views/courtesy_views.xml',
+        'views/billing_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

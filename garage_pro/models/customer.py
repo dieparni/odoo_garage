@@ -133,6 +133,26 @@ class ResPartner(models.Model):
         help="Montant au-dessus duquel le gestionnaire doit approuver",
     )
 
+    # === FACTURATION GARAGE — COMPUTE ===
+    total_invoiced_garage = fields.Monetary(
+        string="Total facturé garage",
+        compute='_compute_garage_invoice_stats',
+        currency_field='currency_id',
+    )
+    outstanding_garage_balance = fields.Monetary(
+        string="Encours garage",
+        compute='_compute_garage_invoice_stats',
+        currency_field='currency_id',
+    )
+    last_visit_date = fields.Date(
+        string="Dernière visite",
+        compute='_compute_last_visit_date',
+    )
+    garage_invoice_count = fields.Integer(
+        string="Nombre factures garage",
+        compute='_compute_garage_invoice_stats',
+    )
+
     # === CONTENTIEUX ===
     is_blocked_garage = fields.Boolean(
         string="Bloqué (garage)",
@@ -173,6 +193,33 @@ class ResPartner(models.Model):
             rec.repair_order_count = self.env['garage.repair.order'].search_count([
                 ('customer_id', '=', rec.id),
             ])
+
+    def _compute_garage_invoice_stats(self):
+        AccountMove = self.env['account.move']
+        for rec in self:
+            invoices = AccountMove.search([
+                ('partner_id', '=', rec.id),
+                ('is_garage_invoice', '=', True),
+                ('move_type', '=', 'out_invoice'),
+                ('state', '=', 'posted'),
+            ])
+            rec.garage_invoice_count = len(invoices)
+            rec.total_invoiced_garage = sum(invoices.mapped('amount_total'))
+            rec.outstanding_garage_balance = sum(
+                invoices.mapped('amount_residual')
+            )
+
+    def _compute_last_visit_date(self):
+        RepairOrder = self.env['garage.repair.order']
+        for rec in self:
+            last_ro = RepairOrder.search([
+                ('customer_id', '=', rec.id),
+                ('state', '=', 'delivered'),
+                ('actual_end_date', '!=', False),
+            ], order='actual_end_date desc', limit=1)
+            rec.last_visit_date = (
+                last_ro.actual_end_date.date() if last_ro else False
+            )
 
     # ------------------------------------------------------------------
     # Contraintes

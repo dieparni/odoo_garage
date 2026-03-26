@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Wizard : Facturation garage                                  -->
+    <!-- ============================================================ -->
+    <record id="garage_invoice_wizard_form" model="ir.ui.view">
+        <field name="name">garage.invoice.wizard.form</field>
+        <field name="model">garage.invoice.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Facturer l'OR">
+                <group>
+                    <field name="repair_order_id" readonly="1"/>
+                    <field name="customer_id" readonly="1"/>
+                    <field name="amount_untaxed" readonly="1"/>
+                    <field name="claim_id" readonly="1"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+                <group>
+                    <field name="invoice_scenario"/>
+                </group>
+                <group invisible="invoice_scenario != 'insurance_split'">
+                    <field name="insurance_company_partner_id" readonly="1"/>
+                    <field name="franchise_amount" readonly="1"/>
+                </group>
+                <group invisible="invoice_scenario != 'deposit'">
+                    <field name="deposit_amount"/>
+                </group>
+                <footer>
+                    <button name="action_create_invoices" type="object"
+                            string="Créer les factures" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit : account.move form — champs garage                  -->
+    <!-- ============================================================ -->
+    <record id="garage_account_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.garage</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="garage_repair_order_id"
+                       invisible="not is_garage_invoice"/>
+                <field name="garage_claim_id"
+                       invisible="not garage_claim_id"/>
+                <field name="garage_invoice_type"
+                       invisible="not is_garage_invoice"/>
+                <field name="garage_license_plate"
+                       invisible="not is_garage_invoice"/>
+                <field name="is_garage_invoice" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit : account.move tree — colonnes garage                -->
+    <!-- ============================================================ -->
+    <record id="garage_account_move_tree_inherit" model="ir.ui.view">
+        <field name="name">account.move.tree.garage</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="garage_repair_order_id" optional="hide"/>
+                <field name="garage_invoice_type" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Factures garage                                     -->
+    <!-- ============================================================ -->
+    <record id="garage_invoice_action" model="ir.actions.act_window">
+        <field name="name">Factures garage</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_garage_invoice', '=', True), ('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'search_default_posted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune facture garage
+            </p>
+            <p>
+                Les factures sont créées depuis les ordres de réparation.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit : OR form — bouton Facturer + onglet Factures        -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_form_billing_inherit" model="ir.ui.view">
+        <field name="name">garage.repair.order.form.billing</field>
+        <field name="model">garage.repair.order</field>
+        <field name="inherit_id" ref="garage_repair_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Bouton Facturer dans le header -->
+            <xpath expr="//button[@name='action_cancel']" position="before">
+                <button name="action_open_invoice_wizard" type="object"
+                        string="Facturer" class="btn-primary"
+                        invisible="state not in ('delivered', 'ready', 'qc_done', 'in_progress', 'paint_booth', 'reassembly')"/>
+                <button name="action_create_credit_note" type="object"
+                        string="Avoir"
+                        invisible="invoice_count == 0"/>
+            </xpath>
+            <!-- Smart button factures -->
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_invoices" type="object"
+                            class="oe_stat_button" icon="fa-pencil-square-o"
+                            invisible="invoice_count == 0">
+                        <field name="invoice_count" widget="statinfo"
+                               string="Factures"/>
+                    </button>
+                </div>
+            </xpath>
+            <!-- Onglet Facturation dans le notebook -->
+            <xpath expr="//page[@name='page_notes']" position="after">
+                <page string="Facturation" name="page_billing">
+                    <group>
+                        <field name="invoice_status"/>
+                    </group>
+                    <field name="invoice_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="garage_invoice_type"/>
+                            <field name="move_type"/>
+                            <field name="amount_total"/>
+                            <field name="amount_residual"/>
+                            <field name="payment_state" widget="badge"
+                                   decoration-success="payment_state == 'paid'"
+                                   decoration-warning="payment_state == 'partial'"
+                                   decoration-info="payment_state == 'not_paid'"/>
+                            <field name="state" widget="badge"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit : Customer form — stats facturation garage            -->
+    <!-- ============================================================ -->
+    <record id="garage_customer_form_billing_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.garage.billing</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="garage_pro.garage_customer_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='garage_credit_limit']" position="after">
+                <field name="total_invoiced_garage" readonly="1"/>
+                <field name="outstanding_garage_balance" readonly="1"/>
+                <field name="last_visit_date" readonly="1"/>
+                <field name="garage_invoice_count" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

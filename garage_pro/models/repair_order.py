@@ -200,6 +200,26 @@ class GarageRepairOrder(models.Model):
         store=True,
     )
 
+    # === FACTURATION ===
+    invoice_ids = fields.One2many(
+        'account.move',
+        'garage_repair_order_id',
+        string="Factures",
+        domain=[('move_type', 'in', ('out_invoice', 'out_refund'))],
+    )
+    invoice_count = fields.Integer(
+        compute='_compute_invoice_count',
+    )
+    invoice_status = fields.Selection([
+        ('no', 'Rien à facturer'),
+        ('to_invoice', 'À facturer'),
+        ('partial', 'Partiellement facturé'),
+        ('invoiced', 'Entièrement facturé'),
+    ], string="Statut facturation",
+        compute='_compute_invoice_status',
+        store=True,
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
     delivery_notes = fields.Html(string="Notes de restitution")
@@ -267,6 +287,24 @@ class GarageRepairOrder(models.Model):
                 )
             else:
                 rec.productivity_rate = 0.0
+
+    @api.depends('invoice_ids')
+    def _compute_invoice_count(self):
+        for rec in self:
+            rec.invoice_count = len(rec.invoice_ids)
+
+    @api.depends('invoice_ids', 'invoice_ids.payment_state', 'state')
+    def _compute_invoice_status(self):
+        for rec in self:
+            if not rec.invoice_ids:
+                if rec.state in ('delivered', 'ready', 'qc_done'):
+                    rec.invoice_status = 'to_invoice'
+                else:
+                    rec.invoice_status = 'no'
+            elif rec.state == 'invoiced':
+                rec.invoice_status = 'invoiced'
+            else:
+                rec.invoice_status = 'partial'
 
     @api.depends('line_ids.amount_total')
     def _compute_amounts(self):
@@ -354,3 +392,48 @@ class GarageRepairOrder(models.Model):
     def action_cancel(self):
         """Annuler l'OR."""
         self.write({'state': 'cancelled'})
+
+    def action_open_invoice_wizard(self):
+        """Ouvre l'assistant de facturation multi-payeur."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Facturer',
+            'res_model': 'garage.invoice.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_repair_order_id': self.id,
+            },
+        }
+
+    def action_view_invoices(self):
+        """Ouvre la liste des factures liées à cet OR."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Factures',
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', self.invoice_ids.ids)],
+        }
+
+    def action_create_credit_note(self):
+        """Crée un avoir lié à cet OR."""
+        self.ensure_one()
+        vals = {
+            'move_type': 'out_refund',
+            'partner_id': self.customer_id.id,
+            'garage_repair_order_id': self.id,
+            'garage_claim_id': self.claim_id.id if self.claim_id else False,
+            'invoice_origin': self.name,
+            'ref': "Avoir — %s" % self.name,
+        }
+        credit_note = self.env['account.move'].create(vals)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Avoir',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'res_id': credit_note.id,
+        }
