@@ -137,6 +137,17 @@ class GarageVehicle(models.Model):
         tracking=True,
     )
 
+    # === HISTORIQUE ===
+    claim_ids = fields.One2many(
+        'garage.insurance.claim',
+        'vehicle_id',
+        string="Sinistres",
+    )
+    claim_count = fields.Integer(
+        compute='_compute_claim_count',
+        string="Nombre de sinistres",
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
 
@@ -148,6 +159,12 @@ class GarageVehicle(models.Model):
     # ------------------------------------------------------------------
     # Compute
     # ------------------------------------------------------------------
+
+    def _compute_claim_count(self):
+        for rec in self:
+            rec.claim_count = self.env['garage.insurance.claim'].search_count([
+                ('vehicle_id', '=', rec.id),
+            ])
 
     @api.depends('power_kw')
     def _compute_power_cv(self):
@@ -207,6 +224,21 @@ class GarageVehicle(models.Model):
     # ------------------------------------------------------------------
     # CRUD
     # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
+
+    def action_view_claims(self):
+        """Ouvre la liste des sinistres liés à ce véhicule."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Sinistres',
+            'res_model': 'garage.insurance.claim',
+            'view_mode': 'tree,form',
+            'domain': [('vehicle_id', '=', self.id)],
+        }
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -8,5 +8,13 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <record id="seq_garage_claim" model="ir.sequence">
+            <field name="name">Sinistre garage</field>
+            <field name="code">garage.insurance.claim</field>
+            <field name="prefix">SIN/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

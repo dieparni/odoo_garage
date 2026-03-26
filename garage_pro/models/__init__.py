@@ -1,3 +1,7 @@
 from . import paint_system
 from . import vehicle
 from . import customer
+from . import insurance_company
+from . import insurance_expert
+from . import insurance_claim
+from . import insurance_supplement

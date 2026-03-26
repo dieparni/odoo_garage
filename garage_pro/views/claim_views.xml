@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Sinistre assurance                                    -->
+    <!-- ============================================================ -->
+    <record id="garage_claim_form" model="ir.ui.view">
+        <field name="name">garage.insurance.claim.form</field>
+        <field name="model">garage.insurance.claim</field>
+        <field name="arch" type="xml">
+            <form string="Sinistre">
+                <header>
+                    <button name="action_declare" type="object"
+                            string="Déclarer" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_request_expertise" type="object"
+                            string="Demander expertise"
+                            invisible="state != 'declared'"/>
+                    <button name="action_expertise_done" type="object"
+                            string="Expertise réalisée"
+                            invisible="state != 'expertise_pending'"/>
+                    <button name="action_approve" type="object"
+                            string="Approuver" class="btn-primary"
+                            invisible="state not in ('expertise_done', 'declared')"/>
+                    <button name="action_mark_vei" type="object"
+                            string="VEI (Perte totale)"
+                            invisible="state not in ('expertise_done', 'declared', 'approved')"
+                            confirm="Confirmer le classement en VEI ?"/>
+                    <button name="action_dispute" type="object"
+                            string="Litige"
+                            invisible="state in ('draft', 'cancelled', 'paid', 'disputed')"/>
+                    <button name="action_cancel" type="object"
+                            string="Annuler"
+                            invisible="state in ('cancelled', 'paid')"
+                            confirm="Confirmer l'annulation du sinistre ?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,declared,expertise_pending,expertise_done,approved,work_in_progress,invoiced,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Véhicule &amp; Client">
+                            <field name="vehicle_id"/>
+                            <field name="customer_id"/>
+                            <field name="claim_date"/>
+                            <field name="claim_type"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Assurance">
+                            <field name="insurance_company_id"/>
+                            <field name="expert_id"/>
+                            <field name="policy_number"/>
+                            <field name="insurance_claim_number"/>
+                            <field name="declaration_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <!-- Onglet Sinistre -->
+                        <page string="Sinistre" name="page_claim_detail">
+                            <group>
+                                <group>
+                                    <field name="has_third_party"/>
+                                    <field name="third_party_info"
+                                           invisible="not has_third_party"/>
+                                    <field name="police_report"/>
+                                    <field name="police_report_number"
+                                           invisible="not police_report"/>
+                                </group>
+                            </group>
+                            <separator string="Circonstances"/>
+                            <field name="claim_description"/>
+                        </page>
+
+                        <!-- Onglet Expertise -->
+                        <page string="Expertise" name="page_expertise">
+                            <group>
+                                <group>
+                                    <field name="expertise_type"/>
+                                    <field name="expertise_date"/>
+                                    <field name="expertise_done_date"/>
+                                </group>
+                                <group>
+                                    <field name="estimated_amount"/>
+                                    <field name="approved_amount"/>
+                                    <field name="supplement_amount"/>
+                                    <field name="total_approved"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="expertise_report"
+                                           filename="expertise_report_filename"/>
+                                    <field name="expertise_report_filename"
+                                           invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Onglet Suppléments -->
+                        <page string="Suppléments" name="page_supplements">
+                            <field name="supplement_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-warning="state == 'sent'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'rejected'"/>
+                                    <field name="approved_amount"/>
+                                    <field name="expert_response_date"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!-- Onglet VEI -->
+                        <page string="VEI" name="page_vei"
+                              invisible="not is_vei">
+                            <group>
+                                <group>
+                                    <field name="is_vei"/>
+                                    <field name="vei_vehicle_value"/>
+                                    <field name="vei_repair_cost"/>
+                                    <field name="vei_customer_decision"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Onglet Franchise -->
+                        <page string="Financier" name="page_financial">
+                            <group>
+                                <group string="Franchise">
+                                    <field name="franchise_type"/>
+                                    <field name="franchise_amount"
+                                           invisible="franchise_type not in ('fixed', 'variable')"/>
+                                    <field name="franchise_percentage"
+                                           invisible="franchise_type != 'percentage'"/>
+                                    <field name="franchise_computed"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Onglet Documents -->
+                        <page string="Documents" name="page_documents">
+                            <group>
+                                <group>
+                                    <field name="accident_report"
+                                           filename="accident_report_filename"/>
+                                    <field name="accident_report_filename"
+                                           invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Sinistres                                             -->
+    <!-- ============================================================ -->
+    <record id="garage_claim_tree" model="ir.ui.view">
+        <field name="name">garage.insurance.claim.tree</field>
+        <field name="model">garage.insurance.claim</field>
+        <field name="arch" type="xml">
+            <tree string="Sinistres"
+                  decoration-danger="state == 'disputed'"
+                  decoration-warning="state == 'vei'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="claim_date"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="insurance_company_id"/>
+                <field name="claim_type"/>
+                <field name="approved_amount" optional="show"/>
+                <field name="total_approved" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('draft', 'declared')"
+                       decoration-warning="state in ('expertise_pending', 'supplement_pending')"
+                       decoration-success="state in ('approved', 'supplement_approved', 'paid')"
+                       decoration-danger="state in ('vei', 'disputed', 'cancelled')"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Sinistres                                           -->
+    <!-- ============================================================ -->
+    <record id="garage_claim_search" model="ir.ui.view">
+        <field name="name">garage.insurance.claim.search</field>
+        <field name="model">garage.insurance.claim</field>
+        <field name="arch" type="xml">
+            <search string="Sinistres">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="insurance_company_id"/>
+                <field name="insurance_claim_number"/>
+                <separator/>
+                <filter string="Brouillon" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="En attente expertise" name="filter_expertise"
+                        domain="[('state', '=', 'expertise_pending')]"/>
+                <filter string="Approuvé" name="filter_approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter string="VEI" name="filter_vei"
+                        domain="[('is_vei', '=', True)]"/>
+                <filter string="Litige" name="filter_disputed"
+                        domain="[('state', '=', 'disputed')]"/>
+                <separator/>
+                <filter string="Collision" name="filter_collision"
+                        domain="[('claim_type', '=', 'collision')]"/>
+                <filter string="Grêle" name="filter_hail"
+                        domain="[('claim_type', '=', 'hail')]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Assurance" name="group_insurance"
+                            context="{'group_by': 'insurance_company_id'}"/>
+                    <filter string="Type" name="group_type"
+                            context="{'group_by': 'claim_type'}"/>
+                    <filter string="Date sinistre" name="group_date"
+                            context="{'group_by': 'claim_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Sinistres                                           -->
+    <!-- ============================================================ -->
+    <record id="garage_claim_action" model="ir.actions.act_window">
+        <field name="name">Sinistres</field>
+        <field name="res_model">garage.insurance.claim</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Enregistrez votre premier sinistre
+            </p>
+        </field>
+    </record>
+
+</odoo>

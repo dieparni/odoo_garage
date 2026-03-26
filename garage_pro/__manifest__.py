@@ -36,6 +36,8 @@
         # Vues
         'views/vehicle_views.xml',
         'views/customer_views.xml',
+        'views/insurance_views.xml',
+        'views/claim_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

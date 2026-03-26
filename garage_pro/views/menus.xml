@@ -29,4 +29,12 @@
     <menuitem id="garage_menu_customers" name="Clients"
         parent="garage_menu_reception"
         action="garage_customer_action" sequence="20"/>
+
+    <!-- Assurances -->
+    <menuitem id="garage_menu_claims" name="Sinistres"
+        parent="garage_menu_insurance"
+        action="garage_claim_action" sequence="10"/>
+    <menuitem id="garage_menu_insurance_companies" name="Compagnies"
+        parent="garage_menu_insurance"
+        action="garage_insurance_company_action" sequence="20"/>
 </odoo>

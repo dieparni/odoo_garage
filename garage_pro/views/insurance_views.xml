@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Compagnie d'assurance                                 -->
+    <!-- ============================================================ -->
+    <record id="garage_insurance_company_form" model="ir.ui.view">
+        <field name="name">garage.insurance.company.form</field>
+        <field name="model">garage.insurance.company</field>
+        <field name="arch" type="xml">
+            <form string="Compagnie d'assurance">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_claims" type="object"
+                                class="oe_stat_button" icon="fa-car-crash">
+                            <field name="claim_count" widget="statinfo"
+                                   string="Sinistres"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Ex: AXA Belgium"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="partner_id"/>
+                            <field name="convention_type"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="claims_email"/>
+                            <field name="portal_url" widget="url"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Barèmes" name="page_rates">
+                            <group>
+                                <group string="Taux horaires agréés">
+                                    <field name="hourly_rate_bodywork"/>
+                                    <field name="hourly_rate_paint"/>
+                                    <field name="hourly_rate_mechanic"/>
+                                </group>
+                                <group string="Pièces &amp; Matière">
+                                    <field name="parts_coefficient"/>
+                                    <field name="paint_material_rate"/>
+                                    <field name="allows_aftermarket_parts"/>
+                                    <field name="allows_used_parts"/>
+                                    <field name="max_vehicle_age_used_parts"
+                                           invisible="not allows_used_parts"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Contacts" name="page_contacts">
+                            <group>
+                                <group string="Contact principal">
+                                    <field name="main_contact_name"/>
+                                    <field name="main_contact_phone"/>
+                                    <field name="main_contact_email"/>
+                                </group>
+                            </group>
+                            <separator string="Experts agréés"/>
+                            <field name="expert_contact_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="phone"/>
+                                    <field name="email"/>
+                                    <field name="expertise_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Conditions" name="page_conditions">
+                            <group>
+                                <group>
+                                    <field name="payment_term_id"/>
+                                    <field name="average_payment_days"/>
+                                </group>
+                            </group>
+                            <separator string="Notes"/>
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Compagnie d'assurance                                 -->
+    <!-- ============================================================ -->
+    <record id="garage_insurance_company_tree" model="ir.ui.view">
+        <field name="name">garage.insurance.company.tree</field>
+        <field name="model">garage.insurance.company</field>
+        <field name="arch" type="xml">
+            <tree string="Compagnies d'assurance">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="convention_type"/>
+                <field name="hourly_rate_bodywork"/>
+                <field name="hourly_rate_paint"/>
+                <field name="claim_count" string="Sinistres"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Compagnie d'assurance                               -->
+    <!-- ============================================================ -->
+    <record id="garage_insurance_company_search" model="ir.ui.view">
+        <field name="name">garage.insurance.company.search</field>
+        <field name="model">garage.insurance.company</field>
+        <field name="arch" type="xml">
+            <search string="Compagnies d'assurance">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Convention directe" name="filter_direct"
+                        domain="[('convention_type', '=', 'direct')]"/>
+                <filter string="Archivées" name="filter_archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Compagnies d'assurance                              -->
+    <!-- ============================================================ -->
+    <record id="garage_insurance_company_action" model="ir.actions.act_window">
+        <field name="name">Compagnies d'assurance</field>
+        <field name="res_model">garage.insurance.company</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajoutez votre première compagnie d'assurance
+            </p>
+        </field>
+    </record>
+
+</odoo>

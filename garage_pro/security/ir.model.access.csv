@@ -6,3 +6,11 @@ access_vehicle_manager,fleet.vehicle manager,fleet.model_fleet_vehicle,garage_pr
 access_paint_system_receptionist,garage.paint.system receptionist,model_garage_paint_system,garage_pro.group_receptionist,1,0,0,0
 access_paint_system_technician,garage.paint.system technician,model_garage_paint_system,garage_pro.group_technician,1,0,0,0
 access_paint_system_manager,garage.paint.system manager,model_garage_paint_system,garage_pro.group_manager,1,1,1,1
+access_insurance_company_receptionist,garage.insurance.company receptionist,model_garage_insurance_company,garage_pro.group_receptionist,1,0,0,0
+access_insurance_company_manager,garage.insurance.company manager,model_garage_insurance_company,garage_pro.group_manager,1,1,1,1
+access_insurance_expert_receptionist,garage.insurance.expert receptionist,model_garage_insurance_expert,garage_pro.group_receptionist,1,0,0,0
+access_insurance_expert_manager,garage.insurance.expert manager,model_garage_insurance_expert,garage_pro.group_manager,1,1,1,1
+access_claim_receptionist,garage.insurance.claim receptionist,model_garage_insurance_claim,garage_pro.group_receptionist,1,1,1,0
+access_claim_manager,garage.insurance.claim manager,model_garage_insurance_claim,garage_pro.group_manager,1,1,1,1
+access_supplement_receptionist,garage.insurance.supplement receptionist,model_garage_insurance_supplement,garage_pro.group_receptionist,1,1,1,0
+access_supplement_manager,garage.insurance.supplement manager,model_garage_insurance_supplement,garage_pro.group_manager,1,1,1,1
