@@ -129,6 +129,25 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Sous-traitance" name="page_subcontract">
+                            <field name="subcontract_order_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="subcontractor_id"/>
+                                    <field name="service_type"/>
+                                    <field name="estimated_cost"/>
+                                    <field name="expected_return_date"/>
+                                    <field name="is_late" column_invisible="1"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Courtoisie" name="page_courtesy">
+                            <group>
+                                <field name="courtesy_loan_id"/>
+                                <field name="has_courtesy_vehicle"/>
+                            </group>
+                        </page>
                         <page string="Notes" name="page_notes">
                             <group>
                                 <field name="internal_notes"

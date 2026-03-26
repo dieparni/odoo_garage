@@ -48,3 +48,10 @@ access_workshop_post_manager,garage.workshop.post manager,model_garage_workshop_
 access_planning_slot_technician,garage.planning.slot technician,model_garage_planning_slot,garage_pro.group_technician,1,1,0,0
 access_planning_slot_chief,garage.planning.slot chief,model_garage_planning_slot,garage_pro.group_workshop_chief,1,1,1,0
 access_planning_slot_manager,garage.planning.slot manager,model_garage_planning_slot,garage_pro.group_manager,1,1,1,1
+access_subcontract_receptionist,garage.subcontract.order receptionist,model_garage_subcontract_order,garage_pro.group_receptionist,1,1,1,0
+access_subcontract_chief,garage.subcontract.order chief,model_garage_subcontract_order,garage_pro.group_workshop_chief,1,1,1,0
+access_subcontract_manager,garage.subcontract.order manager,model_garage_subcontract_order,garage_pro.group_manager,1,1,1,1
+access_courtesy_vehicle_receptionist,garage.courtesy.vehicle receptionist,model_garage_courtesy_vehicle,garage_pro.group_receptionist,1,1,0,0
+access_courtesy_vehicle_manager,garage.courtesy.vehicle manager,model_garage_courtesy_vehicle,garage_pro.group_manager,1,1,1,1
+access_courtesy_loan_receptionist,garage.courtesy.loan receptionist,model_garage_courtesy_loan,garage_pro.group_receptionist,1,1,1,0
+access_courtesy_loan_manager,garage.courtesy.loan manager,model_garage_courtesy_loan,garage_pro.group_manager,1,1,1,1

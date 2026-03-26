@@ -48,6 +48,8 @@
         'views/trade_views.xml',
         'views/planning_views.xml',
         'views/parts_views.xml',
+        'views/subcontract_views.xml',
+        'views/courtesy_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

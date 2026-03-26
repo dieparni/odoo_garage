@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- VÉHICULE DE COURTOISIE — Form                                -->
+    <!-- ============================================================ -->
+    <record id="garage_courtesy_vehicle_form" model="ir.ui.view">
+        <field name="name">garage.courtesy.vehicle.form</field>
+        <field name="model">garage.courtesy.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Véhicule de courtoisie">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_loans" type="object"
+                                class="oe_stat_button" icon="fa-history">
+                            <field name="loan_count" widget="statinfo"
+                                   string="Prêts"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="vehicle_id"/>
+                        <h1>
+                            <field name="vehicle_id"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Véhicule">
+                            <field name="name"/>
+                            <field name="insurance_expiry"/>
+                            <field name="ct_expiry"/>
+                            <field name="current_loan_id"/>
+                        </group>
+                        <group string="Tarification">
+                            <field name="daily_cost"/>
+                            <field name="daily_charge_rate"/>
+                            <field name="max_free_days"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notes sur le véhicule..."/>
+                    </group>
+                    <notebook>
+                        <page string="Historique des prêts" name="page_loans">
+                            <field name="loan_ids">
+                                <tree>
+                                    <field name="customer_id"/>
+                                    <field name="repair_order_id"/>
+                                    <field name="loan_start"/>
+                                    <field name="loan_end"/>
+                                    <field name="loan_days"/>
+                                    <field name="km_start"/>
+                                    <field name="km_end"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- VÉHICULE DE COURTOISIE — Tree -->
+    <record id="garage_courtesy_vehicle_tree" model="ir.ui.view">
+        <field name="name">garage.courtesy.vehicle.tree</field>
+        <field name="model">garage.courtesy.vehicle</field>
+        <field name="arch" type="xml">
+            <tree string="Véhicules de courtoisie"
+                  decoration-success="state == 'available'"
+                  decoration-warning="state == 'loaned'"
+                  decoration-danger="state == 'maintenance'"
+                  decoration-muted="state == 'unavailable'">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="insurance_expiry"/>
+                <field name="ct_expiry"/>
+                <field name="current_loan_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-warning="state == 'loaned'"
+                       decoration-danger="state in ('maintenance', 'unavailable')"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- VÉHICULE DE COURTOISIE — Action -->
+    <record id="garage_courtesy_vehicle_action" model="ir.actions.act_window">
+        <field name="name">Véhicules de courtoisie</field>
+        <field name="res_model">garage.courtesy.vehicle</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajouter un véhicule de courtoisie
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- PRÊT DE COURTOISIE — Form                                    -->
+    <!-- ============================================================ -->
+    <record id="garage_courtesy_loan_form" model="ir.ui.view">
+        <field name="name">garage.courtesy.loan.form</field>
+        <field name="model">garage.courtesy.loan</field>
+        <field name="arch" type="xml">
+            <form string="Prêt de courtoisie">
+                <header>
+                    <button name="action_activate" type="object"
+                            string="Activer le prêt" class="btn-primary"
+                            invisible="state != 'reserved'"/>
+                    <button name="action_return" type="object"
+                            string="Restituer" class="btn-primary"
+                            invisible="state != 'active'"/>
+                    <button name="action_cancel" type="object"
+                            string="Annuler réservation"
+                            invisible="state not in ('reserved', 'active')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="reserved,active,returned"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Prêt">
+                            <field name="courtesy_vehicle_id"/>
+                            <field name="customer_id"/>
+                            <field name="repair_order_id"/>
+                            <field name="agreement_signed"/>
+                            <field name="agreement_file" filename="agreement_signed"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Facturation">
+                            <field name="loan_days"/>
+                            <field name="billable_days"/>
+                            <field name="billable_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Départ" name="page_start">
+                            <group>
+                                <group>
+                                    <field name="loan_start"/>
+                                    <field name="km_start"/>
+                                    <field name="fuel_level_start"/>
+                                </group>
+                                <group>
+                                    <field name="condition_start"
+                                           placeholder="État des lieux au départ..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="condition_start_photos" widget="many2many_binary"/>
+                            </group>
+                        </page>
+                        <page string="Retour" name="page_end">
+                            <group>
+                                <group>
+                                    <field name="loan_end"/>
+                                    <field name="km_end"/>
+                                    <field name="fuel_level_end"/>
+                                    <field name="has_damage"/>
+                                    <field name="damage_description"
+                                           invisible="not has_damage"/>
+                                </group>
+                                <group>
+                                    <field name="condition_end"
+                                           placeholder="État des lieux au retour..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="condition_end_photos" widget="many2many_binary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- PRÊT DE COURTOISIE — Tree -->
+    <record id="garage_courtesy_loan_tree" model="ir.ui.view">
+        <field name="name">garage.courtesy.loan.tree</field>
+        <field name="model">garage.courtesy.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Prêts de courtoisie"
+                  decoration-danger="state == 'damaged'">
+                <field name="courtesy_vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="repair_order_id"/>
+                <field name="loan_start"/>
+                <field name="loan_end"/>
+                <field name="loan_days"/>
+                <field name="billable_amount"/>
+                <field name="has_damage"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'reserved'"
+                       decoration-warning="state == 'active'"
+                       decoration-success="state == 'returned'"
+                       decoration-danger="state == 'damaged'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- PRÊT DE COURTOISIE — Search -->
+    <record id="garage_courtesy_loan_search" model="ir.ui.view">
+        <field name="name">garage.courtesy.loan.search</field>
+        <field name="model">garage.courtesy.loan</field>
+        <field name="arch" type="xml">
+            <search string="Prêts de courtoisie">
+                <field name="courtesy_vehicle_id"/>
+                <field name="customer_id"/>
+                <field name="repair_order_id"/>
+                <separator/>
+                <filter string="En cours" name="filter_active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter string="Avec dommage" name="filter_damaged"
+                        domain="[('has_damage', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Véhicule" name="group_vehicle"
+                            context="{'group_by': 'courtesy_vehicle_id'}"/>
+                    <filter string="Statut" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- PRÊT DE COURTOISIE — Action -->
+    <record id="garage_courtesy_loan_action" model="ir.actions.act_window">
+        <field name="name">Prêts de courtoisie</field>
+        <field name="res_model">garage.courtesy.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un prêt de courtoisie
+            </p>
+        </field>
+    </record>
+
+</odoo>

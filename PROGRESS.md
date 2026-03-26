@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 5 — 2026-03-26
-## Statut global : Phase 2 en cours (Agent 5 terminé)
+## Dernier agent : 7 — 2026-03-26
+## Statut global : Phase 3 en cours (Agents 5-6-7 terminés)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -54,13 +54,32 @@
   - Sécurité : 6 règles ACL (technician/chief/manager) pour workshop_post + planning_slot
   - `tests/test_planning.py` — 21 tests (postes, techniciens, créneaux, chevauchement, workflow, adjacence)
   - Installation OK, 0 erreurs, 97 tests passent
+- Agent 6 : Pièces & Stock (2026-03-26)
+  - `models/product_template.py` — extension product.template (is_garage_part, garage_part_category, OEM/TecDoc refs, consigne)
+  - `data/garage_product_categories.xml` — 7 catégories (pièces garage, OEM, aftermarket, occasion, échange standard, peinture, consommables)
+  - `views/parts_views.xml` — tree+form inherit+search+action filtrée sur is_garage_part
+  - Menu : Pièces & Stock > Pièces
+  - `stock`, `purchase`, `product` ajoutés aux depends
+  - `tests/test_parts.py` — 9 tests (OEM, aftermarket, consigne, catégories, véhicules compatibles)
+  - Installation OK, 0 erreurs, 106 tests passent
+- Agent 7 : Sous-traitance & Courtoisie (2026-03-26)
+  - `models/subcontract_order.py` — garage.subcontract.order (workflow 6 états, 10 types de service, retard compute)
+  - `models/courtesy_vehicle.py` — garage.courtesy.vehicle (4 états, tarification, historique prêts)
+  - `models/courtesy_loan.py` — garage.courtesy.loan (workflow 4 états, état des lieux, facturation jours)
+  - Séquence ST/YYYY/ pour les bons de sous-traitance
+  - Champs différés sur repair_order : `subcontract_order_ids`, `subcontract_count`, `courtesy_loan_id`, `has_courtesy_vehicle`
+  - `views/subcontract_views.xml` — form+tree+search+action
+  - `views/courtesy_views.xml` — form+tree+search+action pour véhicules et prêts
+  - Onglets Sous-traitance + Courtoisie dans OR form
+  - Menus : Atelier > Sous-traitance, Réception > Véhicules courtoisie, Réception > Prêts courtoisie
+  - Sécurité : 7 règles ACL (receptionist/chief/manager) pour 3 modèles
+  - `tests/test_subcontract_courtesy.py` — 20 tests (workflows, retard, facturation jours, dommage, compteurs)
+  - Installation OK, 0 erreurs, 124 tests passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Agent 6 : Pièces & Stock — spec `08_09_10_11_planning_stock_sub_courtesy.md` (Module 09)
-- Agent 7 : Sous-traitance & Courtoisie — spec `08_09_10_11_planning_stock_sub_courtesy.md` (Modules 10+11)
 - Agent 8 : Facturation multi-payeur — spec `12_to_16_billing_comms_quality_reporting.md`
 - Agent 9 : Communication, Qualité, Documentation — idem
 - Agent 10 : Reporting & Dashboards — idem
@@ -70,30 +89,29 @@
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - TVA fixée à 21% en dur — à rendre configurable via ir.config_parameter
 - portal.mixin non inclus sur quotation/OR (nécessite module portal, à ajouter avec Agent 9)
-- Création `product.product` en tests échoue si `purchase` installé (contrainte NOT NULL sur `purchase_line_warn`) — contourné en utilisant un produit existant
 
 ### 📝 Champs différés (dépendent de modèles futurs)
 - `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
 - `vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)
-- ~~`repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)~~ ✅ fait
-- ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅ fait
-- `repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)
-- `repair_order.courtesy_loan_id`, `has_courtesy_vehicle` → garage.courtesy.loan (Agent 7)
+- ~~`repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)~~ ✅
+- ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅
+- ~~`repair_order.subcontract_order_ids` → garage.subcontract.order (Agent 7)~~ ✅
+- ~~`repair_order.courtesy_loan_id`, `has_courtesy_vehicle` → garage.courtesy.loan (Agent 7)~~ ✅
 - `repair_order.quality_check_id`, `qc_validated*` → garage.quality.checklist (Agent 9)
 - `repair_order.documentation_ids`, `photo_count` → garage.documentation (Agent 9)
 - `repair_order.invoice_ids`, `invoice_count`, `invoice_status`, `margin*` → account.move (Agent 8)
-- `ro_line.stock_move_ids`, `parts_received` → stock.move (Agent 6)
+- `ro_line.stock_move_ids`, `parts_received` → stock.move (Agent 6 — à enrichir)
 - `claim.document_ids` → garage.documentation (Agent 9)
-- `customer.total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date` → Agents 3+8
-- `paint_consumption` → stock.move pour décrémentation stock (Agent 6)
+- `customer.total_invoiced_garage`, `outstanding_garage_balance`, `last_visit_date` → Agent 8
+- `paint_consumption` → stock.move pour décrémentation stock (à enrichir)
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 97 tests passent (0 fail, 0 error)
-- Phase 1 complète + Agents 4-5 terminés
-- `hr` est dans les depends (pour technician_id et extension hr.employee)
-- Agent 6 doit lire la spec `08_09_10_11_planning_stock_sub_courtesy.md` — Module 09 (Pièces & Stock)
-- Agent 6 doit ajouter `stock` et `purchase` aux depends du manifest
-- Les consommations peinture ne décrémentent pas encore le stock (à faire en Agent 6)
-- L'extension product.template (is_garage_part, garage_part_category, oem_reference…) est dans la spec Module 09
-- Les catégories produits (OEM, aftermarket, peinture, consommable) sont à créer en data XML
+- 124 tests passent (0 fail, 0 error)
+- Phases 1-2 complètes + Agent 7 (sous-traitance/courtoisie) terminé
+- `stock`, `purchase`, `product` sont dans les depends
+- Agent 8 doit lire la spec `12_to_16_billing_comms_quality_reporting.md` pour la facturation
+- Agent 8 : facturation multi-payeur (client + assurance + franchise), acomptes, avoir, TVA intracom Luxembourg
+- L'extension `account.move` est nécessaire pour le split client/assurance
+- Les consommations peinture ne décrémentent pas encore le stock (peut être enrichi)
+- Auto-création purchase.order sur rupture stock non implémentée (workflow complexe)

@@ -71,3 +71,18 @@ class GarageCourtesyVehicle(models.Model):
     def _compute_loan_count(self):
         for rec in self:
             rec.loan_count = len(rec.loan_ids)
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
+
+    def action_view_loans(self):
+        """Ouvre l'historique des prêts pour ce véhicule."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Prêts',
+            'res_model': 'garage.courtesy.loan',
+            'view_mode': 'tree,form',
+            'domain': [('courtesy_vehicle_id', '=', self.id)],
+        }

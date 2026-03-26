@@ -179,6 +179,27 @@ class GarageRepairOrder(models.Model):
         currency_field='currency_id',
     )
 
+    # === SOUS-TRAITANCE ===
+    subcontract_order_ids = fields.One2many(
+        'garage.subcontract.order',
+        'repair_order_id',
+        string="Bons de sous-traitance",
+    )
+    subcontract_count = fields.Integer(
+        compute='_compute_subcontract_count',
+    )
+
+    # === COURTOISIE ===
+    courtesy_loan_id = fields.Many2one(
+        'garage.courtesy.loan',
+        string="Prêt de courtoisie",
+    )
+    has_courtesy_vehicle = fields.Boolean(
+        string="Véhicule de courtoisie",
+        compute='_compute_has_courtesy',
+        store=True,
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
     delivery_notes = fields.Html(string="Notes de restitution")
@@ -220,6 +241,16 @@ class GarageRepairOrder(models.Model):
     def _compute_planning_slot_count(self):
         for rec in self:
             rec.planning_slot_count = len(rec.planning_slot_ids)
+
+    @api.depends('subcontract_order_ids')
+    def _compute_subcontract_count(self):
+        for rec in self:
+            rec.subcontract_count = len(rec.subcontract_order_ids)
+
+    @api.depends('courtesy_loan_id')
+    def _compute_has_courtesy(self):
+        for rec in self:
+            rec.has_courtesy_vehicle = bool(rec.courtesy_loan_id)
 
     @api.depends('line_ids.allocated_time', 'line_ids.actual_time')
     def _compute_hours(self):

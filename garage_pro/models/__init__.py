@@ -19,3 +19,6 @@ from . import workshop_post
 from . import technician
 from . import planning_slot
 from . import product_template
+from . import subcontract_order
+from . import courtesy_vehicle
+from . import courtesy_loan

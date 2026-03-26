@@ -69,6 +69,17 @@
         parent="garage_menu_stock"
         action="garage_product_action" sequence="10"/>
 
+    <!-- Sous-traitance & Courtoisie -->
+    <menuitem id="garage_menu_subcontract" name="Sous-traitance"
+        parent="garage_menu_workshop"
+        action="garage_subcontract_order_action" sequence="60"/>
+    <menuitem id="garage_menu_courtesy_vehicles" name="Véhicules de courtoisie"
+        parent="garage_menu_reception"
+        action="garage_courtesy_vehicle_action" sequence="40"/>
+    <menuitem id="garage_menu_courtesy_loans" name="Prêts de courtoisie"
+        parent="garage_menu_reception"
+        action="garage_courtesy_loan_action" sequence="50"/>
+
     <!-- Assurances -->
     <menuitem id="garage_menu_claims" name="Sinistres"
         parent="garage_menu_insurance"
