@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 22 (position fiscale Luxembourg + audit final) — 2026-03-26
-## Statut global : Tous agents terminés (1-22) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20 + gaps spec 21 + fiscal position 22
+## Dernier agent : 23 (vérification finale) — 2026-03-26
+## Statut global : Tous agents terminés (1-22) ✅ — Vérifié : installation OK + 358 tests passent (0 fail)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
