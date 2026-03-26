@@ -22,6 +22,12 @@
                     <button name="action_approve" type="object"
                             string="Approuver" class="btn-primary"
                             invisible="state not in ('expertise_done', 'declared')"/>
+                    <button name="action_start_work" type="object"
+                            string="Démarrer travaux" class="btn-primary"
+                            invisible="state not in ('approved', 'supplement_approved')"/>
+                    <button name="action_request_supplement" type="object"
+                            string="Demander supplément"
+                            invisible="state not in ('approved', 'work_in_progress', 'supplement_approved')"/>
                     <button name="action_mark_vei" type="object"
                             string="VEI (Perte totale)"
                             invisible="state not in ('expertise_done', 'declared', 'approved')"
@@ -163,6 +169,31 @@
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
                 </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Form : Wizard supplément                                     -->
+    <!-- ============================================================ -->
+    <record id="garage_supplement_wizard_form" model="ir.ui.view">
+        <field name="name">garage.insurance.supplement.wizard.form</field>
+        <field name="model">garage.insurance.supplement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Demande de supplément">
+                <group>
+                    <field name="claim_id" readonly="1"/>
+                    <field name="name"/>
+                    <field name="amount"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+                <separator string="Justification"/>
+                <field name="reason"/>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Créer le supplément" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
             </form>
         </field>
     </record>

@@ -138,6 +138,18 @@ class GarageQuotation(models.Model):
         compute='_compute_is_insurance',
         store=True,
     )
+    insurance_amount = fields.Monetary(
+        string="Part assurance",
+        compute='_compute_insurance_split',
+        currency_field='currency_id',
+        store=True,
+    )
+    franchise_amount_computed = fields.Monetary(
+        string="Part franchise client",
+        compute='_compute_insurance_split',
+        currency_field='currency_id',
+        store=True,
+    )
 
     # === REMISE ===
     global_discount_rate = fields.Float(string="Remise globale (%)")
@@ -249,6 +261,18 @@ class GarageQuotation(models.Model):
     def _compute_is_insurance(self):
         for rec in self:
             rec.is_insurance_claim = bool(rec.claim_id)
+
+    @api.depends('amount_total', 'claim_id', 'claim_id.franchise_computed')
+    def _compute_insurance_split(self):
+        """Calcule la répartition assurance / franchise sur le devis."""
+        for rec in self:
+            if rec.claim_id and rec.amount_total:
+                franchise = min(rec.claim_id.franchise_computed, rec.amount_total)
+                rec.franchise_amount_computed = franchise
+                rec.insurance_amount = rec.amount_total - franchise
+            else:
+                rec.franchise_amount_computed = 0.0
+                rec.insurance_amount = 0.0
 
     # ------------------------------------------------------------------
     # CRUD

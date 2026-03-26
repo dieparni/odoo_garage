@@ -303,6 +303,27 @@ class GarageInsuranceClaim(models.Model):
                 )
         self.write({'state': 'approved'})
 
+    def action_request_supplement(self):
+        """Ouvre le wizard de demande de supplément."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Demande de supplément',
+            'res_model': 'garage.insurance.supplement.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_claim_id': self.id},
+        }
+
+    def action_start_work(self):
+        """Approuvé → Travaux en cours (vérifie que l'OR existe)."""
+        for rec in self:
+            if not rec.repair_order_id:
+                raise UserError(
+                    "Aucun ordre de réparation n'est lié à ce sinistre."
+                )
+        self.write({'state': 'work_in_progress'})
+
     def action_mark_vei(self):
         """Marquer comme VEI (perte totale)."""
         self.write({

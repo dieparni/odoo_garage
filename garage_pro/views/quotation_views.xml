@@ -103,6 +103,10 @@
                                 <field name="amount_untaxed" class="oe_subtotal_footer_separator"/>
                                 <field name="amount_tax"/>
                                 <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                <field name="insurance_amount"
+                                       invisible="not is_insurance_claim"/>
+                                <field name="franchise_amount_computed"
+                                       invisible="not is_insurance_claim"/>
                             </group>
                         </page>
                         <page string="Suppléments" name="page_supplements"

@@ -167,6 +167,15 @@ class GarageVehicle(models.Model):
         compute='_compute_repair_order_count',
         string="Nombre d'OR",
     )
+    total_spent = fields.Monetary(
+        string="Total dépensé",
+        compute='_compute_total_spent',
+        currency_field='currency_id',
+    )
+    currency_id = fields.Many2one(
+        'res.currency',
+        default=lambda self: self.env.company.currency_id,
+    )
 
     # === CARVERTICAL ===
     carvertical_last_check = fields.Datetime(
@@ -214,6 +223,15 @@ class GarageVehicle(models.Model):
             rec.repair_order_count = self.env['garage.repair.order'].search_count([
                 ('vehicle_id', '=', rec.id),
             ])
+
+    def _compute_total_spent(self):
+        """Somme des montants TTC de tous les OR facturés/terminés pour ce véhicule."""
+        for rec in self:
+            orders = self.env['garage.repair.order'].search([
+                ('vehicle_id', '=', rec.id),
+                ('state', 'not in', ['draft', 'cancelled']),
+            ])
+            rec.total_spent = sum(orders.mapped('amount_total'))
 
     @api.depends('power_kw')
     def _compute_power_cv(self):
