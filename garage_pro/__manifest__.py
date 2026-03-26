@@ -45,6 +45,7 @@
         'data/garage_mail_templates.xml',
         'data/garage_crons.xml',
         'data/garage_config_defaults.xml',
+        'data/garage_fiscal_position.xml',
 
         # Wizards (avant les vues pour les références d'action)
         'wizard/courtesy_return_wizard.xml',

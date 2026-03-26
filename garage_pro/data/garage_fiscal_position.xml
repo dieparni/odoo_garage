@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Position fiscale intracommunautaire Belgique → Luxembourg (professionnel) -->
+        <record id="fiscal_position_intracom_lu" model="account.fiscal.position">
+            <field name="name">Intracommunautaire - Luxembourg</field>
+            <field name="auto_apply">True</field>
+            <field name="country_id" ref="base.lu"/>
+            <field name="vat_required">True</field>
+            <field name="note">Autoliquidation art. 44 CTVA — TVA due par le preneur (client assujetti luxembourgeois).</field>
+        </record>
+    </data>
+</odoo>

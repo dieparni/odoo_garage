@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 21 (comblement gaps spec-vs-implémentation) — 2026-03-26
-## Statut global : Tous agents terminés (1-21) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20 + gaps spec 21
+## Dernier agent : 22 (position fiscale Luxembourg + audit final) — 2026-03-26
+## Statut global : Tous agents terminés (1-22) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20 + gaps spec 21 + fiscal position 22
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -237,16 +237,22 @@
   - Bouton "Anonymiser (RGPD)" dans la fiche client (groupe manager uniquement, avec confirmation)
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 22 : Position fiscale Luxembourg + audit final (2026-03-26)
+  - `data/garage_fiscal_position.xml` — `account.fiscal.position` intracommunautaire Luxembourg (auto_apply, vat_required, note autoliquidation)
+  - Manifest mis à jour avec `garage_fiscal_position.xml`
+  - Audit complet specs vs implémentation : tous les modèles/champs/workflows couverts
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-20) sont terminés
+- Rien — tous les agents (1-22) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
 - ~~TVA fixée à 21% en dur~~ ✅ Agent 14 — configurable via ir.config_parameter
-- Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré)
+- ~~Position fiscale intracommunautaire Luxembourg non créée en data XML~~ ✅ Agent 22 — `fiscal_position_intracom_lu` créée (auto_apply sur pays LU + VAT required). Le mapping de taxes dépend du chart of accounts installé
 - Données de démo (véhicules, systèmes peinture) non créées (nice-to-have)
 - Vue Gantt planning non implémentée (fonctionnalité Odoo Enterprise)
 - Dashboard KPIs détaillés (taux occupation postes, aging créances, etc.) non implémentés en widgets
@@ -274,7 +280,7 @@
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
 - **288 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
-- **Tous les agents (1-21) sont terminés** — conformité spec validée + audit final + gaps comblés
+- **Tous les agents (1-22) sont terminés** — conformité spec validée + audit final + gaps comblés + fiscal position LU
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
@@ -284,4 +290,4 @@
 - **Règles multi-société** (ir.rule) sur devis, OR, sous-traitance
 - **Wizard restitution courtoisie** avec état des lieux retour complet
 - L'intégration CarVertical nécessite une clé API réelle pour fonctionner en production
-- Position fiscale intracommunautaire Luxembourg reste à créer si chart of accounts est configuré
+- Position fiscale Luxembourg créée (`fiscal_position_intracom_lu`), mais le mapping de taxes (ex: 21% → 0% autoliquidation) nécessite un chart of accounts belge installé
