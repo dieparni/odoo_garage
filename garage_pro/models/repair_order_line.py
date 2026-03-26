@@ -84,6 +84,18 @@ class GarageRepairOrderLine(models.Model):
     is_done = fields.Boolean(string="Terminé", default=False)
     done_date = fields.Datetime(string="Date fin")
 
+    # === RÉFÉRENCE BARÈME ===
+    bareme_code = fields.Char(
+        string="Code opération barème",
+        help="Référence Audatex/DAT/GT Motive",
+    )
+    bareme_source = fields.Selection([
+        ('audatex', 'Audatex'),
+        ('dat', 'DAT'),
+        ('gt_motive', 'GT Motive'),
+        ('manual', 'Manuel'),
+    ], string="Source barème", default='manual')
+
     # === ZONE CARROSSERIE ===
     damage_zone = fields.Selection(
         DAMAGE_ZONES,

@@ -57,4 +57,23 @@
         </field>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Email véhicule livré                                          -->
+    <!-- ============================================================ -->
+    <record id="email_template_or_delivered" model="mail.template">
+        <field name="name">Garage - Véhicule livré</field>
+        <field name="model_id" ref="garage_pro.model_garage_repair_order"/>
+        <field name="email_from">{{ object.company_id.email }}</field>
+        <field name="email_to">{{ object.customer_id.email }}</field>
+        <field name="subject">Restitution de votre véhicule - {{ object.vehicle_id.license_plate }}</field>
+        <field name="body_html" type="html">
+            <p>Bonjour {{ object.customer_id.name }},</p>
+            <p>Votre véhicule <strong>{{ object.vehicle_id.license_plate }}</strong>
+            vous a été restitué ce jour.</p>
+            <p>Nous vous remercions de votre confiance et restons à votre disposition
+            pour toute question relative aux travaux effectués (OR {{ object.name }}).</p>
+            <p>Cordialement,<br/>{{ object.company_id.name }}</p>
+        </field>
+    </record>
+
 </odoo>

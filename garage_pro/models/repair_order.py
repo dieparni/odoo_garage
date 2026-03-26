@@ -621,9 +621,9 @@ class GarageRepairOrder(models.Model):
         customers = self.mapped('customer_id')
         if customers:
             customers._compute_last_visit_date()
-        # Notification client — véhicule prêt / livré
+        # Notification client — véhicule livré
         template = self.env.ref(
-            'garage_pro.email_template_or_ready', raise_if_not_found=False
+            'garage_pro.email_template_or_delivered', raise_if_not_found=False
         )
         if template:
             for rec in self:
