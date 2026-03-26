@@ -564,14 +564,23 @@ class GarageRepairOrder(models.Model):
                 self.env['garage.quality.checklist'].create_from_repair_order(rec)
 
     def action_validate_qc(self):
-        """QC → QC validé. Vérifie que la checklist est complète."""
+        """QC → QC validé. Vérifie que la checklist est complète si elle a des items remplis."""
         for rec in self:
-            checklists = rec.quality_checklist_ids
-            if checklists and not all(cl.is_fully_checked for cl in checklists):
-                raise UserError(
-                    "Tous les points de contrôle doivent être remplis "
-                    "avant de valider le QC."
+            checklists = rec.quality_checklist_ids.filtered('item_ids')
+            if checklists:
+                # Si au moins un item a un résultat, exiger que tous soient remplis
+                has_any_result = any(
+                    item.result
+                    for cl in checklists
+                    for item in cl.item_ids
                 )
+                if has_any_result and not all(
+                    cl.is_fully_checked for cl in checklists
+                ):
+                    raise UserError(
+                        "Tous les points de contrôle doivent être remplis "
+                        "avant de valider le QC."
+                    )
         self.write({
             'state': 'qc_done',
             'qc_validated': True,
@@ -608,6 +617,10 @@ class GarageRepairOrder(models.Model):
             if (rec.courtesy_loan_id
                     and rec.courtesy_loan_id.state == 'active'):
                 rec.courtesy_loan_id.action_return()
+        # Recalculer la date de dernière visite sur le client
+        customers = self.mapped('customer_id')
+        if customers:
+            customers._compute_last_visit_date()
         # Notification client — véhicule prêt / livré
         template = self.env.ref(
             'garage_pro.email_template_or_ready', raise_if_not_found=False

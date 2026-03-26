@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 18 (gaps fonctionnels spec) — 2026-03-26
-## Statut global : Tous agents terminés (1-18) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18
+## Dernier agent : 19 (conformité spec finale) — 2026-03-26
+## Statut global : Tous agents terminés (1-19) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -191,11 +191,28 @@
   - `config_views.xml` : action Paramètres Garage + menu Configuration > Paramètres
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 19 : Conformité spec finale (2026-03-26)
+  - `portal.mixin` ajouté à `garage.quotation` et `garage.repair.order` (URLs portail)
+  - `insurance_claim.invoiced_amount` + `paid_amount` — champs monétaires compute (suivi facturation sinistre)
+  - `repair_order_line.technician_id` — Many2one hr.employee (suivi technicien par ligne)
+  - `repair_order.qc_validated`, `qc_validated_by`, `qc_validated_date` — champs validation QC
+  - `action_request_qc()` auto-crée une checklist QC si aucune n'existe
+  - `action_validate_qc()` vérifie que tous les items QC remplis sont complets
+  - `action_deliver()` restitue automatiquement le véhicule de courtoisie + envoie notification email
+  - `customer.last_visit_date` — `store=True` + recompute déclenché depuis `action_deliver()`
+  - `constants.py` — ajout `side_window_l`, `side_window_r` dans DAMAGE_ZONES
+  - `repair_order_line.damage_zone` + `quotation_line.damage_zone` — refactorisés sur DAMAGE_ZONES partagé
+  - `report.revenue` — `revenue`, `cost`, `margin` → `Monetary` (au lieu de `Float`)
+  - `report.activity.amount_untaxed` → `Monetary`
+  - `documentation.thumbnail` — Binary compute (miniature 128x128 auto via `image_process`)
+  - `__manifest__.py` — ajout dépendances `calendar` et `web`
+  - Installation OK, 0 erreurs, 288 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-18) sont terminés
+- Rien — tous les agents (1-19) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -225,7 +242,7 @@
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
 - **288 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-18) sont terminés** — aucun gap spec restant
+- **Tous les agents (1-19) sont terminés** — conformité spec validée
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos

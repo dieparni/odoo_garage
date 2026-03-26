@@ -43,6 +43,12 @@ class GarageDocumentation(models.Model):
 
     file = fields.Binary(string="Fichier", required=True)
     filename = fields.Char(string="Nom de fichier")
+    thumbnail = fields.Binary(
+        string="Miniature",
+        compute='_compute_thumbnail',
+        store=True,
+        help="Miniature générée automatiquement pour les images",
+    )
     file_size = fields.Integer(
         string="Taille (Ko)",
         compute='_compute_file_size',
@@ -71,6 +77,23 @@ class GarageDocumentation(models.Model):
     # ------------------------------------------------------------------
     # Compute
     # ------------------------------------------------------------------
+
+    @api.depends('file', 'filename')
+    def _compute_thumbnail(self):
+        for rec in self:
+            if rec.file and rec.filename:
+                ext = (rec.filename or '').rsplit('.', 1)[-1].lower()
+                if ext in ('jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'):
+                    try:
+                        image_data = base64.b64decode(rec.file)
+                        from odoo.tools.image import image_process
+                        rec.thumbnail = base64.b64encode(
+                            image_process(image_data, size=(128, 128), crop='center')
+                        )
+                        continue
+                    except Exception:
+                        pass
+            rec.thumbnail = False
 
     @api.depends('file')
     def _compute_file_size(self):

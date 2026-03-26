@@ -2,6 +2,8 @@
 
 from odoo import api, fields, models
 
+from .constants import DAMAGE_ZONES
+
 
 class GarageQuotationLine(models.Model):
     """Ligne de devis — MO, pièces, sous-traitance, matière peinture."""
@@ -81,30 +83,10 @@ class GarageQuotationLine(models.Model):
     ], string="Source barème", default='manual')
 
     # === ZONE CARROSSERIE ===
-    damage_zone = fields.Selection([
-        ('front_bumper', 'Pare-chocs avant'),
-        ('rear_bumper', 'Pare-chocs arrière'),
-        ('hood', 'Capot'),
-        ('trunk', 'Coffre'),
-        ('roof', 'Toit'),
-        ('fender_fl', 'Aile avant gauche'),
-        ('fender_fr', 'Aile avant droite'),
-        ('fender_rl', 'Aile arrière gauche'),
-        ('fender_rr', 'Aile arrière droite'),
-        ('door_fl', 'Porte avant gauche'),
-        ('door_fr', 'Porte avant droite'),
-        ('door_rl', 'Porte arrière gauche'),
-        ('door_rr', 'Porte arrière droite'),
-        ('sill_l', 'Bas de caisse gauche'),
-        ('sill_r', 'Bas de caisse droit'),
-        ('windshield', 'Pare-brise'),
-        ('rear_window', 'Lunette arrière'),
-        ('side_window_l', 'Vitre latérale gauche'),
-        ('side_window_r', 'Vitre latérale droite'),
-        ('mirror_l', 'Rétroviseur gauche'),
-        ('mirror_r', 'Rétroviseur droit'),
-        ('other', 'Autre'),
-    ], string="Zone endommagée")
+    damage_zone = fields.Selection(
+        DAMAGE_ZONES,
+        string="Zone endommagée",
+    )
 
     damage_level = fields.Selection([
         ('light', 'Léger (retouche/débosselage)'),

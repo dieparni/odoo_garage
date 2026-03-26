@@ -22,9 +22,9 @@ class GarageReportRevenue(models.Model):
         ('parts', 'Pièces'),
         ('subcontract', 'Sous-traitance'),
     ], string="Activité", readonly=True)
-    revenue = fields.Float(string="CA HT", readonly=True)
-    cost = fields.Float(string="Coût", readonly=True)
-    margin = fields.Float(string="Marge", readonly=True)
+    revenue = fields.Monetary(string="CA HT", readonly=True, currency_field='currency_id')
+    cost = fields.Monetary(string="Coût", readonly=True, currency_field='currency_id')
+    margin = fields.Monetary(string="Marge", readonly=True, currency_field='currency_id')
     margin_rate = fields.Float(string="Taux marge (%)", readonly=True)
     ro_count = fields.Integer(string="Nombre d'OR", readonly=True)
 
@@ -115,7 +115,7 @@ class GarageReportActivity(models.Model):
     total_worked_hours = fields.Float(string="Heures travaillées", readonly=True)
     productivity_rate = fields.Float(string="Taux productivité (%)", readonly=True)
     avg_repair_days = fields.Float(string="Délai moyen réparation (j)", readonly=True)
-    amount_untaxed = fields.Float(string="CA HT", readonly=True)
+    amount_untaxed = fields.Monetary(string="CA HT", readonly=True, currency_field='currency_id')
 
     company_id = fields.Many2one('res.company', string="Société", readonly=True)
     currency_id = fields.Many2one('res.currency', string="Devise", readonly=True)

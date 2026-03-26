@@ -30,6 +30,8 @@
         'purchase_stock',
         'product',
         'portal',
+        'calendar',
+        'web',
     ],
     'data': [
         # Sécurité (TOUJOURS en premier)
