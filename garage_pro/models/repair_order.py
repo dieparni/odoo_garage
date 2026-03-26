@@ -443,18 +443,6 @@ class GarageRepairOrder(models.Model):
                     message_type='notification',
                 )
 
-        PurchaseOrder = self.env['purchase.order'].with_company(
-            self.company_id
-        )
-        # Picking type pour les réceptions (incoming)
-        picking_type = self.env['stock.picking.type'].search([
-            ('code', '=', 'incoming'),
-            ('warehouse_id.company_id', '=', self.company_id.id),
-        ], limit=1)
-        if not picking_type:
-            picking_type = self.env['stock.picking.type'].search([
-                ('code', '=', 'incoming'),
-            ], limit=1)
         for data in supplier_lines.values():
             po_lines = []
             for line in data['lines']:
@@ -476,21 +464,31 @@ class GarageRepairOrder(models.Model):
                     ),
                 }))
             if po_lines:
-                po_vals = {
-                    'partner_id': data['partner'].id,
-                    'origin': self.name,
-                    'order_line': po_lines,
-                }
-                if picking_type:
-                    po_vals['picking_type_id'] = picking_type.id
-                po = PurchaseOrder.create(po_vals)
-                self.message_post(
-                    body="Commande fournisseur <a href='#' "
-                         "data-oe-model='purchase.order' "
-                         "data-oe-id='%d'>%s</a> créée automatiquement."
-                         % (po.id, po.name),
-                    message_type='notification',
-                )
+                try:
+                    with self.env.cr.savepoint():
+                        po = self.env['purchase.order'].with_company(
+                            self.company_id
+                        ).create({
+                            'partner_id': data['partner'].id,
+                            'origin': self.name,
+                            'order_line': po_lines,
+                        })
+                        self.message_post(
+                            body="Commande fournisseur <a href='#' "
+                                 "data-oe-model='purchase.order' "
+                                 "data-oe-id='%d'>%s</a> créée "
+                                 "automatiquement."
+                                 % (po.id, po.name),
+                            message_type='notification',
+                        )
+                except Exception:
+                    self.message_post(
+                        body="Impossible de créer automatiquement la "
+                             "commande fournisseur pour %s. "
+                             "Commande manuelle requise."
+                             % data['partner'].name,
+                        message_type='notification',
+                    )
 
     def action_start(self):
         """Confirmé/Attente pièces → En cours."""

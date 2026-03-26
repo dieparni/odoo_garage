@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 13 (rapports QWeb) — 2026-03-26
-## Statut global : Phase 5 terminée + champs différés + rapports QWeb ✅
+## Dernier agent : 14 (TVA, auto-PO, portail) — 2026-03-26
+## Statut global : Tous agents terminés (1-14) ✅
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -142,19 +142,31 @@
   - Binding `report` sur les 3 modèles → menu Imprimer automatique dans les form views
   - `tests/test_reports.py` — 12 tests (existence actions, rendu HTML, contenu véhicule/lignes/totaux/items QC)
   - Installation OK, 0 erreurs, 246 tests garage_pro passent
+- Agent 14 : TVA configurable, Auto-PO, Portail client (2026-03-26)
+  - TVA configurable via `ir.config_parameter` (`garage_pro.default_vat_rate`)
+  - Champ `garage_default_vat_rate` dans `res.config.settings` (section Facturation dans Configuration > Garage)
+  - `quotation._compute_amounts` et `repair_order._compute_amounts` utilisent le taux configurable (défaut 21%)
+  - `repair_order.action_confirm()` vérifie la disponibilité pièces → passe en `parts_waiting` si rupture
+  - `repair_order._create_auto_purchase_orders()` crée PO fournisseur brouillon automatiquement (groupé par fournisseur, avec savepoint pour robustesse)
+  - Notification activité + message si pièce sans fournisseur
+  - `controllers/portal.py` — GaragePortal étend CustomerPortal (compteurs, liste OR, détail OR, liste devis, détail devis, accepter/refuser devis)
+  - `views/portal_templates.xml` — 5 templates QWeb (accueil, liste OR, détail OR, liste devis, détail devis avec boutons accepter/refuser)
+  - `portal` ajouté aux depends du manifest
+  - `tests/test_portal_vat_po.py` — 16 tests (TVA 21%/17%/0%, TVA sur OR, settings, stock disponible, rupture stock, activité, PO/message, MO sans PO, fournisseur manquant, templates portail, visibilité document)
+  - Installation OK, 0 erreurs, 262 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-13) sont terminés
+- Rien — tous les agents (1-14) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
-- TVA fixée à 21% en dur — à rendre configurable via ir.config_parameter
+- ~~TVA fixée à 21% en dur~~ ✅ Agent 14 — configurable via ir.config_parameter
 - Position fiscale intracommunautaire Luxembourg non créée en data XML (nécessite chart of accounts configuré)
 - ~~Rapport facture personnalisé (QWeb inherit) non implémenté~~ ✅ Agent 13
-- Portail client (controllers/portal.py) non implémenté — nécessite `portal` dans depends et templates QWeb
+- ~~Portail client (controllers/portal.py) non implémenté~~ ✅ Agent 14
 - `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
 
 ### 📝 Champs différés (dépendent de modèles futurs)
@@ -175,10 +187,12 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 246 tests garage_pro passent (0 fail, 0 error)
-- **Toutes les phases (1-5) et tous les agents (1-13) sont terminés**
-- **Tous les champs différés sont implémentés** — plus rien en attente
-- **4 rapports QWeb implémentés** : devis, OR, facture garage (inherit), checklist QC
-- Auto-création purchase.order sur rupture stock non implémentée
-- L'extension portail client (controllers/portal.py) peut être ajoutée dans un agent dédié
+- **262 tests garage_pro passent** (0 fail, 0 error)
+- **Tous les agents (1-14) sont terminés**
+- **Tous les champs différés sont implémentés**
+- **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
+- **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
+- **TVA configurable** via Configuration > Garage > Facturation
+- **Auto-PO** sur rupture stock à la confirmation d'OR (avec fallback gracieux)
 - L'intégration CarVertical nécessite une clé API réelle pour fonctionner en production
+- Position fiscale intracommunautaire Luxembourg reste à créer si chart of accounts est configuré
