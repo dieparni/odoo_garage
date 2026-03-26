@@ -1,7 +1,7 @@
 """Extension de res.partner avec les champs spécifiques garage."""
 
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 
 class ResPartner(models.Model):
@@ -248,6 +248,33 @@ class ResPartner(models.Model):
             'view_mode': 'tree,form',
             'domain': [('customer_id', '=', self.id)],
         }
+
+    def action_anonymize(self):
+        """RGPD : anonymiser les données personnelles du client."""
+        self.ensure_one()
+        if self.repair_order_ids.filtered(
+            lambda r: r.state not in ('delivered', 'invoiced', 'cancelled')
+        ):
+            raise UserError(
+                "Impossible d'anonymiser un client ayant des OR en cours."
+            )
+        self.write({
+            'name': 'Client anonymisé #%d' % self.id,
+            'email': False,
+            'phone': False,
+            'mobile': False,
+            'street': False,
+            'street2': False,
+            'zip': False,
+            'city': False,
+            'comment': False,
+            'vat': False,
+            'preferred_language': False,
+            'preferred_contact_method': False,
+            'is_blocked_garage': True,
+            'blocked_reason': 'Anonymisé — droit à l\'oubli RGPD',
+            'active': False,
+        })
 
     def action_view_vehicles(self):
         """Ouvre la liste des véhicules liés à ce partenaire."""

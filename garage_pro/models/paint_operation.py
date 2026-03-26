@@ -1,6 +1,7 @@
 """Opérations de peinture liées aux ordres de réparation."""
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 from .constants import DAMAGE_ZONES
 
@@ -113,8 +114,22 @@ class GaragePaintOperation(models.Model):
     # ------------------------------------------------------------------
 
     def action_start_prep(self):
-        """En attente → Préparation."""
+        """En attente → Préparation. Vérifie l'habilitation VE si nécessaire."""
+        self._check_ev_certification()
         self.write({'state': 'prep'})
+
+    def _check_ev_certification(self):
+        """Vérifie que le technicien a l'habilitation VE si le véhicule est électrique."""
+        for rec in self:
+            vehicle = rec.repair_order_id.vehicle_id
+            if (vehicle.is_electric
+                    and rec.technician_id
+                    and not rec.technician_id.has_ev_certification):
+                raise UserError(
+                    "Le technicien %s n'a pas l'habilitation véhicule "
+                    "électrique requise pour intervenir sur %s."
+                    % (rec.technician_id.name, vehicle.license_plate)
+                )
 
     def action_enter_booth(self):
         """Préparation → En cabine."""

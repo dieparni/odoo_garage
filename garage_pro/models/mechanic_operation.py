@@ -1,6 +1,7 @@
 """Opérations mécaniques liées aux ordres de réparation."""
 
 from odoo import fields, models
+from odoo.exceptions import UserError
 
 
 class GarageMechanicOperation(models.Model):
@@ -117,8 +118,22 @@ class GarageMechanicOperation(models.Model):
     # ------------------------------------------------------------------
 
     def action_start(self):
-        """À faire → En cours."""
+        """À faire → En cours. Vérifie l'habilitation VE si nécessaire."""
+        self._check_ev_certification()
         self.write({'state': 'in_progress'})
+
+    def _check_ev_certification(self):
+        """Vérifie que le technicien a l'habilitation VE si le véhicule est électrique."""
+        for rec in self:
+            vehicle = rec.repair_order_id.vehicle_id
+            if (vehicle.is_electric
+                    and rec.technician_id
+                    and not rec.technician_id.has_ev_certification):
+                raise UserError(
+                    "Le technicien %s n'a pas l'habilitation véhicule "
+                    "électrique requise pour intervenir sur %s."
+                    % (rec.technician_id.name, vehicle.license_plate)
+                )
 
     def action_wait_parts(self):
         """En cours → Attente pièces."""

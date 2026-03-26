@@ -21,7 +21,10 @@
                             invisible="state != 'expertise_pending'"/>
                     <button name="action_approve" type="object"
                             string="Approuver" class="btn-primary"
-                            invisible="state not in ('expertise_done', 'declared')"/>
+                            invisible="state not in ('expertise_done',)"/>
+                    <button name="action_approve_waived" type="object"
+                            string="Approuver (sans expertise)" class="btn-primary"
+                            invisible="state != 'declared'"/>
                     <button name="action_start_work" type="object"
                             string="Démarrer travaux" class="btn-primary"
                             invisible="state not in ('approved', 'supplement_approved')"/>
@@ -32,6 +35,12 @@
                             string="VEI (Perte totale)"
                             invisible="state not in ('expertise_done', 'declared', 'approved')"
                             confirm="Confirmer le classement en VEI ?"/>
+                    <button name="action_invoice" type="object"
+                            string="Marquer facturé"
+                            invisible="state != 'work_in_progress'"/>
+                    <button name="action_mark_paid" type="object"
+                            string="Marquer payé" class="btn-success"
+                            invisible="state != 'invoiced'"/>
                     <button name="action_dispute" type="object"
                             string="Litige"
                             invisible="state in ('draft', 'cancelled', 'paid', 'disputed')"/>
@@ -147,6 +156,10 @@
                                     <field name="franchise_percentage"
                                            invisible="franchise_type != 'percentage'"/>
                                     <field name="franchise_computed"/>
+                                </group>
+                                <group string="Suivi facturation">
+                                    <field name="invoiced_amount"/>
+                                    <field name="paid_amount"/>
                                 </group>
                             </group>
                         </page>

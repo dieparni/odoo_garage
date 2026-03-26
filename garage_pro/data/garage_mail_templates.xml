@@ -76,4 +76,24 @@
         </field>
     </record>
 
+    <!-- ============================================================ -->
+    <!-- Email sinistre VEI (perte totale)                           -->
+    <!-- ============================================================ -->
+    <record id="email_template_claim_vei" model="mail.template">
+        <field name="name">Garage - Sinistre VEI</field>
+        <field name="model_id" ref="garage_pro.model_garage_insurance_claim"/>
+        <field name="email_from">{{ object.vehicle_id.company_id.email or '' }}</field>
+        <field name="email_to">{{ object.customer_id.email }}</field>
+        <field name="subject">Information importante — Véhicule {{ object.vehicle_id.license_plate }} déclaré en perte totale</field>
+        <field name="body_html" type="html">
+            <p>Bonjour {{ object.customer_id.name }},</p>
+            <p>Suite à l'expertise de votre véhicule <strong>{{ object.vehicle_id.license_plate }}</strong>
+            dans le cadre du sinistre <strong>{{ object.name }}</strong>, celui-ci a été déclaré
+            <strong>Véhicule Économiquement Irréparable (VEI)</strong>.</p>
+            <p>Le coût de réparation estimé dépasse la valeur vénale du véhicule.
+            Veuillez nous contacter pour discuter des options qui s'offrent à vous.</p>
+            <p>Cordialement,<br/>{{ object.vehicle_id.company_id.name or '' }}</p>
+        </field>
+    </record>
+
 </odoo>

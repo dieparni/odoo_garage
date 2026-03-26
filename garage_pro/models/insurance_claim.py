@@ -353,13 +353,39 @@ class GarageInsuranceClaim(models.Model):
                 )
         self.write({'state': 'work_in_progress'})
 
+    def action_approve_waived(self):
+        """Déclaré → Approuvé directement (expertise dispensée)."""
+        for rec in self:
+            if not rec.approved_amount:
+                raise UserError(
+                    "Veuillez saisir le montant approuvé avant de valider."
+                )
+        self.write({
+            'state': 'approved',
+            'expertise_type': 'waived',
+        })
+
+    def action_invoice(self):
+        """Travaux en cours → Facturé (déclenché par la facturation de l'OR)."""
+        self.write({'state': 'invoiced'})
+
+    def action_mark_paid(self):
+        """Facturé → Payé (déclenché par le paiement complet des factures)."""
+        self.write({'state': 'paid'})
+
     def action_mark_vei(self):
-        """Marquer comme VEI (perte totale)."""
+        """Marquer comme VEI (perte totale). Notifie le client par email."""
         self.write({
             'state': 'vei',
             'is_vei': True,
             'vei_customer_decision': 'pending',
         })
+        template = self.env.ref(
+            'garage_pro.email_template_claim_vei', raise_if_not_found=False
+        )
+        if template:
+            for rec in self:
+                template.send_mail(rec.id, force_send=False)
 
     def action_dispute(self):
         """Passer en litige."""

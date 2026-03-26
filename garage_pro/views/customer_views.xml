@@ -9,6 +9,16 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <!-- Bouton anonymiser (RGPD) -->
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <div invisible="not is_garage_customer" class="float-end">
+                    <button name="action_anonymize" type="object"
+                            string="Anonymiser (RGPD)" class="btn-link text-danger"
+                            confirm="Cette action est irréversible. Toutes les données personnelles seront supprimées. Continuer ?"
+                            groups="garage_pro.group_manager"/>
+                </div>
+            </xpath>
+
             <!-- Boutons smart -->
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_repair_orders" type="object"

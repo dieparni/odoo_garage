@@ -118,6 +118,10 @@ class GarageInvoiceWizard(models.TransientModel):
         if self.invoice_scenario in ('client_full', 'insurance_split',
                                      'insurance_only'):
             ro.write({'state': 'invoiced'})
+            # Auto-transition du sinistre vers 'invoiced'
+            if (ro.claim_id
+                    and ro.claim_id.state == 'work_in_progress'):
+                ro.claim_id.action_invoice()
 
         # Retourner la vue des factures créées
         action = {

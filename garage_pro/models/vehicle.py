@@ -1,11 +1,14 @@
 """Extension du modèle fleet.vehicle avec les champs spécifiques garage."""
 
+import logging
 import re
 
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class GarageVehicle(models.Model):
@@ -359,4 +362,38 @@ class GarageVehicle(models.Model):
                 vals['garage_ref'] = self.env['ir.sequence'].next_by_code(
                     'garage.vehicle'
                 ) or 'Nouveau'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._trigger_carvertical_auto_lookup()
+        return records
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'vin_sn' in vals:
+            self._trigger_carvertical_auto_lookup()
+        return res
+
+    def _trigger_carvertical_auto_lookup(self):
+        """Lance automatiquement une recherche CarVertical si activé."""
+        auto_lookup = self.env['ir.config_parameter'].sudo().get_param(
+            'garage_pro.carvertical_auto_lookup', 'False'
+        )
+        if auto_lookup not in ('True', '1', 'true'):
+            return
+        api_key = self.env['ir.config_parameter'].sudo().get_param(
+            'garage_pro.carvertical_api_key', ''
+        )
+        if not api_key:
+            return
+        for vehicle in self:
+            if vehicle.vin_sn and len(vehicle.vin_sn) == 17:
+                try:
+                    wizard = self.env['garage.carvertical.lookup.wizard'].create({
+                        'vehicle_id': vehicle.id,
+                        'vin': vehicle.vin_sn,
+                    })
+                    wizard.action_search()
+                except Exception as e:
+                    _logger.warning(
+                        "CarVertical auto-lookup failed for %s: %s",
+                        vehicle.vin_sn, e
+                    )

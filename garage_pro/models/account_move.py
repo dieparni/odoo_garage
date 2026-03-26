@@ -56,3 +56,32 @@ class AccountMove(models.Model):
     def _compute_is_garage(self):
         for rec in self:
             rec.is_garage_invoice = bool(rec.garage_repair_order_id)
+
+    # ------------------------------------------------------------------
+    # Overrides
+    # ------------------------------------------------------------------
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'payment_state' in vals:
+            self._check_claim_paid()
+        return res
+
+    def _check_claim_paid(self):
+        """Auto-transition claim to 'paid' when all invoices are paid."""
+        for move in self:
+            claim = move.garage_claim_id
+            if not claim or claim.state != 'invoiced':
+                continue
+            ro = move.garage_repair_order_id
+            if not ro:
+                continue
+            invoices = ro.invoice_ids.filtered(
+                lambda m: m.state == 'posted'
+                and m.move_type == 'out_invoice'
+            )
+            if invoices and all(
+                inv.payment_state in ('paid', 'in_payment')
+                for inv in invoices
+            ):
+                claim.action_mark_paid()

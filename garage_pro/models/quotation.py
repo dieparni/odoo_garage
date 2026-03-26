@@ -289,14 +289,21 @@ class GarageQuotation(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'garage.quotation'
                 ) or 'Nouveau'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        # Auto-flag partner as garage customer
+        partners = records.mapped('customer_id').filtered(
+            lambda p: not p.is_garage_customer
+        )
+        if partners:
+            partners.sudo().write({'is_garage_customer': True})
+        return records
 
     # ------------------------------------------------------------------
     # Workflow actions
     # ------------------------------------------------------------------
 
     def action_send(self):
-        """Brouillon → Envoyé. Envoie le mail au client."""
+        """Brouillon → Envoyé. Envoie le mail au client + CC assurance si sinistre."""
         self.write({
             'state': 'sent',
             'date_sent': fields.Datetime.now(),
@@ -306,7 +313,18 @@ class GarageQuotation(models.Model):
         )
         if template:
             for rec in self:
+                # Send to customer
                 template.send_mail(rec.id, force_send=False)
+                # Also send to insurance company if linked claim
+                if (rec.claim_id
+                        and rec.claim_id.insurance_company_id
+                        and rec.claim_id.insurance_company_id.claims_email):
+                    template.send_mail(
+                        rec.id, force_send=False,
+                        email_values={
+                            'email_to': rec.claim_id.insurance_company_id.claims_email,
+                        },
+                    )
 
     def action_approve(self):
         """Envoyé → Accepté."""
@@ -333,6 +351,31 @@ class GarageQuotation(models.Model):
             raise UserError(
                 "Ce client est bloqué. Raison : %s"
                 % self.customer_id.blocked_reason
+            )
+        # Fleet approval enforcement
+        customer = self.customer_id
+        if (customer.fleet_approval_required
+                and customer.fleet_approval_threshold
+                and self.amount_total > customer.fleet_approval_threshold):
+            manager = customer.fleet_manager_id
+            if manager:
+                raise UserError(
+                    "Le montant TTC (%s €) dépasse le seuil d'approbation "
+                    "flotte (%s €). Veuillez obtenir l'accord du "
+                    "gestionnaire de flotte %s avant conversion."
+                    % (self.amount_total, customer.fleet_approval_threshold,
+                       manager.name)
+                )
+        # Credit limit check
+        if (customer.garage_credit_limit
+                and customer.outstanding_garage_balance + self.amount_total
+                > customer.garage_credit_limit):
+            raise UserError(
+                "L'encours garage du client (%s €) plus le montant de ce "
+                "devis (%s €) dépasse le plafond de crédit autorisé (%s €)."
+                % (customer.outstanding_garage_balance,
+                   self.amount_total,
+                   customer.garage_credit_limit)
             )
 
         ro = self.env['garage.repair.order'].create({
