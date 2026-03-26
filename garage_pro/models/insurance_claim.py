@@ -193,6 +193,14 @@ class GarageInsuranceClaim(models.Model):
     # === DOCUMENTS ===
     accident_report = fields.Binary(string="Constat amiable")
     accident_report_filename = fields.Char()
+    document_ids = fields.One2many(
+        'garage.documentation',
+        'claim_id',
+        string="Documents / Photos",
+    )
+    document_count = fields.Integer(
+        compute='_compute_document_count',
+    )
 
     currency_id = fields.Many2one(
         'res.currency',
@@ -233,6 +241,11 @@ class GarageInsuranceClaim(models.Model):
     def _compute_supplement_count(self):
         for rec in self:
             rec.supplement_count = len(rec.supplement_ids)
+
+    @api.depends('document_ids')
+    def _compute_document_count(self):
+        for rec in self:
+            rec.document_count = len(rec.document_ids)
 
     @api.model
     def _group_expand_states(self, states, domain):
@@ -305,3 +318,34 @@ class GarageInsuranceClaim(models.Model):
     def action_cancel(self):
         """Annuler le sinistre."""
         self.write({'state': 'cancelled'})
+
+    def action_view_documents(self):
+        """Ouvre les documents / photos liés à ce sinistre."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Documents / Photos',
+            'res_model': 'garage.documentation',
+            'view_mode': 'tree,form',
+            'domain': [('claim_id', '=', self.id)],
+            'context': {'default_claim_id': self.id},
+        }
+
+    # ------------------------------------------------------------------
+    # Crons
+    # ------------------------------------------------------------------
+
+    @api.model
+    def cron_reminder_expertise(self):
+        """Relance : sinistres en attente d'expertise > 5 jours."""
+        cutoff = fields.Datetime.now() - timedelta(days=5)
+        claims = self.search([
+            ('state', '=', 'expertise_pending'),
+            ('write_date', '<=', cutoff),
+        ])
+        for claim in claims:
+            claim.activity_schedule(
+                'mail.mail_activity_data_todo',
+                date_deadline=fields.Date.today(),
+                summary="Relance expertise sinistre %s" % claim.name,
+            )

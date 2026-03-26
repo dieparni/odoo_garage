@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Documentation                                          -->
+    <!-- ============================================================ -->
+    <record id="garage_documentation_form" model="ir.ui.view">
+        <field name="name">garage.documentation.form</field>
+        <field name="model">garage.documentation</field>
+        <field name="arch" type="xml">
+            <form string="Document / Photo">
+                <sheet>
+                    <group>
+                        <group string="Document">
+                            <field name="name"/>
+                            <field name="doc_type"/>
+                            <field name="file" filename="filename"/>
+                            <field name="filename" invisible="1"/>
+                            <field name="file_size"/>
+                        </group>
+                        <group string="Liens">
+                            <field name="repair_order_id"/>
+                            <field name="claim_id"/>
+                            <field name="vehicle_id"/>
+                            <field name="damage_zone"
+                                   invisible="doc_type != 'photo_damage'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Métadonnées">
+                            <field name="taken_by"/>
+                            <field name="taken_date"/>
+                            <field name="is_visible_portal"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes"
+                           placeholder="Notes sur ce document..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Documentation                                          -->
+    <!-- ============================================================ -->
+    <record id="garage_documentation_tree" model="ir.ui.view">
+        <field name="name">garage.documentation.tree</field>
+        <field name="model">garage.documentation</field>
+        <field name="arch" type="xml">
+            <tree string="Documents / Photos">
+                <field name="name"/>
+                <field name="doc_type"/>
+                <field name="repair_order_id" optional="show"/>
+                <field name="claim_id" optional="show"/>
+                <field name="vehicle_id" optional="show"/>
+                <field name="file_size"/>
+                <field name="taken_by"/>
+                <field name="taken_date"/>
+                <field name="is_visible_portal"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Documentation                                        -->
+    <!-- ============================================================ -->
+    <record id="garage_documentation_search" model="ir.ui.view">
+        <field name="name">garage.documentation.search</field>
+        <field name="model">garage.documentation</field>
+        <field name="arch" type="xml">
+            <search string="Documents / Photos">
+                <field name="name"/>
+                <field name="repair_order_id"/>
+                <field name="claim_id"/>
+                <field name="vehicle_id"/>
+                <separator/>
+                <filter string="Photos avant" name="filter_before"
+                        domain="[('doc_type', '=', 'photo_before')]"/>
+                <filter string="Photos après" name="filter_after"
+                        domain="[('doc_type', '=', 'photo_after')]"/>
+                <filter string="Photos dommage" name="filter_damage"
+                        domain="[('doc_type', '=', 'photo_damage')]"/>
+                <filter string="Rapports" name="filter_reports"
+                        domain="[('doc_type', 'in', ('expertise_report', 'technical_report', 'accident_report'))]"/>
+                <filter string="Visible portail" name="filter_portal"
+                        domain="[('is_visible_portal', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Type" name="group_type"
+                            context="{'group_by': 'doc_type'}"/>
+                    <filter string="OR" name="group_ro"
+                            context="{'group_by': 'repair_order_id'}"/>
+                    <filter string="Véhicule" name="group_vehicle"
+                            context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Pris par" name="group_taken_by"
+                            context="{'group_by': 'taken_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Documentation                                        -->
+    <!-- ============================================================ -->
+    <record id="garage_documentation_action" model="ir.actions.act_window">
+        <field name="name">Documents / Photos</field>
+        <field name="res_model">garage.documentation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun document
+            </p>
+            <p>
+                Ajoutez des photos et documents liés aux véhicules, OR et sinistres.
+            </p>
+        </field>
+    </record>
+
+</odoo>

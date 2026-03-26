@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Relance expertise assurance (> 5 jours en attente)            -->
+    <!-- ============================================================ -->
+    <record id="cron_claim_expertise_reminder" model="ir.cron">
+        <field name="name">Garage - Relance expertise</field>
+        <field name="model_id" ref="garage_pro.model_garage_insurance_claim"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_reminder_expertise()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Alertes contrôle technique (30 jours avant échéance)          -->
+    <!-- ============================================================ -->
+    <record id="cron_ct_alerts" model="ir.cron">
+        <field name="name">Garage - Alertes contrôle technique</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_ct_alerts()</field>
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Alertes entretien (30 jours avant échéance)                   -->
+    <!-- ============================================================ -->
+    <record id="cron_maintenance_alerts" model="ir.cron">
+        <field name="name">Garage - Alertes entretien</field>
+        <field name="model_id" ref="garage_pro.model_garage_maintenance_plan_item"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_maintenance_alerts()</field>
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Véhicule non récupéré (> 7 jours après "prêt")               -->
+    <!-- ============================================================ -->
+    <record id="cron_vehicle_not_picked_up" model="ir.cron">
+        <field name="name">Garage - Véhicule non récupéré</field>
+        <field name="model_id" ref="garage_pro.model_garage_repair_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_vehicle_not_picked_up()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

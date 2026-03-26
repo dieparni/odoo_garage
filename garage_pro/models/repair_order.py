@@ -1,5 +1,7 @@
 """Ordre de réparation — objet opérationnel central de l'atelier."""
 
+from datetime import timedelta
+
 from odoo import api, fields, models
 
 
@@ -220,6 +222,26 @@ class GarageRepairOrder(models.Model):
         store=True,
     )
 
+    # === QUALITÉ ===
+    quality_checklist_ids = fields.One2many(
+        'garage.quality.checklist',
+        'repair_order_id',
+        string="Checklists qualité",
+    )
+    quality_checklist_count = fields.Integer(
+        compute='_compute_quality_checklist_count',
+    )
+
+    # === DOCUMENTATION ===
+    documentation_ids = fields.One2many(
+        'garage.documentation',
+        'repair_order_id',
+        string="Documents / Photos",
+    )
+    photo_count = fields.Integer(
+        compute='_compute_photo_count',
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
     delivery_notes = fields.Html(string="Notes de restitution")
@@ -271,6 +293,16 @@ class GarageRepairOrder(models.Model):
     def _compute_has_courtesy(self):
         for rec in self:
             rec.has_courtesy_vehicle = bool(rec.courtesy_loan_id)
+
+    @api.depends('quality_checklist_ids')
+    def _compute_quality_checklist_count(self):
+        for rec in self:
+            rec.quality_checklist_count = len(rec.quality_checklist_ids)
+
+    @api.depends('documentation_ids')
+    def _compute_photo_count(self):
+        for rec in self:
+            rec.photo_count = len(rec.documentation_ids)
 
     @api.depends('line_ids.allocated_time', 'line_ids.actual_time')
     def _compute_hours(self):
@@ -437,3 +469,57 @@ class GarageRepairOrder(models.Model):
             'view_mode': 'form',
             'res_id': credit_note.id,
         }
+
+    def action_create_quality_checklist(self):
+        """Crée une checklist QC pré-livraison pour cet OR."""
+        self.ensure_one()
+        checklist = self.env['garage.quality.checklist'].create_from_repair_order(self)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Checklist qualité',
+            'res_model': 'garage.quality.checklist',
+            'view_mode': 'form',
+            'res_id': checklist.id,
+        }
+
+    def action_view_quality_checklists(self):
+        """Ouvre les checklists qualité liées à cet OR."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Checklists qualité',
+            'res_model': 'garage.quality.checklist',
+            'view_mode': 'tree,form',
+            'domain': [('repair_order_id', '=', self.id)],
+        }
+
+    def action_view_documentation(self):
+        """Ouvre les documents / photos liés à cet OR."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Documents / Photos',
+            'res_model': 'garage.documentation',
+            'view_mode': 'tree,form',
+            'domain': [('repair_order_id', '=', self.id)],
+            'context': {'default_repair_order_id': self.id},
+        }
+
+    # ------------------------------------------------------------------
+    # Crons
+    # ------------------------------------------------------------------
+
+    @api.model
+    def cron_vehicle_not_picked_up(self):
+        """Alerte : véhicule non récupéré > 7 jours après état 'ready'."""
+        cutoff = fields.Datetime.now() - timedelta(days=7)
+        orders = self.search([
+            ('state', '=', 'ready'),
+            ('write_date', '<=', cutoff),
+        ])
+        for order in orders:
+            order.activity_schedule(
+                'mail.mail_activity_data_todo',
+                date_deadline=fields.Date.today(),
+                summary="Véhicule non récupéré depuis > 7 jours — %s" % order.name,
+            )

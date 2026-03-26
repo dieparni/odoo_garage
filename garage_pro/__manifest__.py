@@ -37,6 +37,8 @@
         # Données
         'data/garage_sequences.xml',
         'data/garage_product_categories.xml',
+        'data/garage_mail_templates.xml',
+        'data/garage_crons.xml',
 
         # Vues
         'views/vehicle_views.xml',
@@ -51,6 +53,8 @@
         'views/subcontract_views.xml',
         'views/courtesy_views.xml',
         'views/billing_views.xml',
+        'views/quality_views.xml',
+        'views/documentation_views.xml',
         'views/menus.xml',
     ],
     'installable': True,

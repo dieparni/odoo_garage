@@ -57,3 +57,12 @@ access_courtesy_loan_receptionist,garage.courtesy.loan receptionist,model_garage
 access_courtesy_loan_manager,garage.courtesy.loan manager,model_garage_courtesy_loan,garage_pro.group_manager,1,1,1,1
 access_invoice_wizard_receptionist,garage.invoice.wizard receptionist,model_garage_invoice_wizard,garage_pro.group_receptionist,1,1,1,0
 access_invoice_wizard_manager,garage.invoice.wizard manager,model_garage_invoice_wizard,garage_pro.group_manager,1,1,1,1
+access_quality_checklist_technician,garage.quality.checklist technician,model_garage_quality_checklist,garage_pro.group_technician,1,1,0,0
+access_quality_checklist_chief,garage.quality.checklist chief,model_garage_quality_checklist,garage_pro.group_workshop_chief,1,1,1,0
+access_quality_checklist_manager,garage.quality.checklist manager,model_garage_quality_checklist,garage_pro.group_manager,1,1,1,1
+access_quality_check_item_technician,garage.quality.check.item technician,model_garage_quality_check_item,garage_pro.group_technician,1,1,0,0
+access_quality_check_item_chief,garage.quality.check.item chief,model_garage_quality_check_item,garage_pro.group_workshop_chief,1,1,1,0
+access_quality_check_item_manager,garage.quality.check.item manager,model_garage_quality_check_item,garage_pro.group_manager,1,1,1,1
+access_documentation_receptionist,garage.documentation receptionist,model_garage_documentation,garage_pro.group_receptionist,1,1,1,0
+access_documentation_technician,garage.documentation technician,model_garage_documentation,garage_pro.group_technician,1,1,1,0
+access_documentation_manager,garage.documentation manager,model_garage_documentation,garage_pro.group_manager,1,1,1,1

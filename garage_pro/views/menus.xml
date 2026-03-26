@@ -69,6 +69,14 @@
         parent="garage_menu_stock"
         action="garage_product_action" sequence="10"/>
 
+    <!-- Qualité & Documentation -->
+    <menuitem id="garage_menu_quality" name="Contrôle qualité"
+        parent="garage_menu_workshop"
+        action="garage_quality_checklist_action" sequence="70"/>
+    <menuitem id="garage_menu_documentation" name="Documents / Photos"
+        parent="garage_menu_reception"
+        action="garage_documentation_action" sequence="60"/>
+
     <!-- Sous-traitance & Courtoisie -->
     <menuitem id="garage_menu_subcontract" name="Sous-traitance"
         parent="garage_menu_workshop"

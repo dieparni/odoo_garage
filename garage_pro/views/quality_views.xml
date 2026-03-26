@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Form : Checklist qualité                                      -->
+    <!-- ============================================================ -->
+    <record id="garage_quality_checklist_form" model="ir.ui.view">
+        <field name="name">garage.quality.checklist.form</field>
+        <field name="model">garage.quality.checklist</field>
+        <field name="arch" type="xml">
+            <form string="Checklist qualité">
+                <header>
+                    <button name="action_validate" type="object"
+                            string="Valider le contrôle" class="btn-primary"
+                            invisible="is_fully_checked"/>
+                    <field name="overall_result" widget="badge"
+                           decoration-success="overall_result == 'pass'"
+                           decoration-warning="overall_result == 'partial'"
+                           decoration-danger="overall_result == 'fail'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="checklist_type"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="repair_order_id"/>
+                            <field name="checked_by"/>
+                            <field name="check_date"/>
+                        </group>
+                        <group>
+                            <field name="is_fully_checked"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Points de contrôle" name="page_items">
+                            <field name="item_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="check_type" widget="badge"/>
+                                    <field name="result" widget="badge"
+                                           decoration-success="result == 'ok'"
+                                           decoration-danger="result == 'nok'"
+                                           decoration-muted="result == 'na'"/>
+                                    <field name="notes"/>
+                                    <field name="photo" widget="image"
+                                           options='{"size": [60, 60]}'/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Remarques" name="page_notes">
+                            <field name="notes"
+                                   placeholder="Remarques générales..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Tree : Checklists qualité                                     -->
+    <!-- ============================================================ -->
+    <record id="garage_quality_checklist_tree" model="ir.ui.view">
+        <field name="name">garage.quality.checklist.tree</field>
+        <field name="model">garage.quality.checklist</field>
+        <field name="arch" type="xml">
+            <tree string="Checklists qualité"
+                  decoration-success="overall_result == 'pass'"
+                  decoration-danger="overall_result == 'fail'"
+                  decoration-warning="overall_result == 'partial'">
+                <field name="repair_order_id"/>
+                <field name="checklist_type"/>
+                <field name="checked_by"/>
+                <field name="check_date"/>
+                <field name="is_fully_checked"/>
+                <field name="overall_result" widget="badge"
+                       decoration-success="overall_result == 'pass'"
+                       decoration-warning="overall_result == 'partial'"
+                       decoration-danger="overall_result == 'fail'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Search : Checklists qualité                                   -->
+    <!-- ============================================================ -->
+    <record id="garage_quality_checklist_search" model="ir.ui.view">
+        <field name="name">garage.quality.checklist.search</field>
+        <field name="model">garage.quality.checklist</field>
+        <field name="arch" type="xml">
+            <search string="Checklists qualité">
+                <field name="repair_order_id"/>
+                <field name="checked_by"/>
+                <separator/>
+                <filter string="Conforme" name="filter_pass"
+                        domain="[('overall_result', '=', 'pass')]"/>
+                <filter string="Non conforme" name="filter_fail"
+                        domain="[('overall_result', '=', 'fail')]"/>
+                <filter string="Partiel" name="filter_partial"
+                        domain="[('overall_result', '=', 'partial')]"/>
+                <filter string="Non contrôlé" name="filter_pending"
+                        domain="[('is_fully_checked', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Type" name="group_type"
+                            context="{'group_by': 'checklist_type'}"/>
+                    <filter string="Résultat" name="group_result"
+                            context="{'group_by': 'overall_result'}"/>
+                    <filter string="Contrôlé par" name="group_checker"
+                            context="{'group_by': 'checked_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Action : Checklists qualité                                   -->
+    <!-- ============================================================ -->
+    <record id="garage_quality_checklist_action" model="ir.actions.act_window">
+        <field name="name">Contrôle qualité</field>
+        <field name="res_model">garage.quality.checklist</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucune checklist qualité
+            </p>
+            <p>
+                Les checklists sont créées automatiquement depuis les ordres de réparation.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit OR form : onglet Qualité + Documentation              -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_form_quality" model="ir.ui.view">
+        <field name="name">garage.repair.order.form.quality</field>
+        <field name="model">garage.repair.order</field>
+        <field name="inherit_id" ref="garage_repair_order_form"/>
+        <field name="arch" type="xml">
+            <page name="page_notes" position="before">
+                <page string="Qualité" name="page_quality">
+                    <div class="mb-3">
+                        <button name="action_create_quality_checklist"
+                                type="object" class="btn-secondary"
+                                string="Créer checklist QC"
+                                icon="fa-plus"/>
+                    </div>
+                    <field name="quality_checklist_ids">
+                        <tree>
+                            <field name="checklist_type"/>
+                            <field name="checked_by"/>
+                            <field name="check_date"/>
+                            <field name="is_fully_checked"/>
+                            <field name="overall_result" widget="badge"
+                                   decoration-success="overall_result == 'pass'"
+                                   decoration-warning="overall_result == 'partial'"
+                                   decoration-danger="overall_result == 'fail'"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Documents" name="page_documentation">
+                    <field name="documentation_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="doc_type"/>
+                            <field name="file" filename="filename"/>
+                            <field name="filename" column_invisible="1"/>
+                            <field name="file_size"/>
+                            <field name="damage_zone" optional="hide"/>
+                            <field name="taken_by"/>
+                            <field name="taken_date"/>
+                            <field name="is_visible_portal"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit OR form : smart buttons QC + Photos                   -->
+    <!-- ============================================================ -->
+    <record id="garage_repair_order_form_quality_buttons" model="ir.ui.view">
+        <field name="name">garage.repair.order.form.quality.buttons</field>
+        <field name="model">garage.repair.order</field>
+        <field name="inherit_id" ref="garage_repair_order_form"/>
+        <field name="arch" type="xml">
+            <div class="oe_title" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_quality_checklists"
+                            type="object" class="oe_stat_button"
+                            icon="fa-check-square-o">
+                        <field name="quality_checklist_count"
+                               widget="statinfo" string="QC"/>
+                    </button>
+                    <button name="action_view_documentation"
+                            type="object" class="oe_stat_button"
+                            icon="fa-camera">
+                        <field name="photo_count"
+                               widget="statinfo" string="Documents"/>
+                    </button>
+                </div>
+            </div>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Inherit Claim form : onglet Documents enrichi                 -->
+    <!-- ============================================================ -->
+    <record id="garage_claim_form_documents" model="ir.ui.view">
+        <field name="name">garage.insurance.claim.form.documents</field>
+        <field name="model">garage.insurance.claim</field>
+        <field name="inherit_id" ref="garage_claim_form"/>
+        <field name="arch" type="xml">
+            <page name="page_documents" position="inside">
+                <separator string="Documents / Photos"/>
+                <field name="document_ids">
+                    <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="doc_type"/>
+                        <field name="file" filename="filename"/>
+                        <field name="filename" column_invisible="1"/>
+                        <field name="file_size"/>
+                        <field name="damage_zone" optional="hide"/>
+                        <field name="taken_by"/>
+                        <field name="taken_date"/>
+                        <field name="is_visible_portal"/>
+                    </tree>
+                </field>
+            </page>
+        </field>
+    </record>
+
+</odoo>

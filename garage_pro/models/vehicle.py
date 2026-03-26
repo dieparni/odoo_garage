@@ -266,6 +266,27 @@ class GarageVehicle(models.Model):
             'domain': [('vehicle_id', '=', self.id)],
         }
 
+    # ------------------------------------------------------------------
+    # Crons
+    # ------------------------------------------------------------------
+
+    @api.model
+    def cron_ct_alerts(self):
+        """Alerte : contrôle technique à venir dans les 30 prochains jours."""
+        today = fields.Date.today()
+        limit = today + relativedelta(days=30)
+        vehicles = self.search([
+            ('ct_next_date', '!=', False),
+            ('ct_next_date', '<=', limit),
+            ('ct_next_date', '>=', today),
+        ])
+        for vehicle in vehicles:
+            vehicle.activity_schedule(
+                'mail.mail_activity_data_todo',
+                date_deadline=vehicle.ct_next_date,
+                summary="CT à renouveler — %s" % vehicle.license_plate,
+            )
+
     @api.model_create_multi
     def create(self, vals_list):
         """Attribue une référence garage séquentielle à la création."""

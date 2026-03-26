@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Email envoi devis                                             -->
+    <!-- ============================================================ -->
+    <record id="email_template_quotation_sent" model="mail.template">
+        <field name="name">Garage - Devis envoyé</field>
+        <field name="model_id" ref="garage_pro.model_garage_quotation"/>
+        <field name="email_from">{{ object.company_id.email }}</field>
+        <field name="email_to">{{ object.customer_id.email }}</field>
+        <field name="subject">Votre devis {{ object.name }} - {{ object.vehicle_id.license_plate }}</field>
+        <field name="body_html" type="html">
+            <p>Bonjour {{ object.customer_id.name }},</p>
+            <p>Veuillez trouver ci-joint votre devis <strong>{{ object.name }}</strong>
+            pour votre véhicule <strong>{{ object.vehicle_id.license_plate }}</strong>.</p>
+            <p>Montant total : <strong>{{ object.amount_total }} EUR</strong></p>
+            <p>Ce devis est valable jusqu'au {{ object.date_validity }}.</p>
+            <p>Cordialement,<br/>{{ object.company_id.name }}</p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Email OR en cours                                             -->
+    <!-- ============================================================ -->
+    <record id="email_template_or_in_progress" model="mail.template">
+        <field name="name">Garage - Travaux en cours</field>
+        <field name="model_id" ref="garage_pro.model_garage_repair_order"/>
+        <field name="email_from">{{ object.company_id.email }}</field>
+        <field name="email_to">{{ object.customer_id.email }}</field>
+        <field name="subject">Travaux en cours - {{ object.vehicle_id.license_plate }}</field>
+        <field name="body_html" type="html">
+            <p>Bonjour {{ object.customer_id.name }},</p>
+            <p>Nous vous informons que les travaux sur votre véhicule
+            <strong>{{ object.vehicle_id.license_plate }}</strong> (OR {{ object.name }})
+            ont débuté.</p>
+            <p>Date de restitution estimée : <strong>{{ object.estimated_delivery_date }}</strong></p>
+            <p>Cordialement,<br/>{{ object.company_id.name }}</p>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- Email véhicule prêt                                           -->
+    <!-- ============================================================ -->
+    <record id="email_template_or_ready" model="mail.template">
+        <field name="name">Garage - Véhicule prêt</field>
+        <field name="model_id" ref="garage_pro.model_garage_repair_order"/>
+        <field name="email_from">{{ object.company_id.email }}</field>
+        <field name="email_to">{{ object.customer_id.email }}</field>
+        <field name="subject">Votre véhicule est prêt ! - {{ object.vehicle_id.license_plate }}</field>
+        <field name="body_html" type="html">
+            <p>Bonjour {{ object.customer_id.name }},</p>
+            <p>Bonne nouvelle ! Votre véhicule <strong>{{ object.vehicle_id.license_plate }}</strong>
+            est prêt à être récupéré.</p>
+            <p>Merci de prendre rendez-vous pour la restitution.</p>
+            <p>Cordialement,<br/>{{ object.company_id.name }}</p>
+        </field>
+    </record>
+
+</odoo>

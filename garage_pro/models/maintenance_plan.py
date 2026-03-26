@@ -94,3 +94,28 @@ class GarageMaintenancePlanItem(models.Model):
             if rec.next_due_date and rec.next_due_date < today:
                 overdue = True
             rec.is_overdue = overdue
+
+    # ------------------------------------------------------------------
+    # Crons
+    # ------------------------------------------------------------------
+
+    @api.model
+    def cron_maintenance_alerts(self):
+        """Alerte : entretien à venir dans les 30 prochains jours."""
+        today = fields.Date.today()
+        limit = today + relativedelta(days=30)
+        items = self.search([
+            ('next_due_date', '!=', False),
+            ('next_due_date', '<=', limit),
+            ('next_due_date', '>=', today),
+        ])
+        for item in items:
+            vehicle = item.plan_id.vehicle_id
+            if vehicle:
+                vehicle.activity_schedule(
+                    'mail.mail_activity_data_todo',
+                    date_deadline=item.next_due_date,
+                    summary="Entretien à planifier : %s — %s" % (
+                        item.name, vehicle.license_plate
+                    ),
+                )

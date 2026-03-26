@@ -23,3 +23,5 @@ from . import subcontract_order
 from . import courtesy_vehicle
 from . import courtesy_loan
 from . import account_move
+from . import quality_checklist
+from . import documentation
