@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 19 (conformité spec finale) — 2026-03-26
-## Statut global : Tous agents terminés (1-19) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19
+## Dernier agent : 20 (audit spec final) — 2026-03-26
+## Statut global : Tous agents terminés (1-20) ✅ — bugfix 15 + gaps 16 + compliance 17 + gaps fonctionnels 18 + conformité spec 19 + audit final 20
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -208,11 +208,20 @@
   - `__manifest__.py` — ajout dépendances `calendar` et `web`
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 20 : Audit spec final (2026-03-26)
+  - `email_template_or_delivered` — template email dédié pour restitution véhicule (distinct du "prêt")
+  - `action_deliver()` utilise maintenant `email_template_or_delivered` au lieu de `email_template_or_ready`
+  - `repair_order_line.bareme_code` + `bareme_source` — champs barème (Audatex/DAT/GT Motive) alignés sur quotation_line
+  - Vue Kanban sinistres — groupée par statut, carte avec référence/véhicule/client/montant/date
+  - Action sinistres mise à jour : `tree,kanban,form`
+  - Filtre "Suppléments en cours" + "Travaux en cours" ajoutés à la recherche sinistres
+  - Installation OK, 0 erreurs, 358 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-19) sont terminés
+- Rien — tous les agents (1-20) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -241,8 +250,8 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **288 tests garage_pro passent** (0 fail, 0 error)
-- **Tous les agents (1-19) sont terminés** — conformité spec validée
+- **358 tests garage_pro passent** (0 fail, 0 error)
+- **Tous les agents (1-20) sont terminés** — conformité spec validée + audit final
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
