@@ -78,12 +78,22 @@ class GaragePaintConsumption(models.Model):
             location_dest = self.env.ref(
                 'stock.location_production', raise_if_not_found=False
             ) or warehouse.lot_stock_id
+            # Utiliser le UoM du produit pour le mouvement stock,
+            # convertir la quantité si nécessaire
+            product_uom = rec.product_id.uom_id
+            qty = rec.quantity
+            if rec.uom_id and rec.uom_id != product_uom:
+                try:
+                    qty = rec.uom_id._compute_quantity(
+                        rec.quantity, product_uom)
+                except Exception:
+                    qty = rec.quantity
             move_vals = {
                 'name': "Conso peinture — %s" % (
                     rec.paint_operation_id.display_name or ''),
                 'product_id': rec.product_id.id,
-                'product_uom': rec.uom_id.id or rec.product_id.uom_id.id,
-                'product_uom_qty': rec.quantity,
+                'product_uom': product_uom.id,
+                'product_uom_qty': qty,
                 'location_id': location_src.id,
                 'location_dest_id': location_dest.id,
                 'garage_paint_consumption_id': rec.id,

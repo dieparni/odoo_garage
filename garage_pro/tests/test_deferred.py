@@ -260,13 +260,17 @@ class TestPaintConsumptionStock(TransactionCase):
             'repair_order_id': cls.ro.id,
             'name': 'Peinture test',
             'zone': 'hood',
-            'paint_type': 'base_clear',
+            'operation_type': 'base_coat',
         })
+        # Utiliser l'UoM litre pour le produit peinture
+        uom_litre = cls.env.ref('uom.product_uom_litre', raise_if_not_found=False)
         cls.product = cls.env['product.product'].create({
             'name': 'Base colorée Standox',
             'type': 'product',
             'list_price': 45.0,
             'standard_price': 30.0,
+            'uom_id': uom_litre.id if uom_litre else False,
+            'uom_po_id': uom_litre.id if uom_litre else False,
         })
 
     def test_01_stock_move_created(self):

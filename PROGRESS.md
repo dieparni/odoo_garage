@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 11 — 2026-03-26
-## Statut global : Phase 5 terminée (Agents 1 à 11 terminés) ✅
+## Dernier agent : 12 (champs différés) — 2026-03-26
+## Statut global : Phase 5 terminée + champs différés complétés ✅
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -122,12 +122,24 @@
   - Sécurité : 4 règles ACL (receptionist/manager) pour cache + wizard
   - `tests/test_carvertical.py` — 29 tests (cache, expiration, wizard, validation VIN, parse, mappings, application véhicule, settings, cache hit)
   - Installation OK, 0 erreurs, 218 tests garage_pro passent
+- Agent 12 : Champs différés — Formules, Marge, Stock (2026-03-26)
+  - `vehicle.paint_formula_ids` — One2many + count vers garage.paint.formula
+  - Onglet "Formules peinture" dans vehicle form (tree editable)
+  - `repair_order.total_cost`, `margin`, `margin_rate` — compute depuis `line_ids.cost_total`
+  - `repair_order_line.cost_price`, `cost_total` — coût unitaire et total par ligne
+  - `repair_order_line.stock_move_ids`, `parts_received` — lien stock.move + compute réception
+  - `models/stock_move.py` — extension stock.move (`garage_ro_line_id`, `garage_paint_consumption_id`)
+  - `paint_consumption.stock_move_id` — mouvement sortie auto à la création (stock → production)
+  - Conversion UoM automatique (produit vs consommation) dans `_create_stock_move`
+  - Vues : marge dans OR form footer + OR tree, cost_price/parts_received dans OR line tree
+  - `tests/test_deferred.py` — 16 tests (formules, marge, stock moves, consommation peinture)
+  - Installation OK, 0 erreurs, 234 tests garage_pro passent
 
 ### 🔧 En cours
 - Rien
 
 ### 📋 À faire
-- Rien — tous les agents (1-11) sont terminés
+- Rien — tous les agents (1-12) sont terminés
 
 ### ⚠️ Problèmes connus
 - `fleet.vehicle` utilise `vin_sn` (pas `vin`)
@@ -138,7 +150,7 @@
 - `fleet.vehicle.model_id` est NOT NULL en DB — impossible de tester la création marque/modèle via wizard sans modèle existant
 
 ### 📝 Champs différés (dépendent de modèles futurs)
-- `vehicle.paint_formula_ids` → garage.paint.formula — ✅ modèle créé, One2many à ajouter sur vehicle
+- ~~`vehicle.paint_formula_ids` → garage.paint.formula~~ ✅ Agent 12
 - ~~`vehicle.carvertical_*` → 4 champs CarVertical (Agent 11)~~ ✅
 - ~~`repair_order.technician_ids`, `workshop_chief_id` → hr.employee (Agent 5)~~ ✅
 - ~~`repair_order.planning_slot_ids` → garage.planning.slot (Agent 5)~~ ✅
@@ -149,15 +161,15 @@
 - ~~`repair_order.quality_checklist_ids`, `quality_checklist_count` → garage.quality.checklist (Agent 9)~~ ✅
 - ~~`repair_order.documentation_ids`, `photo_count` → garage.documentation (Agent 9)~~ ✅
 - ~~`claim.document_ids` → garage.documentation (Agent 9)~~ ✅
-- `repair_order.margin*` → compute basé sur invoice_ids (à enrichir)
-- `ro_line.stock_move_ids`, `parts_received` → stock.move (Agent 6 — à enrichir)
-- `paint_consumption` → stock.move pour décrémentation stock (à enrichir)
+- ~~`repair_order.margin*` → compute depuis line_ids.cost_total~~ ✅ Agent 12
+- ~~`ro_line.stock_move_ids`, `parts_received` → stock.move~~ ✅ Agent 12
+- ~~`paint_consumption` → stock.move pour décrémentation stock~~ ✅ Agent 12
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- 218 tests garage_pro passent (0 fail, 0 error)
-- **Toutes les phases (1-5) et tous les agents (1-11) sont terminés**
-- Les consommations peinture ne décrémentent pas encore le stock
+- 234 tests garage_pro passent (0 fail, 0 error)
+- **Toutes les phases (1-5) et tous les agents (1-12) sont terminés**
+- **Tous les champs différés sont implémentés** — plus rien en attente
 - Auto-création purchase.order sur rupture stock non implémentée
 - Le rapport facture personnalisé (QWeb) peut être ajouté plus tard
 - L'extension portail client (controllers/portal.py) peut être ajoutée dans un agent dédié
