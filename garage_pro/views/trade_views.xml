@@ -138,7 +138,7 @@
                                 <strong><field name="name"/></strong>
                                 <div><field name="repair_order_id"/></div>
                                 <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                                 </div>
                             </div>
                         </div>
@@ -324,7 +324,7 @@
                                 <strong><field name="name"/></strong>
                                 <div><field name="repair_order_id"/></div>
                                 <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                                 </div>
                             </div>
                         </div>
@@ -560,7 +560,7 @@
                                 <strong><field name="name"/></strong>
                                 <div><field name="repair_order_id"/></div>
                                 <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                                 </div>
                             </div>
                         </div>

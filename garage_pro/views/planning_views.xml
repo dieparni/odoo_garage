@@ -252,7 +252,7 @@
                                 <div><field name="vehicle_plate"/></div>
                                 <div><field name="post_id"/> — <field name="operation_type"/></div>
                                 <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user"/> <field name="technician_id"/>
+                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                                 </div>
                                 <div class="text-muted">
                                     <field name="start_datetime"/>
