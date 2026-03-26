@@ -318,3 +318,17 @@ class TestMaintenancePlan(TestTradesBase):
             'last_done_date': date.today(),
         })
         self.assertFalse(item.is_overdue)
+
+    def test_05_plan_item_no_last_done(self):
+        """next_due_km calculé même sans last_done_km (nouveau véhicule)."""
+        plan = self.env['garage.maintenance.plan'].create({
+            'vehicle_id': self.vehicle.id,
+        })
+        item = self.env['garage.maintenance.plan.item'].create({
+            'plan_id': plan.id,
+            'name': 'Première vidange',
+            'interval_km': 15000,
+            'interval_months': 12,
+        })
+        self.assertEqual(item.next_due_km, 15000)
+        self.assertTrue(item.next_due_date)

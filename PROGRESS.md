@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 24 (vérification) — 2026-03-26
-## Statut global : Tous agents terminés (1-22) ✅ — Vérifié : installation OK + 288 tests passent (0 fail)
+## Dernier agent : 25 (audit spec + gaps) — 2026-03-26
+## Statut global : Tous agents terminés (1-22) + audit gaps ✅ — Vérifié : installation OK + 292 tests passent (0 fail)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -243,6 +243,16 @@
   - Audit complet specs vs implémentation : tous les modèles/champs/workflows couverts
   - Installation OK, 0 erreurs, 288 tests garage_pro passent
 
+- Agent 25 : Audit spec final + comblement gaps (2026-03-26)
+  - **Fiscal position sur facture** : `_base_invoice_vals()` applique automatiquement la `fiscal_position_id` du partenaire (ex: intracommunautaire LU)
+  - **Autoliquidation sur rapport facture** : mention "Autoliquidation de la TVA — art. 44 CTVA" conditionnelle si position fiscale avec `vat_required`
+  - **Récapitulatif par catégorie sur rapport facture** : tableau résumé MO carrosserie/peinture/mécanique, pièces, sous-traitance, etc. avant les totaux
+  - **Maintenance plan fix** : `next_due_km` et `next_due_date` calculés même sans `last_done_km`/`last_done_date` (nouveau véhicule)
+  - **Différence assurance (scénario 9)** : champs `insurance_shortfall` (compute) + `shortfall_action` sur sinistre, scénario `shortfall_client` dans le wizard de facturation
+  - Vue sinistre : champs shortfall dans l'onglet Financier
+  - 4 tests ajoutés (fiscal position, shortfall, maintenance sans last_done)
+  - Installation OK, 0 erreurs, 292 tests garage_pro passent
+
 ### 🔧 En cours
 - Rien
 
@@ -279,8 +289,8 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **288 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
-- **Tous les agents (1-22) sont terminés** — conformité spec validée + audit final + gaps comblés + fiscal position LU
+- **292 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
+- **Tous les agents (1-22) + agent 25 (audit) sont terminés** — conformité spec validée + audit final + gaps comblés + fiscal position LU
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
 - **Portail client** opérationnel : OR, devis (avec accepter/refuser), documents/photos
