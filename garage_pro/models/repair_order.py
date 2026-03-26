@@ -1,8 +1,11 @@
 """Ordre de réparation — objet opérationnel central de l'atelier."""
 
+import logging
 from datetime import timedelta
 
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class GarageRepairOrder(models.Model):
@@ -466,13 +469,30 @@ class GarageRepairOrder(models.Model):
             if po_lines:
                 try:
                     with self.env.cr.savepoint():
-                        po = self.env['purchase.order'].with_company(
-                            self.company_id
-                        ).create({
+                        company = self.company_id or self.env.company
+                        picking_type = self.env['stock.picking.type'].search(
+                            [('code', '=', 'incoming'),
+                             ('warehouse_id.company_id', '=', company.id)],
+                            limit=1,
+                        )
+                        if not picking_type:
+                            picking_type = self.env[
+                                'stock.picking.type'
+                            ].search(
+                                [('code', '=', 'incoming'),
+                                 ('warehouse_id', '=', False)],
+                                limit=1,
+                            )
+                        vals = {
                             'partner_id': data['partner'].id,
                             'origin': self.name,
                             'order_line': po_lines,
-                        })
+                        }
+                        if picking_type:
+                            vals['picking_type_id'] = picking_type.id
+                        po = self.env['purchase.order'].with_company(
+                            company
+                        ).create(vals)
                         self.message_post(
                             body="Commande fournisseur <a href='#' "
                                  "data-oe-model='purchase.order' "
@@ -481,7 +501,11 @@ class GarageRepairOrder(models.Model):
                                  % (po.id, po.name),
                             message_type='notification',
                         )
-                except Exception:
+                except Exception as e:
+                    _logger.warning(
+                        "Auto-PO creation failed for %s: %s",
+                        self.name, e,
+                    )
                     self.message_post(
                         body="Impossible de créer automatiquement la "
                              "commande fournisseur pour %s. "

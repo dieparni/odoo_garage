@@ -196,7 +196,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         self.assertEqual(ro.state, 'parts_waiting')
 
     def test_03_auto_po_message_posted(self):
-        """Un message est posté quand il y a des pièces manquantes avec fournisseur."""
+        """Un PO brouillon est créé quand il y a des pièces manquantes avec fournisseur."""
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce auto-PO',
             'type': 'product',
@@ -206,6 +206,8 @@ class TestAutoPurchaseOrder(TransactionCase):
                 'price': 35.0,
             })],
         })
+
+        po_count_before = self.env['purchase.order'].search_count([])
 
         ro = self.env['garage.repair.order'].create({
             'vehicle_id': self.vehicle.id,
@@ -222,7 +224,17 @@ class TestAutoPurchaseOrder(TransactionCase):
         ro.action_confirm()
         self.assertEqual(ro.state, 'parts_waiting')
 
-        # Un message a été posté (soit PO créé, soit commande manuelle requise)
+        # Un PO a été créé
+        po_count_after = self.env['purchase.order'].search_count([])
+        self.assertEqual(po_count_after, po_count_before + 1,
+                         "Un bon de commande fournisseur doit être créé")
+        po = self.env['purchase.order'].search(
+            [('origin', '=', ro.name)], limit=1)
+        self.assertTrue(po, "Le PO doit avoir l'OR comme origine")
+        self.assertEqual(po.partner_id, self.supplier)
+        self.assertEqual(po.state, 'draft')
+
+        # Un message a été posté
         messages = ro.message_ids.filtered(
             lambda m: 'ommande' in (m.body or '').lower()
         )
