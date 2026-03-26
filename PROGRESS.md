@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 23 (vérification finale) — 2026-03-26
-## Statut global : Tous agents terminés (1-22) ✅ — Vérifié : installation OK + 358 tests passent (0 fail)
+## Dernier agent : 24 (vérification) — 2026-03-26
+## Statut global : Tous agents terminés (1-22) ✅ — Vérifié : installation OK + 288 tests passent (0 fail)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -279,7 +279,7 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **358 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
+- **288 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
 - **Tous les agents (1-22) sont terminés** — conformité spec validée + audit final + gaps comblés + fiscal position LU
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
