@@ -242,6 +242,25 @@ class GarageRepairOrder(models.Model):
         compute='_compute_photo_count',
     )
 
+    # === MARGE ===
+    total_cost = fields.Monetary(
+        string="Coût total",
+        compute='_compute_margin',
+        store=True,
+        currency_field='currency_id',
+    )
+    margin = fields.Monetary(
+        string="Marge",
+        compute='_compute_margin',
+        store=True,
+        currency_field='currency_id',
+    )
+    margin_rate = fields.Float(
+        string="Taux marge (%)",
+        compute='_compute_margin',
+        store=True,
+    )
+
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
     delivery_notes = fields.Html(string="Notes de restitution")
@@ -337,6 +356,16 @@ class GarageRepairOrder(models.Model):
                 rec.invoice_status = 'invoiced'
             else:
                 rec.invoice_status = 'partial'
+
+    @api.depends('line_ids.cost_total', 'amount_untaxed')
+    def _compute_margin(self):
+        for rec in self:
+            rec.total_cost = sum(rec.line_ids.mapped('cost_total'))
+            rec.margin = rec.amount_untaxed - rec.total_cost
+            if rec.amount_untaxed:
+                rec.margin_rate = (rec.margin / rec.amount_untaxed) * 100
+            else:
+                rec.margin_rate = 0.0
 
     @api.depends('line_ids.amount_total')
     def _compute_amounts(self):

@@ -97,6 +97,20 @@
                     </group>
                 </page>
 
+                <!-- Onglet Formules peinture -->
+                <page string="Formules peinture" name="page_paint_formulas">
+                    <field name="paint_formula_ids">
+                        <tree editable="bottom">
+                            <field name="paint_system_id"/>
+                            <field name="paint_code"/>
+                            <field name="formula_reference"/>
+                            <field name="variant_name"/>
+                            <field name="spectro_date"/>
+                            <field name="active" column_invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+
                 <!-- Onglet Notes -->
                 <page string="Notes internes" name="page_notes">
                     <field name="internal_notes"/>

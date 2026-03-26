@@ -137,6 +137,17 @@ class GarageVehicle(models.Model):
         tracking=True,
     )
 
+    # === FORMULES PEINTURE ===
+    paint_formula_ids = fields.One2many(
+        'garage.paint.formula',
+        'vehicle_id',
+        string="Formules teinte enregistrées",
+    )
+    paint_formula_count = fields.Integer(
+        compute='_compute_paint_formula_count',
+        string="Nombre de formules",
+    )
+
     # === HISTORIQUE ===
     claim_ids = fields.One2many(
         'garage.insurance.claim',
@@ -187,6 +198,10 @@ class GarageVehicle(models.Model):
     # ------------------------------------------------------------------
     # Compute
     # ------------------------------------------------------------------
+
+    def _compute_paint_formula_count(self):
+        for rec in self:
+            rec.paint_formula_count = len(rec.paint_formula_ids)
 
     def _compute_claim_count(self):
         for rec in self:

@@ -104,6 +104,31 @@ class GarageRepairOrderLine(models.Model):
         ('replace', 'Remplacement complet'),
     ], string="Niveau de dommage")
 
+    # === STOCK ===
+    stock_move_ids = fields.One2many(
+        'stock.move',
+        'garage_ro_line_id',
+        string="Mouvements stock",
+    )
+    parts_received = fields.Boolean(
+        string="Pièces reçues",
+        compute='_compute_parts_received',
+        store=True,
+    )
+
+    # === COÛT ===
+    cost_price = fields.Monetary(
+        string="Coût unitaire",
+        currency_field='currency_id',
+        help="Coût d'achat ou coût horaire technicien",
+    )
+    cost_total = fields.Monetary(
+        string="Coût total",
+        compute='_compute_cost_total',
+        store=True,
+        currency_field='currency_id',
+    )
+
     currency_id = fields.Many2one(related='repair_order_id.currency_id')
 
     # ------------------------------------------------------------------
@@ -121,3 +146,22 @@ class GarageRepairOrderLine(models.Model):
             else:
                 subtotal = line.quantity * line.unit_price
             line.amount_total = subtotal * (1 - (line.discount / 100.0))
+
+    @api.depends('stock_move_ids.state')
+    def _compute_parts_received(self):
+        for line in self:
+            moves = line.stock_move_ids
+            if moves:
+                line.parts_received = all(m.state == 'done' for m in moves)
+            else:
+                # Pas de mouvement stock = pas en attente de pièces
+                line.parts_received = True
+
+    @api.depends('quantity', 'cost_price', 'allocated_time', 'line_type')
+    def _compute_cost_total(self):
+        labor_types = ('labor_body', 'labor_paint', 'labor_mech')
+        for line in self:
+            if line.line_type in labor_types and line.allocated_time:
+                line.cost_total = line.allocated_time * line.cost_price
+            else:
+                line.cost_total = line.quantity * line.cost_price

@@ -106,6 +106,10 @@
                                     <field name="discount"/>
                                     <field name="amount_total" sum="Total"/>
                                     <field name="actual_time"/>
+                                    <field name="cost_price" optional="hide"/>
+                                    <field name="parts_received"
+                                           invisible="line_type not in ('parts', 'consumable')"
+                                           optional="hide"/>
                                     <field name="is_done"/>
                                     <field name="currency_id" column_invisible="1"/>
                                 </tree>
@@ -114,6 +118,9 @@
                                 <field name="amount_untaxed" class="oe_subtotal_footer_separator"/>
                                 <field name="amount_tax"/>
                                 <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                <field name="total_cost"/>
+                                <field name="margin"/>
+                                <field name="margin_rate" widget="progressbar"/>
                             </group>
                         </page>
                         <page string="Planning" name="page_planning">
@@ -187,6 +194,8 @@
                 <field name="vehicle_location" optional="show"/>
                 <field name="estimated_delivery_date" optional="show"/>
                 <field name="amount_total"/>
+                <field name="margin" optional="hide"/>
+                <field name="margin_rate" optional="hide"/>
                 <field name="priority" widget="priority" optional="hide"/>
                 <field name="state" widget="badge"
                        decoration-info="state in ('draft', 'confirmed')"

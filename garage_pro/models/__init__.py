@@ -27,4 +27,5 @@ from . import quality_checklist
 from . import documentation
 from . import report_revenue
 from . import carvertical_cache
+from . import stock_move
 from . import res_config_settings
