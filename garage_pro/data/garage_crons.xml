@@ -11,7 +11,6 @@
         <field name="code">model.cron_reminder_expertise()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
     </record>
 
@@ -25,7 +24,6 @@
         <field name="code">model.cron_ct_alerts()</field>
         <field name="interval_number">7</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
     </record>
 
@@ -39,7 +37,6 @@
         <field name="code">model.cron_maintenance_alerts()</field>
         <field name="interval_number">7</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
     </record>
 
@@ -53,7 +50,6 @@
         <field name="code">model.cron_vehicle_not_picked_up()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
         <field name="active">True</field>
     </record>
 
