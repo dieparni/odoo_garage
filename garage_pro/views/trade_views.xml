@@ -132,15 +132,11 @@
                 <field name="damage_zone"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="name"/></strong>
-                                <div><field name="repair_order_id"/></div>
-                                <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
-                                </div>
-                            </div>
+                    <t t-name="card">
+                        <strong><field name="name"/></strong>
+                        <div><field name="repair_order_id"/></div>
+                        <div class="text-muted" t-if="record.technician_id.value">
+                            <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                         </div>
                     </t>
                 </templates>
@@ -318,15 +314,11 @@
                 <field name="zone"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="name"/></strong>
-                                <div><field name="repair_order_id"/></div>
-                                <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
-                                </div>
-                            </div>
+                    <t t-name="card">
+                        <strong><field name="name"/></strong>
+                        <div><field name="repair_order_id"/></div>
+                        <div class="text-muted" t-if="record.technician_id.value">
+                            <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                         </div>
                     </t>
                 </templates>
@@ -554,15 +546,11 @@
                 <field name="operation_category"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="name"/></strong>
-                                <div><field name="repair_order_id"/></div>
-                                <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
-                                </div>
-                            </div>
+                    <t t-name="card">
+                        <strong><field name="name"/></strong>
+                        <div><field name="repair_order_id"/></div>
+                        <div class="text-muted" t-if="record.technician_id.value">
+                            <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
                         </div>
                     </t>
                 </templates>

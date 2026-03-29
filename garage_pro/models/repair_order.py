@@ -470,7 +470,7 @@ class GarageRepairOrder(models.Model):
                     'product_id': line.product_id.id,
                     'name': line.name,
                     'product_qty': qty_needed,
-                    'product_uom': (
+                    'product_uom_id': (
                         line.product_id.uom_po_id.id
                         or line.product_id.uom_id.id
                     ),

@@ -245,19 +245,15 @@
                 <field name="state"/>
                 <field name="vehicle_plate"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="repair_order_id"/></strong>
-                                <div><field name="vehicle_plate"/></div>
-                                <div><field name="post_id"/> — <field name="operation_type"/></div>
-                                <div class="text-muted" t-if="record.technician_id.value">
-                                    <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
-                                </div>
-                                <div class="text-muted">
-                                    <field name="start_datetime"/>
-                                </div>
-                            </div>
+                    <t t-name="card">
+                        <strong><field name="repair_order_id"/></strong>
+                        <div><field name="vehicle_plate"/></div>
+                        <div><field name="post_id"/> — <field name="operation_type"/></div>
+                        <div class="text-muted" t-if="record.technician_id.value">
+                            <i class="fa fa-user" title="Technicien"/> <field name="technician_id"/>
+                        </div>
+                        <div class="text-muted">
+                            <field name="start_datetime"/>
                         </div>
                     </t>
                 </templates>
