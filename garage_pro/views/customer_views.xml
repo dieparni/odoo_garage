@@ -10,13 +10,14 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <!-- Bouton anonymiser (RGPD) -->
-            <xpath expr="//div[hasclass('oe_title')]" position="after">
-                <div invisible="not is_garage_customer" class="float-end">
-                    <button name="action_anonymize" type="object"
-                            string="Anonymiser (RGPD)" class="btn-link text-danger"
-                            confirm="Cette action est irréversible. Toutes les données personnelles seront supprimées. Continuer ?"
-                            groups="garage_pro.group_manager"/>
-                </div>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_anonymize" type="object"
+                        class="oe_stat_button" icon="fa-user-secret"
+                        invisible="not is_garage_customer"
+                        confirm="Cette action est irréversible. Toutes les données personnelles seront supprimées. Continuer ?"
+                        groups="garage_pro.group_manager">
+                    <span class="d-block text-danger">Anonymiser (RGPD)</span>
+                </button>
             </xpath>
 
             <!-- Boutons smart -->
@@ -42,7 +43,7 @@
             </xpath>
 
             <!-- Bannière client bloqué -->
-            <xpath expr="//div[hasclass('oe_title')]" position="before">
+            <xpath expr="//sheet" position="inside">
                 <div class="alert alert-danger mb-0" role="alert"
                      invisible="not is_blocked_garage">
                     <strong>Client bloqué :</strong>
@@ -132,7 +133,7 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='display_name']" position="after">
+            <xpath expr="//field[@name='complete_name']" position="after">
                 <field name="garage_customer_type" optional="hide"/>
                 <field name="vehicle_count" string="Véhicules" optional="hide"/>
             </xpath>

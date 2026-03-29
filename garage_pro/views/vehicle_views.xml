@@ -62,24 +62,19 @@
                             <field name="drive_type"/>
                         </group>
                     </group>
-                    <group string="Électrique / Hybride"
-                           invisible="not is_electric">
-                        <group>
-                            <field name="is_electric" invisible="1"/>
+                    <group>
+                        <group string="Électrique / Hybride">
                             <field name="battery_capacity_kwh"/>
                             <field name="charge_connector_type"/>
+                            <field name="is_electric"/>
                         </group>
-                    </group>
-                </page>
-
-                <!-- Onglet Contrôle technique & Garantie -->
-                <page string="CT &amp; Garantie" name="page_ct_warranty">
-                    <group>
                         <group string="Contrôle technique">
                             <field name="ct_last_date"/>
                             <field name="ct_next_date"/>
                             <field name="ct_result"/>
                         </group>
+                    </group>
+                    <group>
                         <group string="Garantie">
                             <field name="warranty_end_date"/>
                             <field name="is_under_warranty"/>
@@ -122,10 +117,10 @@
     </record>
 
     <!-- ============================================================ -->
-    <!-- Tree : Extension fleet.vehicle                               -->
+    <!-- List : Extension fleet.vehicle                               -->
     <!-- ============================================================ -->
     <record id="garage_vehicle_tree" model="ir.ui.view">
-        <field name="name">fleet.vehicle.tree.garage</field>
+        <field name="name">fleet.vehicle.list.garage</field>
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_tree"/>
         <field name="arch" type="xml">
@@ -163,15 +158,14 @@
                         domain="[('body_type', '=', 'suv')]"/>
                 <filter string="Utilitaire" name="filter_utilitaire"
                         domain="[('body_type', '=', 'utilitaire')]"/>
-                <separator/>
-                <group>
-                    <filter string="Type carrosserie" name="group_body"
-                            context="{'group_by': 'body_type'}"/>
-                    <filter string="Propriété" name="group_ownership"
-                            context="{'group_by': 'ownership_type'}"/>
-                    <filter string="Système peinture" name="group_paint"
-                            context="{'group_by': 'paint_system_id'}"/>
-                </group>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Type carrosserie" name="group_body"
+                        context="{'group_by': 'body_type'}"/>
+                <filter string="Propriété" name="group_ownership"
+                        context="{'group_by': 'ownership_type'}"/>
+                <filter string="Système peinture" name="group_paint"
+                        context="{'group_by': 'paint_system_id'}"/>
             </xpath>
         </field>
     </record>
@@ -186,10 +180,6 @@
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Créez votre premier véhicule
-            </p>
-            <p>
-                Enregistrez les véhicules de vos clients avec leurs
-                caractéristiques techniques et historique.
             </p>
         </field>
     </record>
