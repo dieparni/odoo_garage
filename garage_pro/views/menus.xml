@@ -111,4 +111,15 @@
     <menuitem id="garage_menu_carvertical_cache" name="Cache CarVertical"
         parent="garage_menu_config"
         action="garage_carvertical_cache_action" sequence="40"/>
+
+    <!-- Reporting -->
+    <menuitem id="garage_menu_report_dashboard" name="Tableau de bord"
+        parent="garage_menu_reporting"
+        action="garage_dashboard_action" sequence="10"/>
+    <menuitem id="garage_menu_report_revenue" name="Chiffre d'affaires"
+        parent="garage_menu_reporting"
+        action="garage_report_revenue_action" sequence="20"/>
+    <menuitem id="garage_menu_report_activity" name="Activité atelier"
+        parent="garage_menu_reporting"
+        action="garage_report_activity_action" sequence="30"/>
 </odoo>
