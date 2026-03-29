@@ -41,12 +41,12 @@
         <field name="name">garage.paint.system.tree</field>
         <field name="model">garage.paint.system</field>
         <field name="arch" type="xml">
-            <tree string="Systèmes de peinture" editable="bottom">
+            <list string="Systèmes de peinture" editable="bottom">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="supplier_id"/>
                 <field name="active" column_invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -56,7 +56,7 @@
     <record id="garage_paint_system_action" model="ir.actions.act_window">
         <field name="name">Systèmes de peinture</field>
         <field name="res_model">garage.paint.system</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Ajoutez votre premier système de peinture (Standox, Sikkens, PPG...)

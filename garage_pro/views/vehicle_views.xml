@@ -102,14 +102,14 @@
                 <!-- Onglet Formules peinture -->
                 <page string="Formules peinture" name="page_paint_formulas">
                     <field name="paint_formula_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="paint_system_id"/>
                             <field name="paint_code"/>
                             <field name="formula_reference"/>
                             <field name="variant_name"/>
                             <field name="spectro_date"/>
                             <field name="active" column_invisible="1"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
 
@@ -164,7 +164,7 @@
                 <filter string="Utilitaire" name="filter_utilitaire"
                         domain="[('body_type', '=', 'utilitaire')]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Type carrosserie" name="group_body"
                             context="{'group_by': 'body_type'}"/>
                     <filter string="Propriété" name="group_ownership"
@@ -182,7 +182,7 @@
     <record id="garage_vehicle_action" model="ir.actions.act_window">
         <field name="name">Véhicules</field>
         <field name="res_model">fleet.vehicle</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">list,form,kanban</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Créez votre premier véhicule

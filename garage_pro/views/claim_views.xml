@@ -119,7 +119,7 @@
                         <!-- Onglet Suppléments -->
                         <page string="Suppléments" name="page_supplements">
                             <field name="supplement_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="name"/>
                                     <field name="amount"/>
                                     <field name="state" widget="badge"
@@ -129,7 +129,7 @@
                                            decoration-danger="state == 'rejected'"/>
                                     <field name="approved_amount"/>
                                     <field name="expert_response_date"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -222,7 +222,7 @@
         <field name="name">garage.insurance.claim.tree</field>
         <field name="model">garage.insurance.claim</field>
         <field name="arch" type="xml">
-            <tree string="Sinistres"
+            <list string="Sinistres"
                   decoration-danger="state == 'disputed'"
                   decoration-warning="state == 'vei'"
                   decoration-muted="state == 'cancelled'">
@@ -239,7 +239,7 @@
                        decoration-warning="state in ('expertise_pending', 'supplement_pending')"
                        decoration-success="state in ('approved', 'supplement_approved', 'paid')"
                        decoration-danger="state in ('vei', 'disputed', 'cancelled')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -318,7 +318,7 @@
                 <filter string="Grêle" name="filter_hail"
                         domain="[('claim_type', '=', 'hail')]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Statut" name="group_state"
                             context="{'group_by': 'state'}"/>
                     <filter string="Assurance" name="group_insurance"
@@ -338,7 +338,7 @@
     <record id="garage_claim_action" model="ir.actions.act_window">
         <field name="name">Sinistres</field>
         <field name="res_model">garage.insurance.claim</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">list,kanban,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Enregistrez votre premier sinistre

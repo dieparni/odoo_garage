@@ -78,7 +78,7 @@
     <record id="garage_invoice_action" model="ir.actions.act_window">
         <field name="name">Factures garage</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('is_garage_invoice', '=', True), ('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
         <field name="context">{'default_move_type': 'out_invoice', 'search_default_posted': 1}</field>
         <field name="help" type="html">
@@ -126,7 +126,7 @@
                         <field name="invoice_status"/>
                     </group>
                     <field name="invoice_ids">
-                        <tree>
+                        <list>
                             <field name="name"/>
                             <field name="partner_id"/>
                             <field name="garage_invoice_type"/>
@@ -138,7 +138,7 @@
                                    decoration-warning="payment_state == 'partial'"
                                    decoration-info="payment_state == 'not_paid'"/>
                             <field name="state" widget="badge"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </xpath>

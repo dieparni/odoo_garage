@@ -76,7 +76,7 @@
                     <notebook>
                         <page string="Lignes de devis" name="page_lines">
                             <field name="line_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="line_type"/>
                                     <field name="name"/>
@@ -92,7 +92,7 @@
                                     <field name="discount"/>
                                     <field name="amount_total" sum="Total"/>
                                     <field name="currency_id" column_invisible="1"/>
-                                </tree>
+                                </list>
                             </field>
                             <group class="oe_subtotal_footer">
                                 <field name="amount_labor"/>
@@ -115,11 +115,11 @@
                             <field name="parent_quotation_id"
                                    invisible="not parent_quotation_id"/>
                             <field name="supplement_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="state" widget="badge"/>
                                     <field name="amount_total"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Notes" name="page_notes">
@@ -150,7 +150,7 @@
         <field name="name">garage.quotation.tree</field>
         <field name="model">garage.quotation</field>
         <field name="arch" type="xml">
-            <tree string="Devis garage"
+            <list string="Devis garage"
                   decoration-muted="state == 'cancelled'"
                   decoration-info="state == 'draft'"
                   decoration-success="state == 'approved'">
@@ -166,7 +166,7 @@
                        decoration-warning="state == 'sent'"
                        decoration-success="state in ('approved', 'converted')"
                        decoration-danger="state in ('refused', 'cancelled')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -192,7 +192,7 @@
                 <filter string="Avec sinistre" name="filter_insurance"
                         domain="[('is_insurance_claim', '=', True)]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Statut" name="group_state"
                             context="{'group_by': 'state'}"/>
                     <filter string="Client" name="group_customer"
@@ -210,7 +210,7 @@
     <record id="garage_quotation_action" model="ir.actions.act_window">
         <field name="name">Devis</field>
         <field name="res_model">garage.quotation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Créez votre premier devis garage

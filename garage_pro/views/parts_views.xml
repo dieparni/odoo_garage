@@ -8,7 +8,7 @@
         <field name="name">product.template.garage.tree</field>
         <field name="model">product.template</field>
         <field name="arch" type="xml">
-            <tree string="Pièces garage">
+            <list string="Pièces garage">
                 <field name="default_code"/>
                 <field name="name"/>
                 <field name="garage_part_category"/>
@@ -19,7 +19,7 @@
                 <field name="list_price"/>
                 <field name="standard_price" optional="show"/>
                 <field name="categ_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -79,7 +79,7 @@
                 <filter string="Consignées" name="filter_consignment"
                         domain="[('is_consignment', '=', True)]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Catégorie garage" name="group_garage_categ"
                             context="{'group_by': 'garage_part_category'}"/>
                     <filter string="Catégorie produit" name="group_categ"
@@ -93,12 +93,12 @@
     <record id="garage_product_action" model="ir.actions.act_window">
         <field name="name">Pièces garage</field>
         <field name="res_model">product.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('is_garage_part', '=', True)]</field>
         <field name="context">{'default_is_garage_part': True, 'default_type': 'product',
             'search_default_filter_oem': 0}</field>
         <field name="view_ids" eval="[(5, 0, 0),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('garage_product_template_tree')})]"/>
+            (0, 0, {'view_mode': 'list', 'view_id': ref('garage_product_template_tree')})]"/>
         <field name="search_view_id" ref="garage_product_template_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

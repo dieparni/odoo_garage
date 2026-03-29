@@ -71,7 +71,7 @@
         <field name="name">garage.bodywork.operation.tree</field>
         <field name="model">garage.bodywork.operation</field>
         <field name="arch" type="xml">
-            <tree string="Opérations carrosserie"
+            <list string="Opérations carrosserie"
                   decoration-success="state == 'done'"
                   decoration-danger="state == 'blocked'">
                 <field name="repair_order_id"/>
@@ -87,7 +87,7 @@
                        decoration-warning="state == 'in_progress'"
                        decoration-success="state == 'done'"
                        decoration-danger="state == 'blocked'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -108,7 +108,7 @@
                 <filter string="Bloqué" name="filter_blocked"
                         domain="[('state', '=', 'blocked')]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="OR" name="group_ro"
                             context="{'group_by': 'repair_order_id'}"/>
                     <filter string="Statut" name="group_state"
@@ -148,7 +148,7 @@
     <record id="garage_bodywork_operation_action" model="ir.actions.act_window">
         <field name="name">Carrosserie</field>
         <field name="res_model">garage.bodywork.operation</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -223,7 +223,7 @@
                     <notebook>
                         <page string="Consommation produits" name="page_consumption">
                             <field name="product_consumption_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="product_id"/>
                                     <field name="product_type"/>
                                     <field name="quantity"/>
@@ -231,7 +231,7 @@
                                     <field name="unit_cost"/>
                                     <field name="total_cost" sum="Total"/>
                                     <field name="currency_id" column_invisible="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Notes qualité" name="page_notes">
@@ -253,7 +253,7 @@
         <field name="name">garage.paint.operation.tree</field>
         <field name="model">garage.paint.operation</field>
         <field name="arch" type="xml">
-            <tree string="Opérations peinture"
+            <list string="Opérations peinture"
                   decoration-success="state == 'done'"
                   decoration-warning="state == 'rework'">
                 <field name="repair_order_id"/>
@@ -269,7 +269,7 @@
                        decoration-warning="state in ('prep', 'booth', 'drying', 'polish')"
                        decoration-success="state == 'done'"
                        decoration-danger="state == 'rework'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -290,7 +290,7 @@
                 <filter string="Reprise" name="filter_rework"
                         domain="[('state', '=', 'rework')]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="OR" name="group_ro"
                             context="{'group_by': 'repair_order_id'}"/>
                     <filter string="Statut" name="group_state"
@@ -330,7 +330,7 @@
     <record id="garage_paint_operation_action" model="ir.actions.act_window">
         <field name="name">Peinture</field>
         <field name="res_model">garage.paint.operation</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucune opération de peinture
@@ -378,21 +378,21 @@
         <field name="name">garage.paint.formula.tree</field>
         <field name="model">garage.paint.formula</field>
         <field name="arch" type="xml">
-            <tree string="Formules peinture">
+            <list string="Formules peinture">
                 <field name="paint_code"/>
                 <field name="paint_system_id"/>
                 <field name="formula_reference"/>
                 <field name="variant_name"/>
                 <field name="vehicle_id"/>
                 <field name="spectro_date"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="garage_paint_formula_action" model="ir.actions.act_window">
         <field name="name">Formules peinture</field>
         <field name="res_model">garage.paint.formula</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucune formule peinture enregistrée
@@ -487,7 +487,7 @@
         <field name="name">garage.mechanic.operation.tree</field>
         <field name="model">garage.mechanic.operation</field>
         <field name="arch" type="xml">
-            <tree string="Opérations mécanique"
+            <list string="Opérations mécanique"
                   decoration-success="state == 'done'"
                   decoration-warning="state == 'waiting_parts'">
                 <field name="repair_order_id"/>
@@ -501,7 +501,7 @@
                        decoration-info="state == 'todo'"
                        decoration-warning="state in ('in_progress', 'waiting_parts')"
                        decoration-success="state == 'done'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -522,7 +522,7 @@
                 <filter string="Attente pièces" name="filter_parts"
                         domain="[('state', '=', 'waiting_parts')]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="OR" name="group_ro"
                             context="{'group_by': 'repair_order_id'}"/>
                     <filter string="Catégorie" name="group_cat"
@@ -562,7 +562,7 @@
     <record id="garage_mechanic_operation_action" model="ir.actions.act_window">
         <field name="name">Mécanique</field>
         <field name="res_model">garage.mechanic.operation</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="context">{'search_default_filter_todo': 1, 'search_default_filter_progress': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -589,7 +589,7 @@
                         <field name="vehicle_id"/>
                     </group>
                     <field name="item_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="name"/>
                             <field name="interval_km"/>
                             <field name="interval_months"/>
@@ -598,7 +598,7 @@
                             <field name="next_due_km"/>
                             <field name="next_due_date"/>
                             <field name="is_overdue" widget="boolean_toggle"/>
-                        </tree>
+                        </list>
                     </field>
                     <group>
                         <field name="notes" placeholder="Notes constructeur..."/>
@@ -612,17 +612,17 @@
         <field name="name">garage.maintenance.plan.tree</field>
         <field name="model">garage.maintenance.plan</field>
         <field name="arch" type="xml">
-            <tree string="Plans d'entretien">
+            <list string="Plans d'entretien">
                 <field name="vehicle_id"/>
                 <field name="name"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="garage_maintenance_plan_action" model="ir.actions.act_window">
         <field name="name">Plans d'entretien</field>
         <field name="res_model">garage.maintenance.plan</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucun plan d'entretien
@@ -641,7 +641,7 @@
             <xpath expr="//page[@name='page_notes']" position="before">
                 <page string="Carrosserie" name="page_bodywork">
                     <field name="bodywork_operation_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="name"/>
                             <field name="operation_type"/>
                             <field name="damage_zone"/>
@@ -655,12 +655,12 @@
                                    decoration-warning="state == 'in_progress'"
                                    decoration-success="state == 'done'"
                                    decoration-danger="state == 'blocked'"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
                 <page string="Peinture" name="page_paint">
                     <field name="paint_operation_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="name"/>
                             <field name="operation_type"/>
                             <field name="zone"/>
@@ -674,12 +674,12 @@
                                    decoration-success="state == 'done'"
                                    decoration-danger="state == 'rework'"/>
                             <field name="currency_id" column_invisible="1"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
                 <page string="Mécanique" name="page_mechanic">
                     <field name="mechanic_operation_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="name"/>
                             <field name="operation_category"/>
                             <field name="operation_type"/>
@@ -690,7 +690,7 @@
                                    decoration-info="state == 'todo'"
                                    decoration-warning="state in ('in_progress', 'waiting_parts')"
                                    decoration-success="state == 'done'"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </xpath>

@@ -37,7 +37,7 @@
                     <notebook>
                         <page string="Points de contrôle" name="page_items">
                             <field name="item_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="check_type" widget="badge"/>
@@ -48,7 +48,7 @@
                                     <field name="notes"/>
                                     <field name="photo" widget="image"
                                            options='{"size": [60, 60]}'/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Remarques" name="page_notes">
@@ -72,7 +72,7 @@
         <field name="name">garage.quality.checklist.tree</field>
         <field name="model">garage.quality.checklist</field>
         <field name="arch" type="xml">
-            <tree string="Checklists qualité"
+            <list string="Checklists qualité"
                   decoration-success="overall_result == 'pass'"
                   decoration-danger="overall_result == 'fail'"
                   decoration-warning="overall_result == 'partial'">
@@ -85,7 +85,7 @@
                        decoration-success="overall_result == 'pass'"
                        decoration-warning="overall_result == 'partial'"
                        decoration-danger="overall_result == 'fail'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -109,7 +109,7 @@
                 <filter string="Non contrôlé" name="filter_pending"
                         domain="[('is_fully_checked', '=', False)]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Type" name="group_type"
                             context="{'group_by': 'checklist_type'}"/>
                     <filter string="Résultat" name="group_result"
@@ -127,7 +127,7 @@
     <record id="garage_quality_checklist_action" model="ir.actions.act_window">
         <field name="name">Contrôle qualité</field>
         <field name="res_model">garage.quality.checklist</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucune checklist qualité
@@ -155,7 +155,7 @@
                                 icon="fa-plus"/>
                     </div>
                     <field name="quality_checklist_ids">
-                        <tree>
+                        <list>
                             <field name="checklist_type"/>
                             <field name="checked_by"/>
                             <field name="check_date"/>
@@ -164,12 +164,12 @@
                                    decoration-success="overall_result == 'pass'"
                                    decoration-warning="overall_result == 'partial'"
                                    decoration-danger="overall_result == 'fail'"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
                 <page string="Documents" name="page_documentation">
                     <field name="documentation_ids">
-                        <tree editable="bottom">
+                        <list editable="bottom">
                             <field name="name"/>
                             <field name="doc_type"/>
                             <field name="file" filename="filename"/>
@@ -179,7 +179,7 @@
                             <field name="taken_by"/>
                             <field name="taken_date"/>
                             <field name="is_visible_portal"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </page>
@@ -224,7 +224,7 @@
             <page name="page_documents" position="inside">
                 <separator string="Documents / Photos"/>
                 <field name="document_ids">
-                    <tree editable="bottom">
+                    <list editable="bottom">
                         <field name="name"/>
                         <field name="doc_type"/>
                         <field name="file" filename="filename"/>
@@ -234,7 +234,7 @@
                         <field name="taken_by"/>
                         <field name="taken_date"/>
                         <field name="is_visible_portal"/>
-                    </tree>
+                    </list>
                 </field>
             </page>
         </field>

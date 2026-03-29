@@ -46,7 +46,7 @@
                     <notebook>
                         <page string="Historique des prêts" name="page_loans">
                             <field name="loan_ids">
-                                <tree>
+                                <list>
                                     <field name="customer_id"/>
                                     <field name="repair_order_id"/>
                                     <field name="loan_start"/>
@@ -55,7 +55,7 @@
                                     <field name="km_start"/>
                                     <field name="km_end"/>
                                     <field name="state" widget="badge"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -73,7 +73,7 @@
         <field name="name">garage.courtesy.vehicle.tree</field>
         <field name="model">garage.courtesy.vehicle</field>
         <field name="arch" type="xml">
-            <tree string="Véhicules de courtoisie"
+            <list string="Véhicules de courtoisie"
                   decoration-success="state == 'available'"
                   decoration-warning="state == 'loaned'"
                   decoration-danger="state == 'maintenance'"
@@ -87,7 +87,7 @@
                        decoration-success="state == 'available'"
                        decoration-warning="state == 'loaned'"
                        decoration-danger="state in ('maintenance', 'unavailable')"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -95,7 +95,7 @@
     <record id="garage_courtesy_vehicle_action" model="ir.actions.act_window">
         <field name="name">Véhicules de courtoisie</field>
         <field name="res_model">garage.courtesy.vehicle</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Ajouter un véhicule de courtoisie
@@ -192,7 +192,7 @@
         <field name="name">garage.courtesy.loan.tree</field>
         <field name="model">garage.courtesy.loan</field>
         <field name="arch" type="xml">
-            <tree string="Prêts de courtoisie"
+            <list string="Prêts de courtoisie"
                   decoration-danger="state == 'damaged'">
                 <field name="courtesy_vehicle_id"/>
                 <field name="customer_id"/>
@@ -207,7 +207,7 @@
                        decoration-warning="state == 'active'"
                        decoration-success="state == 'returned'"
                        decoration-danger="state == 'damaged'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -226,7 +226,7 @@
                 <filter string="Avec dommage" name="filter_damaged"
                         domain="[('has_damage', '=', True)]"/>
                 <separator/>
-                <group expand="0" string="Grouper par">
+                <group>
                     <filter string="Véhicule" name="group_vehicle"
                             context="{'group_by': 'courtesy_vehicle_id'}"/>
                     <filter string="Statut" name="group_state"
@@ -240,7 +240,7 @@
     <record id="garage_courtesy_loan_action" model="ir.actions.act_window">
         <field name="name">Prêts de courtoisie</field>
         <field name="res_model">garage.courtesy.loan</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Créer un prêt de courtoisie
