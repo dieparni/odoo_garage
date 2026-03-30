@@ -180,6 +180,15 @@ class TestRepairOrderLineStock(TransactionCase):
             'vehicle_id': cls.vehicle.id,
             'customer_id': cls.partner.id,
         })
+        # S'assurer qu'un entrepôt existe pour les tests stock
+        cls.warehouse = cls.env['stock.warehouse'].search(
+            [('company_id', '=', cls.env.company.id)], limit=1)
+        if not cls.warehouse:
+            cls.warehouse = cls.env['stock.warehouse'].create({
+                'name': 'Test Warehouse ST',
+                'code': 'TWST',
+                'company_id': cls.env.company.id,
+            })
 
     def test_01_stock_move_fields_exist(self):
         """Les champs stock existent sur la ligne d'OR."""
@@ -217,14 +226,13 @@ class TestRepairOrderLineStock(TransactionCase):
             'name': 'Produit Test Stock',
             'type': 'consu',
         })
-        warehouse = self.env['stock.warehouse'].search([], limit=1)
         self.env['stock.move'].create({
             'name': 'Test move',
             'product_id': product.id,
             'product_uom': product.uom_id.id,
             'product_uom_qty': 1,
-            'location_id': warehouse.lot_stock_id.id,
-            'location_dest_id': warehouse.lot_stock_id.id,
+            'location_id': self.warehouse.lot_stock_id.id,
+            'location_dest_id': self.warehouse.lot_stock_id.id,
             'garage_ro_line_id': line.id,
         })
         line.invalidate_recordset()
@@ -262,6 +270,15 @@ class TestPaintConsumptionStock(TransactionCase):
             'zone': 'hood',
             'operation_type': 'base_coat',
         })
+        # S'assurer qu'un entrepôt existe pour les mouvements stock
+        cls.warehouse = cls.env['stock.warehouse'].search(
+            [('company_id', '=', cls.env.company.id)], limit=1)
+        if not cls.warehouse:
+            cls.warehouse = cls.env['stock.warehouse'].create({
+                'name': 'Test Warehouse PC',
+                'code': 'TWPC',
+                'company_id': cls.env.company.id,
+            })
         # Utiliser l'UoM litre pour le produit peinture
         uom_litre = cls.env.ref('uom.product_uom_litre', raise_if_not_found=False)
         cls.product = cls.env['product.product'].create({

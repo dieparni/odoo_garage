@@ -128,6 +128,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         cls.vehicle = cls.env['fleet.vehicle'].create({
             'model_id': model.id,
             'license_plate': 'PO-001',
+            'vin_sn': 'WDBRF61J31FAUTOPO',
         })
         cls.customer = cls.env['res.partner'].create({
             'name': 'Client PO Test',
@@ -137,6 +138,15 @@ class TestAutoPurchaseOrder(TransactionCase):
             'name': 'Fournisseur Pièces Test',
             'supplier_rank': 1,
         })
+        # S'assurer qu'un entrepôt existe
+        cls.warehouse = cls.env['stock.warehouse'].search(
+            [('company_id', '=', cls.env.company.id)], limit=1)
+        if not cls.warehouse:
+            cls.warehouse = cls.env['stock.warehouse'].create({
+                'name': 'Test Warehouse PO',
+                'code': 'TWPO',
+                'company_id': cls.env.company.id,
+            })
         cls.product = cls.env['product.product'].create({
             'name': 'Pièce test auto-PO',
             'type': 'consu',
@@ -323,11 +333,10 @@ class TestAutoPurchaseOrder(TransactionCase):
 
     def _add_stock(self, product, qty):
         """Helper pour ajouter du stock."""
-        warehouse = self.env['stock.warehouse'].search([], limit=1)
         self.env['stock.quant'].with_context(inventory_mode=True).create({
             'product_id': product.id,
             'inventory_quantity': qty,
-            'location_id': warehouse.lot_stock_id.id,
+            'location_id': self.warehouse.lot_stock_id.id,
         }).action_apply_inventory()
 
 
