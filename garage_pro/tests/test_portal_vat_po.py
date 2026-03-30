@@ -128,7 +128,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         cls.vehicle = cls.env['fleet.vehicle'].create({
             'model_id': model.id,
             'license_plate': 'PO-001',
-            'vin_sn': 'WDBRF61J31FAUTOPO',
+            'vin_sn': 'WDBRF61J31FAUT0P0',
         })
         cls.customer = cls.env['res.partner'].create({
             'name': 'Client PO Test',
@@ -150,6 +150,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         cls.product = cls.env['product.product'].create({
             'name': 'Pièce test auto-PO',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 50.0,
             'standard_price': 30.0,
             'seller_ids': [(0, 0, {
@@ -183,6 +184,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce sans stock',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 80.0,
             'seller_ids': [(0, 0, {
                 'partner_id': self.supplier.id,
@@ -210,6 +212,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce auto-PO',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 60.0,
             'seller_ids': [(0, 0, {
                 'partner_id': self.supplier.id,
@@ -278,6 +281,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         product_no_supplier = self.env['product.product'].create({
             'name': 'Pièce sans fournisseur',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 40.0,
         })
 
@@ -308,6 +312,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce activité test',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 50.0,
         })
 

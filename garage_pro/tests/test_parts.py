@@ -19,6 +19,7 @@ class TestGarageParts(TransactionCase):
             'is_garage_part': True,
             'garage_part_category': 'oem',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 350.0,
             'standard_price': 200.0,
         }
@@ -61,6 +62,7 @@ class TestGarageParts(TransactionCase):
             name='Vernis bi-composant 2K',
             garage_part_category='paint',
             type='consu',
+            is_storable=True,
         )
         self.assertEqual(part.garage_part_category, 'paint')
 
@@ -70,6 +72,7 @@ class TestGarageParts(TransactionCase):
             name='Disque abrasif P800',
             garage_part_category='consumable',
             type='consu',
+            is_storable=True,
         )
         self.assertEqual(part.garage_part_category, 'consumable')
 

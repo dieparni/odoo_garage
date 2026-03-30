@@ -89,8 +89,6 @@ class GaragePaintConsumption(models.Model):
                 except Exception:
                     qty = rec.quantity
             move_vals = {
-                'name': "Conso peinture — %s" % (
-                    rec.paint_operation_id.display_name or ''),
                 'product_id': rec.product_id.id,
                 'product_uom': product_uom.id,
                 'product_uom_qty': qty,

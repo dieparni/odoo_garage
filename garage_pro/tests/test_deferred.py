@@ -225,9 +225,9 @@ class TestRepairOrderLineStock(TransactionCase):
         product = self.env['product.product'].create({
             'name': 'Produit Test Stock',
             'type': 'consu',
+            'is_storable': True,
         })
         self.env['stock.move'].create({
-            'name': 'Test move',
             'product_id': product.id,
             'product_uom': product.uom_id.id,
             'product_uom_qty': 1,
@@ -284,6 +284,7 @@ class TestPaintConsumptionStock(TransactionCase):
         cls.product = cls.env['product.product'].create({
             'name': 'Base colorée Standox',
             'type': 'consu',
+            'is_storable': True,
             'list_price': 45.0,
             'standard_price': 30.0,
             'uom_id': uom_litre.id if uom_litre else False,

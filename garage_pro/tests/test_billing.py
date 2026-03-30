@@ -3,22 +3,17 @@
 from datetime import date
 
 from odoo.exceptions import UserError
-from odoo.tests.common import TransactionCase
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
-class TestGarageBilling(TransactionCase):
+class TestGarageBilling(AccountTestInvoicingCommon):
     """Tests unitaires pour la facturation garage multi-payeur."""
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Journal de vente (requis pour créer des account.move de type sale en Odoo 19)
-        cls.journal_sale = cls.env['account.journal'].create({
-            'name': 'Test Sale Journal',
-            'type': 'sale',
-            'code': 'TSLG',
-            'company_id': cls.env.company.id,
-        })
+        # Utiliser l'environnement admin pour éviter les problèmes de droits
+        cls.env = cls.env(user=cls.env.ref('base.user_admin'))
         # Client
         cls.partner = cls.env['res.partner'].create({
             'name': 'Client Facturation Test',
