@@ -12,8 +12,9 @@ class TestGarageBilling(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Utiliser l'environnement admin pour éviter les problèmes de droits
-        cls.env = cls.env(user=cls.env.ref('base.user_admin'))
+        # Ajouter le groupe garage manager à l'utilisateur de test
+        garage_manager = cls.env.ref('garage_pro.group_manager')
+        cls.env.user.group_ids += garage_manager
         # Client
         cls.partner = cls.env['res.partner'].create({
             'name': 'Client Facturation Test',
