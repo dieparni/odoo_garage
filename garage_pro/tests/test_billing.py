@@ -12,9 +12,19 @@ class TestGarageBilling(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Ajouter le groupe garage manager à l'utilisateur de test
+        # Ajouter les groupes nécessaires à l'utilisateur de test
         garage_manager = cls.env.ref('garage_pro.group_manager')
-        cls.env.user.group_ids += garage_manager
+        fleet_admin = cls.env.ref('fleet.fleet_group_manager')
+        cls.env.user.group_ids += garage_manager + fleet_admin
+        # S'assurer qu'un journal de vente existe pour la company courante
+        if not cls.env['account.journal'].search(
+                [('type', '=', 'sale'), ('company_id', '=', cls.env.company.id)], limit=1):
+            cls.env['account.journal'].create({
+                'name': 'Test Sale Journal',
+                'type': 'sale',
+                'code': 'TSLG',
+                'company_id': cls.env.company.id,
+            })
         # Client
         cls.partner = cls.env['res.partner'].create({
             'name': 'Client Facturation Test',
