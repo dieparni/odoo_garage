@@ -198,10 +198,10 @@ class GarageVehicle(models.Model):
     # === NOTES ===
     internal_notes = fields.Html(string="Notes internes")
 
-    _sql_constraints = [
-        ('vin_sn_unique', 'UNIQUE(vin_sn)',
-         'Ce numéro VIN/châssis existe déjà dans le système.'),
-    ]
+    _vin_sn_unique = models.Constraint(
+        'UNIQUE(vin_sn)',
+        'Ce numéro VIN/châssis existe déjà dans le système.',
+    )
 
     # ------------------------------------------------------------------
     # Compute

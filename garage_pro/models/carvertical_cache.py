@@ -21,9 +21,10 @@ class CarVerticalCache(models.Model):
         compute='_compute_expired',
     )
 
-    _sql_constraints = [
-        ('vin_unique', 'UNIQUE(vin)', 'Un seul cache par VIN.'),
-    ]
+    _vin_unique = models.Constraint(
+        'UNIQUE(vin)',
+        'Un seul cache par VIN.',
+    )
 
     @api.depends('lookup_date')
     def _compute_expired(self):

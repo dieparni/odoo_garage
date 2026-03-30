@@ -18,7 +18,7 @@ class TestGarageParts(TransactionCase):
             'name': 'Aile avant gauche Golf 7',
             'is_garage_part': True,
             'garage_part_category': 'oem',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 350.0,
             'standard_price': 200.0,
         }
@@ -60,7 +60,7 @@ class TestGarageParts(TransactionCase):
         part = self._create_part(
             name='Vernis bi-composant 2K',
             garage_part_category='paint',
-            type='product',
+            type='consu',
         )
         self.assertEqual(part.garage_part_category, 'paint')
 

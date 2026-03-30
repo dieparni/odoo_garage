@@ -471,8 +471,7 @@ class GarageRepairOrder(models.Model):
                     'name': line.name,
                     'product_qty': qty_needed,
                     'product_uom_id': (
-                        line.product_id.uom_po_id.id
-                        or line.product_id.uom_id.id
+                        line.product_id.uom_id.id
                     ),
                     'price_unit': (
                         line.product_id.seller_ids[:1].price

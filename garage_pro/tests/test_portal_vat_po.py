@@ -139,7 +139,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         })
         cls.product = cls.env['product.product'].create({
             'name': 'Pièce test auto-PO',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 50.0,
             'standard_price': 30.0,
             'seller_ids': [(0, 0, {
@@ -172,7 +172,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         """OR passe en attente pièces si stock insuffisant."""
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce sans stock',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 80.0,
             'seller_ids': [(0, 0, {
                 'partner_id': self.supplier.id,
@@ -199,7 +199,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         """Un PO brouillon est créé quand il y a des pièces manquantes avec fournisseur."""
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce auto-PO',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 60.0,
             'seller_ids': [(0, 0, {
                 'partner_id': self.supplier.id,
@@ -267,7 +267,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         """Si pas de fournisseur, message de notification posté."""
         product_no_supplier = self.env['product.product'].create({
             'name': 'Pièce sans fournisseur',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 40.0,
         })
 
@@ -297,7 +297,7 @@ class TestAutoPurchaseOrder(TransactionCase):
         """Une activité est planifiée quand il y a des pièces manquantes."""
         product_no_stock = self.env['product.product'].create({
             'name': 'Pièce activité test',
-            'type': 'product',
+            'type': 'consu',
             'list_price': 50.0,
         })
 
