@@ -167,6 +167,13 @@ class GarageInvoiceWizard(models.TransientModel):
             if line.product_id:
                 vals['product_id'] = line.product_id.id
             invoice_lines.append((0, 0, vals))
+        # Assurer que chaque ligne a un account_id (requis Odoo 19)
+        income_account = self._get_default_income_account()
+        if income_account:
+            for cmd in invoice_lines:
+                line_vals = cmd[2]
+                if 'account_id' not in line_vals and 'product_id' not in line_vals:
+                    line_vals['account_id'] = income_account.id
         return invoice_lines
 
     def _base_invoice_vals(self, ro, partner, garage_type):
@@ -186,10 +193,31 @@ class GarageInvoiceWizard(models.TransientModel):
             vals['fiscal_position_id'] = fp.id
         return vals
 
+
+
+    def _ensure_line_accounts(self, line_commands):
+        """Ajoute account_id aux lignes sans produit (requis Odoo 19)."""
+        income_account = self._get_default_income_account()
+        if income_account:
+            for cmd in line_commands:
+                if cmd[0] == 0:
+                    line_vals = cmd[2]
+                    if 'account_id' not in line_vals and 'product_id' not in line_vals:
+                        line_vals['account_id'] = income_account.id
+        return line_commands
+
+    def _get_default_income_account(self):
+        """Retourne le compte de revenu par défaut (requis Odoo 19)."""
+        return self.env['account.account'].search([
+            ('account_type', '=', 'income'),
+            ('company_ids', 'in', self.env.company.ids),
+        ], limit=1)
+
     def _create_client_full_invoice(self, ro):
         """Scénario 1 : facture client intégrale."""
         vals = self._base_invoice_vals(ro, ro.customer_id, 'client_full')
         vals['invoice_line_ids'] = self._prepare_invoice_lines(ro)
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         return self.env['account.move'].create(vals)
 
     def _create_insurance_split_invoices(self, ro):
@@ -223,6 +251,7 @@ class GarageInvoiceWizard(models.TransientModel):
                 'quantity': 1,
                 'price_unit': -franchise,
             }))
+        self._ensure_line_accounts(insurance_vals.get('invoice_line_ids', []))
         invoices |= self.env['account.move'].create(insurance_vals)
 
         # Facture franchise client
@@ -235,6 +264,7 @@ class GarageInvoiceWizard(models.TransientModel):
                 'quantity': 1,
                 'price_unit': franchise,
             })]
+            self._ensure_line_accounts(franchise_vals.get('invoice_line_ids', []))
             invoices |= self.env['account.move'].create(franchise_vals)
 
         return invoices
@@ -256,6 +286,7 @@ class GarageInvoiceWizard(models.TransientModel):
             ro, claim.insurance_company_id.partner_id, 'insurance'
         )
         vals['invoice_line_ids'] = self._prepare_invoice_lines(ro)
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         return self.env['account.move'].create(vals)
 
     def _create_deposit_invoice(self, ro):
@@ -269,6 +300,7 @@ class GarageInvoiceWizard(models.TransientModel):
             'quantity': 1,
             'price_unit': self.deposit_amount,
         })]
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         return self.env['account.move'].create(vals)
 
     def _create_partial_invoice(self, ro):
@@ -283,6 +315,7 @@ class GarageInvoiceWizard(models.TransientModel):
         vals['invoice_line_ids'] = self._prepare_invoice_lines(
             ro, line_filter=lambda l: l.is_done
         )
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         return self.env['account.move'].create(vals)
 
     def _create_courtesy_invoice(self, ro):
@@ -306,6 +339,7 @@ class GarageInvoiceWizard(models.TransientModel):
             'quantity': loan.billable_days,
             'price_unit': rate,
         })]
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         return self.env['account.move'].create(vals)
 
     def _create_shortfall_client_invoice(self, ro):
@@ -329,6 +363,7 @@ class GarageInvoiceWizard(models.TransientModel):
             'quantity': 1,
             'price_unit': shortfall,
         })]
+        self._ensure_line_accounts(vals.get('invoice_line_ids', []))
         invoice = self.env['account.move'].create(vals)
         # Marquer le traitement sur le sinistre
         claim.write({'shortfall_action': 'refund_client'})
