@@ -1,7 +1,7 @@
 # Garage Pro — Progression
 
-## Dernier agent : 25 (audit spec + gaps) — 2026-03-26
-## Statut global : Tous agents terminés (1-22) + audit gaps ✅ — Vérifié : installation OK + 292 tests passent (0 fail)
+## Dernier agent : Migration Odoo 19 — 2026-03-30
+## Statut global : Migration Odoo 17 → 19 complète ✅ — Installation OK + 269 tests passent (0 fail, 0 error)
 
 ### ✅ Terminé
 - Specs rédigées et déposées
@@ -253,6 +253,35 @@
   - 4 tests ajoutés (fiscal position, shortfall, maintenance sans last_done)
   - Installation OK, 0 erreurs, 292 tests garage_pro passent
 
+
+- **Migration Odoo 17 → 19** (2026-03-30)
+  - Branche `migration/odoo19`
+  - Odoo 19 installé dans /opt/odoo19, config mise à jour
+  - DB de test recréée sur Odoo 19
+  - `__manifest__.py` → version `19.0.1.0.0`
+  - `<tree>` → `<list>` (44 occurrences, 17 fichiers) + `view_mode` tree→list
+  - `kanban-box` → `card` + suppression `oe_kanban_global_click` (5 vues)
+  - `ir.module.category` → `res.groups.privilege` (5 groupes)
+  - `_sql_constraints` → `models.Constraint` (vehicle, carvertical_cache)
+  - `expand="0"` supprimé des search views (16 occurrences)
+  - `<group string="...">` → `<group>` dans search views
+  - `numbercall` supprimé des ir.cron (4 crons)
+  - `target="inline"` → `target="main"` (config settings)
+  - `product_uom` → `product_uom_id` (purchase.order.line)
+  - `uom_po_id` supprimé (plus de champ achat UoM en v19)
+  - `name` supprimé des stock.move.create (champ supprimé en v19)
+  - `product.template.type='product'` → `type='consu'` + `is_storable=True`
+  - `account.account.company_id` → `company_ids` (Many2many en v19)
+  - Xpath `oe_title` → adaptés pour nouvelle structure partner v19
+  - Xpath `display_name` → `complete_name` (partner list)
+  - Menuitems reporting déplacés vers menus.xml (ordre de chargement)
+  - Invoice wizard : ajout `account_id` pour lignes sans produit (requis v19)
+  - Tests adaptés : AccountTestInvoicingCommon, chart of accounts, droits
+  - Module s'installe sans erreur ✅
+  - 269 tests passent (0 fail, 0 error) ✅
+  - 5 rôles Garage (Réceptionniste/Technicien/Chef d'atelier/Comptable/Gérant) sous res.groups.privilege ✅
+  - Paramètres application accessibles (target=main) ✅
+
 ### 🔧 En cours
 - Rien
 
@@ -289,7 +318,7 @@
 
 ### 📝 Notes pour le prochain agent
 - Le module s'installe et se met à jour sans erreur
-- **292 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-26
+- **269 tests garage_pro passent** (0 fail, 0 error) — vérifié 2026-03-30 (Odoo 19)
 - **Tous les agents (1-22) + agent 25 (audit) sont terminés** — conformité spec validée + audit final + gaps comblés + fiscal position LU
 - **Tous les champs différés sont implémentés**
 - **4 rapports QWeb** : devis, OR, facture garage (inherit), checklist QC
