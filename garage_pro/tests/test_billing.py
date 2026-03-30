@@ -12,6 +12,13 @@ class TestGarageBilling(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # Journal de vente (requis pour créer des account.move de type sale en Odoo 19)
+        cls.journal_sale = cls.env['account.journal'].create({
+            'name': 'Test Sale Journal',
+            'type': 'sale',
+            'code': 'TSLG',
+            'company_id': cls.env.company.id,
+        })
         # Client
         cls.partner = cls.env['res.partner'].create({
             'name': 'Client Facturation Test',
